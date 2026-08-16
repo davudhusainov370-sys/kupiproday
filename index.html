@@ -2,7 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Купи Продай</title>
 
     <style>
@@ -12,97 +14,131 @@
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            color: #111;
-        }
-
-        header {
-            background: #111;
+            background: #202020;
             color: white;
-            padding: 20px;
-            font-size: 24px;
-            font-weight: bold;
+            font-family: Arial, sans-serif;
         }
 
-        .container {
-            padding: 16px;
+        .header {
+            background: #111111;
+            padding: 28px 36px;
+        }
+
+        .logo {
+            font-size: 42px;
+            font-weight: 700;
         }
 
         .search {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            margin-bottom: 20px;
+            margin: 38px 36px;
+            background: #3b3b3b;
+            border-radius: 28px;
+            padding: 25px 32px;
+            color: #999;
+            font-size: 24px;
         }
 
-        h2 {
-            font-size: 20px;
+        .title {
+            margin: 0 36px 28px;
+            font-size: 40px;
+            font-weight: 700;
         }
 
         .categories {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            padding: 0 36px;
         }
 
         .category {
-            background: white;
-            padding: 20px 10px;
-            border-radius: 15px;
-            text-align: center;
-            font-size: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            background: #111111;
+            border-radius: 30px;
+            min-height: 138px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 27px;
         }
 
-        .sell {
+        .sell-button {
             position: fixed;
-            bottom: 20px;
-            left: 16px;
-            right: 16px;
-            padding: 16px;
-            background: #111;
+            left: 36px;
+            right: 36px;
+            bottom: 35px;
+
+            background: #111111;
             color: white;
+
             border: none;
-            border-radius: 14px;
-            font-size: 18px;
-            font-weight: bold;
+            border-radius: 28px;
+
+            padding: 28px;
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+        .emoji {
+            margin-right: 12px;
         }
     </style>
 </head>
 
 <body>
 
-<header>
-    🛍️ Купи Продай
-</header>
+    <div class="header">
+        <div class="logo">
+            🛍️ Купи Продай
+        </div>
+    </div>
 
-<div class="container">
+    <div class="search">
+        🔍 Что хотите найти?
+    </div>
 
-    <input
-        class="search"
-        type="text"
-        placeholder="🔍 Что хотите найти?"
-    >
-
-    <h2>Категории</h2>
+    <div class="title">
+        Категории
+    </div>
 
     <div class="categories">
 
-        <div class="category">📱 Электроника</div>
-        <div class="category">🚗 Авто</div>
-        <div class="category">👕 Одежда</div>
-        <div class="category">🏠 Дом</div>
-        <div class="category">🎮 Игры</div>
-        <div class="category">📦 Другое</div>
+        <div class="category">
+            <span class="emoji">📱</span>
+            Электроника
+        </div>
+
+        <div class="category">
+            <span class="emoji">🚗</span>
+            Авто
+        </div>
+
+        <div class="category">
+            <span class="emoji">👕</span>
+            Одежда
+        </div>
+
+        <div class="category">
+            <span class="emoji">🏠</span>
+            Дом
+        </div>
+
+        <div class="category">
+            <span class="emoji">🎮</span>
+            Игры
+        </div>
+
+        <div class="category">
+            <span class="emoji">📦</span>
+            Другое
+        </div>
 
     </div>
 
-</div>
-
-<button>+ Продать товар</button>
+    <button class="sell-button">
+        ＋&nbsp; Продать товар
+    </button>
 
 </body>
 </html>
