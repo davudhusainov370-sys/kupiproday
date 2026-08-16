@@ -448,16 +448,14 @@
 ===================================== -->
 
 <div id="mainScreen">
-<div id="productsList">
-    
-</div>
+
 
     <div class="header">
 
         <div class="logo">
             🛍️ Купи Продай
         </div>
-
+        
     </div>
 
 
@@ -509,7 +507,9 @@
             Другое
         </div>
 
-
+<div id="productsList">
+    
+</div>
     </div>
 
 
@@ -818,7 +818,8 @@ const product = {
     price: price,
     category: category,
     city: city,
-    description: description
+    description: description,
+    photo: URL.createObjectURL(photo)
 };
 
 let products = JSON.parse(localStorage.getItem("products")) || [];
@@ -868,6 +869,8 @@ function showProducts() {
 
         list.innerHTML += `
         <div class="product-card">
+       
+        <img src="${product.photo}" width="150">
 
             <h3>${product.name}</h3>
 
