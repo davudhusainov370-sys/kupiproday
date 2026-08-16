@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -45,9 +46,7 @@
         }
 
 
-        /* =========================
-           ШАПКА
-        ========================= */
+        /* ШАПКА */
 
         .header {
             background: #111111;
@@ -61,9 +60,7 @@
         }
 
 
-        /* =========================
-           ПОИСК
-        ========================= */
+        /* ПОИСК */
 
         .search {
             margin: 36px 20px;
@@ -84,9 +81,7 @@
         }
 
 
-        /* =========================
-           ЗАГОЛОВКИ
-        ========================= */
+        /* ЗАГОЛОВОК */
 
         .title {
             margin: 0 20px 22px;
@@ -97,9 +92,7 @@
         }
 
 
-        /* =========================
-           КАТЕГОРИИ
-        ========================= */
+        /* КАТЕГОРИИ */
 
         .categories {
 
@@ -138,8 +131,6 @@
             min-width: 0;
 
             overflow: hidden;
-
-            cursor: pointer;
         }
 
 
@@ -155,21 +146,11 @@
         ========================= */
 
         #productsSection {
-
             margin-top: 35px;
-
-            padding-bottom: 20px;
         }
 
 
         #productsContainer {
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 16px;
-
             padding: 0 20px;
         }
 
@@ -180,9 +161,9 @@
 
             border-radius: 22px;
 
-            overflow: hidden;
+            margin-bottom: 18px;
 
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
         }
 
 
@@ -190,31 +171,26 @@
 
             width: 100%;
 
-            height: 230px;
+            height: 220px;
 
             object-fit: cover;
 
             display: block;
-
-            background: #303030;
         }
 
 
         .product-content {
-
             padding: 18px;
         }
 
 
         .product-name {
 
-            font-size: 23px;
+            font-size: 22px;
 
             font-weight: 700;
 
             margin-bottom: 8px;
-
-            word-break: break-word;
         }
 
 
@@ -224,7 +200,7 @@
 
             font-weight: 700;
 
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
 
@@ -234,9 +210,9 @@
 
             font-size: 15px;
 
-            margin-bottom: 12px;
-
             line-height: 1.5;
+
+            margin-bottom: 10px;
         }
 
 
@@ -248,11 +224,11 @@
 
             line-height: 1.5;
 
-            margin-bottom: 15px;
-
             white-space: pre-wrap;
 
             word-break: break-word;
+
+            margin-bottom: 15px;
         }
 
 
@@ -260,33 +236,29 @@
 
             width: 100%;
 
+            padding: 12px;
+
             border: none;
+
+            border-radius: 14px;
 
             background: #292929;
 
-            color: #ff6b6b;
-
-            padding: 13px;
-
-            border-radius: 14px;
+            color: #ff7777;
 
             font-size: 15px;
 
             font-weight: 700;
-
-            cursor: pointer;
         }
 
 
         .empty-products {
 
-            margin: 0 20px;
-
-            padding: 25px;
-
             background: #111111;
 
             border-radius: 20px;
+
+            padding: 22px;
 
             color: #888;
 
@@ -305,7 +277,6 @@
             position: fixed;
 
             left: 20px;
-
             right: 20px;
 
             bottom: 20px;
@@ -333,7 +304,7 @@
 
 
         /* =========================
-           ФОРМА ПРОДАЖИ
+           ЭКРАН ПРОДАЖИ
         ========================= */
 
         #sellForm {
@@ -356,6 +327,8 @@
                 40px;
         }
 
+
+        /* ЗАГОЛОВОК ФОРМЫ */
 
         .sell-header {
 
@@ -428,8 +401,6 @@
             overflow: hidden;
 
             cursor: pointer;
-
-            position: relative;
         }
 
 
@@ -458,7 +429,6 @@
 
 
         #productPhoto {
-
             display: none;
         }
 
@@ -499,7 +469,6 @@
 
 
         .select-field {
-
             appearance: auto;
         }
 
@@ -513,7 +482,7 @@
 
 
         /* =========================
-           КНОПКА ПУБЛИКАЦИИ
+           ПУБЛИКАЦИЯ
         ========================= */
 
         .publish-button {
@@ -535,13 +504,11 @@
             font-size: 19px;
 
             font-weight: 700;
-
-            cursor: pointer;
         }
 
 
         /* =========================
-           ЭФФЕКТ НАЖАТИЯ
+           НАЖАТИЕ
         ========================= */
 
         button:active,
@@ -601,18 +568,11 @@
             }
 
             #productsContainer {
-
                 padding: 0 16px;
             }
 
             .empty-products {
-
-                margin: 0 16px;
-            }
-
-            .product-image {
-
-                height: 200px;
+                margin: 0;
             }
 
             .sell-button {
@@ -629,6 +589,7 @@
 
                 font-size: 20px;
             }
+
         }
 
     </style>
@@ -646,8 +607,6 @@
 <div id="mainScreen">
 
 
-    <!-- ШАПКА -->
-
     <div class="header">
 
         <div class="logo">
@@ -657,14 +616,10 @@
     </div>
 
 
-    <!-- ПОИСК -->
-
     <div class="search">
         🔍&nbsp; Что хотите найти?
     </div>
 
-
-    <!-- КАТЕГОРИИ -->
 
     <div class="title">
         Категории
@@ -713,27 +668,27 @@
     </div>
 
 
-    <!-- =====================================
-         ОБЪЯВЛЕНИЯ
-    ===================================== -->
+    <!-- =========================
+         НОВЫЕ ОБЪЯВЛЕНИЯ
+    ========================= -->
 
     <div id="productsSection">
-
 
         <div class="title">
             Новые объявления
         </div>
 
-
         <div id="productsContainer"></div>
-
 
     </div>
 
 
-    <!-- КНОПКА ПРОДАТЬ -->
+    <!-- =========================
+         ПРОДАТЬ
+    ========================= -->
 
     <button
+        type="button"
         class="sell-button"
         onclick="openSellForm()">
 
@@ -757,6 +712,7 @@
 
 
         <button
+            type="button"
             class="back-button"
             onclick="closeSellForm()">
 
@@ -807,7 +763,6 @@
         id="productPhoto"
         type="file"
         accept="image/*"
-        onchange="previewPhoto()"
     >
 
 
@@ -904,6 +859,7 @@
     <!-- ПУБЛИКАЦИЯ -->
 
     <button
+        type="button"
         class="publish-button"
         onclick="publishProduct()">
 
@@ -923,7 +879,105 @@
    ХРАНИЛИЩЕ
 ===================================== */
 
-const STORAGE_KEY = "kupiproday_products";
+const STORAGE_KEY = "kupiproday_products_v1";
+
+
+
+/* =====================================
+   ОТКРЫТЬ ФОРМУ
+===================================== */
+
+function openSellForm() {
+
+    document.getElementById(
+        "mainScreen"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "sellForm"
+    ).style.display = "block";
+
+}
+
+
+
+/* =====================================
+   ЗАКРЫТЬ ФОРМУ
+===================================== */
+
+function closeSellForm() {
+
+    document.getElementById(
+        "sellForm"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "mainScreen"
+    ).style.display = "block";
+
+}
+
+
+
+/* =====================================
+   ФОТО
+===================================== */
+
+document
+    .getElementById("productPhoto")
+    .addEventListener(
+        "change",
+        function() {
+
+            const file =
+                this.files[0];
+
+
+            if (!file) {
+                return;
+            }
+
+
+            const preview =
+                document.getElementById(
+                    "photoPreview"
+                );
+
+
+            const placeholder =
+                document.getElementById(
+                    "photoPlaceholder"
+                );
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function(event) {
+
+                    preview.src =
+                        event.target.result;
+
+
+                    preview.style.display =
+                        "block";
+
+
+                    placeholder.style.display =
+                        "none";
+
+                };
+
+
+            reader.readAsDataURL(file);
+
+        }
+    );
+
 
 
 /* =====================================
@@ -932,11 +986,13 @@ const STORAGE_KEY = "kupiproday_products";
 
 function getProducts() {
 
-    const savedProducts =
-        localStorage.getItem(STORAGE_KEY);
+    const data =
+        localStorage.getItem(
+            STORAGE_KEY
+        );
 
 
-    if (!savedProducts) {
+    if (!data) {
 
         return [];
 
@@ -945,14 +1001,9 @@ function getProducts() {
 
     try {
 
-        return JSON.parse(savedProducts);
+        return JSON.parse(data);
 
     } catch (error) {
-
-        console.error(
-            "Ошибка чтения объявлений:",
-            error
-        );
 
         return [];
 
@@ -978,164 +1029,16 @@ function saveProducts(products) {
 
 
 /* =====================================
-   ОТКРЫТЬ ФОРМУ
+   ПУБЛИКАЦИЯ
 ===================================== */
 
-function openSellForm() {
-
-    document.getElementById(
-        "mainScreen"
-    ).style.display = "none";
+function publishProduct() {
 
 
-    document.getElementById(
-        "sellForm"
-    ).style.display = "block";
-
-
-    window.scrollTo(
-        0,
-        0
-    );
-
-}
-
-
-
-/* =====================================
-   ЗАКРЫТЬ ФОРМУ
-===================================== */
-
-function closeSellForm() {
-
-    document.getElementById(
-        "sellForm"
-    ).style.display = "none";
-
-
-    document.getElementById(
-        "mainScreen"
-    ).style.display = "block";
-
-
-    window.scrollTo(
-        0,
-        0
-    );
-
-}
-
-
-
-/* =====================================
-   ПРЕВЬЮ ФОТО
-===================================== */
-
-function previewPhoto() {
-
-
-    const input =
+    const photoInput =
         document.getElementById(
             "productPhoto"
         );
-
-
-    const preview =
-        document.getElementById(
-            "photoPreview"
-        );
-
-
-    const placeholder =
-        document.getElementById(
-            "photoPlaceholder"
-        );
-
-
-    if (
-        input.files &&
-        input.files[0]
-    ) {
-
-
-        const file =
-            input.files[0];
-
-
-        const imageURL =
-            URL.createObjectURL(file);
-
-
-        preview.src =
-            imageURL;
-
-
-        preview.style.display =
-            "block";
-
-
-        placeholder.style.display =
-            "none";
-
-    }
-
-}
-
-
-
-/* =====================================
-   ПРЕОБРАЗОВАНИЕ ФОТО В DATA URL
-===================================== */
-
-function convertImageToDataURL(
-    file
-) {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            const reader =
-                new FileReader();
-
-
-            reader.onload =
-                function(event) {
-
-                    resolve(
-                        event.target.result
-                    );
-
-                };
-
-
-            reader.onerror =
-                function(error) {
-
-                    reject(error);
-
-                };
-
-
-            reader.readAsDataURL(file);
-
-        }
-    );
-
-}
-
-
-
-/* =====================================
-   ПУБЛИКАЦИЯ ОБЪЯВЛЕНИЯ
-===================================== */
-
-async function publishProduct() {
-
-
-    const photo =
-        document.getElementById(
-            "productPhoto"
-        ).files[0];
 
 
     const name =
@@ -1169,9 +1072,9 @@ async function publishProduct() {
 
 
 
-    /* ПРОВЕРКА ФОТО */
+    /* ПРОВЕРКА */
 
-    if (!photo) {
+    if (!photoInput.files.length) {
 
         alert(
             "Пожалуйста, добавьте фотографию товара."
@@ -1181,9 +1084,6 @@ async function publishProduct() {
 
     }
 
-
-
-    /* ПРОВЕРКА ПОЛЕЙ */
 
     if (
         !name ||
@@ -1203,15 +1103,19 @@ async function publishProduct() {
 
 
 
+    const file =
+        photoInput.files[0];
+
+
     /* ПРОВЕРКА РАЗМЕРА */
 
     if (
-        photo.size >
+        file.size >
         5 * 1024 * 1024
     ) {
 
         alert(
-            "Фото слишком большое. Выберите фото до 5 МБ."
+            "Фото должно быть меньше 5 МБ."
         );
 
         return;
@@ -1220,119 +1124,125 @@ async function publishProduct() {
 
 
 
-    try {
+    /* ЧИТАЕМ ФОТО */
+
+    const reader =
+        new FileReader();
 
 
-        /* КОНВЕРТИРУЕМ ФОТО */
+    reader.onload =
+        function(event) {
 
-        const photoData =
-            await convertImageToDataURL(
-                photo
+
+            const product = {
+
+                id:
+                    Date.now(),
+
+                photo:
+                    event.target.result,
+
+                name:
+                    name,
+
+                price:
+                    price,
+
+                category:
+                    category,
+
+                city:
+                    city,
+
+                description:
+                    description,
+
+                date:
+                    new Date().toLocaleString(
+                        "ru-RU"
+                    )
+
+            };
+
+
+
+            /* ПОЛУЧАЕМ СТАРЫЕ */
+
+            const products =
+                getProducts();
+
+
+
+            /* ДОБАВЛЯЕМ НОВОЕ */
+
+            products.unshift(
+                product
             );
 
 
 
-        /* СОЗДАЁМ ОБЪЯВЛЕНИЕ */
+            /* СОХРАНЯЕМ */
 
-        const product = {
+            try {
 
-            id:
-                Date.now(),
+                saveProducts(
+                    products
+                );
 
-            name:
-                name,
+            } catch (error) {
 
-            price:
-                price,
+                alert(
+                    "Не удалось сохранить объявление. Возможно, фотография слишком большая."
+                );
 
-            category:
-                category,
+                return;
 
-            city:
-                city,
+            }
 
-            description:
-                description,
 
-            photo:
-                photoData,
 
-            date:
-                new Date().toLocaleString(
-                    "ru-RU"
-                )
+            /* ОЧИЩАЕМ ФОРМУ */
+
+            resetForm();
+
+
+
+            /* ЗАКРЫВАЕМ */
+
+            closeSellForm();
+
+
+
+            /* ПОКАЗЫВАЕМ */
+
+            renderProducts();
+
+
+            alert(
+                "Объявление опубликовано! 🎉"
+            );
 
         };
 
 
+    reader.onerror =
+        function() {
 
-        /* ПОЛУЧАЕМ СТАРЫЕ */
+            alert(
+                "Не удалось загрузить фотографию."
+            );
 
-        const products =
-            getProducts();
-
-
-
-        /* ДОБАВЛЯЕМ НОВОЕ В НАЧАЛО */
-
-        products.unshift(
-            product
-        );
+        };
 
 
-
-        /* СОХРАНЯЕМ */
-
-        saveProducts(
-            products
-        );
-
-
-
-        /* ОЧИЩАЕМ ФОРМУ */
-
-        resetForm();
-
-
-
-        /* ЗАКРЫВАЕМ */
-
-        closeSellForm();
-
-
-
-        /* ОБНОВЛЯЕМ СПИСОК */
-
-        renderProducts();
-
-
-
-        /* УВЕДОМЛЕНИЕ */
-
-        alert(
-            "Объявление успешно опубликовано! 🎉"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-
-        alert(
-            "Не удалось сохранить фотографию."
-        );
-
-    }
+    reader.readAsDataURL(file);
 
 }
 
 
 
 /* =====================================
-   ОЧИСТИТЬ ФОРМУ
+   ОЧИСТКА ФОРМЫ
 ===================================== */
 
 function resetForm() {
@@ -1380,4 +1290,72 @@ function resetForm() {
 
     document.getElementById(
         "photoPlaceholder"
-    ).style.disp
+    ).style.display = "block";
+
+}
+
+
+
+/* =====================================
+   ПОКАЗ ОБЪЯВЛЕНИЙ
+===================================== */
+
+function renderProducts() {
+
+
+    const container =
+        document.getElementById(
+            "productsContainer"
+        );
+
+
+    const products =
+        getProducts();
+
+
+    container.innerHTML = "";
+
+
+
+    if (
+        products.length === 0
+    ) {
+
+        container.innerHTML = `
+
+            <div class="empty-products">
+
+                Пока нет объявлений.<br><br>
+
+                Добавьте первый товар
+                через кнопку
+                «＋ Продать товар».
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+
+    products.forEach(
+        function(product) {
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "product-card";
+
+
+            card.innerHTML = `
+
+                <img
+                    class="product-ima
