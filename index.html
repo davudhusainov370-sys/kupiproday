@@ -670,6 +670,7 @@
 
     </button>
 
+
 </div>
 
 
@@ -783,32 +784,6 @@ function publishProduct() {
 
     }
 
-function publishProduct() {
-
-    const photo =
-        document.getElementById("productPhoto").files[0];
-
-    const name =
-        document.getElementById("productName").value.trim();
-
-    const price =
-        document.getElementById("productPrice").value.trim();
-
-    const category =
-        document.getElementById("productCategory").value;
-
-    const city =
-        document.getElementById("productCity").value.trim();
-
-    const description =
-        document.getElementById("productDescription").value.trim();
-
-
-    if (!photo) {
-        alert("Пожалуйста, добавьте фотографию товара.");
-        return;
-    }
-
 
     if (
         !name ||
@@ -817,53 +792,28 @@ function publishProduct() {
         !city ||
         !description
     ) {
+
         alert("Пожалуйста, заполните все поля.");
+
         return;
+
     }
 
 
-    // получаем старые объявления
-    let ads = JSON.parse(localStorage.getItem("ads")) || [];
 
-
-    // создаём новое объявление
-    let newAd = {
-
-        id: Date.now(),
-
-        name: name,
-
-        price: price,
-
-        category: category,
-
-        city: city,
-
-        description: description,
-
-        photo: URL.createObjectURL(photo)
-
-    };
-
-
-    // добавляем объявление
-    ads.push(newAd);
-
-
-    // сохраняем
-    localStorage.setItem(
-        "ads",
-        JSON.stringify(ads)
-    );
-
+    /* ВРЕМЕННАЯ ПУБЛИКАЦИЯ */
 
     alert(
-        "Объявление сохранено! 🎉\n\n" +
-        name
+        "Объявление создано! 🎉\n\n" +
+        name + "\n" +
+        price + " ₽\n" +
+        category + "\n" +
+        city
     );
 
 
-    // очистка формы
+
+    /* ОЧИСТКА ФОРМЫ */
 
     document.getElementById("productPhoto").value = "";
 
@@ -887,8 +837,6 @@ function publishProduct() {
 
     closeSellForm();
 
-
-}
 }
 
 </script>
