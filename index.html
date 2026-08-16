@@ -887,38 +887,7 @@ function publishProduct() {
 
     closeSellForm();
 
-}
-function loadAds() {
 
-    let ads = JSON.parse(localStorage.getItem("ads")) || [];
-
-    let container = document.getElementById("adsContainer");
-
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    if (ads.length === 0) {
-        container.innerHTML = "<p>Объявлений пока нет</p>";
-        return;
-    }
-
-    ads.forEach(ad => {
-
-        let card = document.createElement("div");
-
-        card.innerHTML = `
-            <img src="${ad.photo}" width="200">
-            <h3>${ad.name}</h3>
-            <p>Цена: ${ad.price} €</p>
-            <p>${ad.category}</p>
-            <p>${ad.city}</p>
-            <p>${ad.description}</p>
-        `;
-
-        container.appendChild(card);
-
-    });
 }
 }
 
