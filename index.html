@@ -448,7 +448,9 @@
 ===================================== -->
 
 <div id="mainScreen">
-
+<div id="productsList">
+    
+</div>
 
     <div class="header">
 
@@ -811,7 +813,21 @@ function publishProduct() {
         city
     );
 
+const product = {
+    name: name,
+    price: price,
+    category: category,
+    city: city,
+    description: description
+};
 
+let products = JSON.parse(localStorage.getItem("products")) || [];
+
+products.push(product);
+
+localStorage.setItem("products", JSON.stringify(products));
+
+showProducts();
 
     /* ОЧИСТКА ФОРМЫ */
 
@@ -838,7 +854,37 @@ function publishProduct() {
     closeSellForm();
 
 }
+function showProducts() {
 
+    const list = document.getElementById("productsList");
+
+    if (!list) return;
+
+    let products = JSON.parse(localStorage.getItem("products")) || [];
+
+    list.innerHTML = "";
+
+    products.forEach(product => {
+
+        list.innerHTML += `
+        <div class="product-card">
+
+            <h3>${product.name}</h3>
+
+            <p>Цена: ${product.price} ₽</p>
+
+            <p>Категория: ${product.category}</p>
+
+            <p>Город: ${product.city}</p>
+
+            <p>${product.description}</p>
+
+        </div>
+        `;
+
+    });
+
+}
 </script>
 
 
