@@ -864,25 +864,26 @@ function showProducts() {
 
     let products = JSON.parse(localStorage.getItem("products")) || [];
 
-    list.innerHTML += `
-list.innerHTML += `
-<div class="product-card">
+    list.innerHTML = "";
+
+    products.forEach(product => {
+
+        list.innerHTML += `
+        <div class="product-card">
        
-<img src="${product.photo}" width="150">
+        <img src="${product.photo}" width="150">
 
-<h3>${product.name}</h3>
+            <h3>${product.name}</h3>
 
-<p>Цена: ${product.price} ₽</p>
+            <p>Цена: ${product.price} ₽</p>
 
-<p>Категория: ${product.category}</p>
+            <p>Категория: ${product.category}</p>
 
-<p>Город: ${product.city}</p>
+            <p>Город: ${product.city}</p>
 
-<p>${product.description}</p>
+            <p>${product.description}</p>
 
-</div>
-
-`;
+        </div>
         `;
 
     });
