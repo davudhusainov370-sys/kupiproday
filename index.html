@@ -864,7 +864,7 @@ function showProducts() {
 
     let products = JSON.parse(localStorage.getItem("products")) || [];
 
-    list.innerHTML = "list.innerHTML += ``;";
+    list.innerHTML = "list.innerHTML = "";
 
     products.forEach(product => {
 
