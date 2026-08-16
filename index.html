@@ -858,6 +858,8 @@ showProducts();
 }
 function showProducts() {
 
+function showProducts() {
+
     const list = document.getElementById("productsList");
 
     if (!list) return;
@@ -869,9 +871,26 @@ function showProducts() {
     products.forEach(product => {
 
         list.innerHTML += `
-        list.innerHTML
+        <div class="product-card">
+
+            <img src="${product.photo}" width="150">
+
+            <h3>${product.name}</h3>
+
+            <p>Цена: ${product.price} ₽</p>
+
+            <p>Категория: ${product.category}</p>
+
+            <p>Город: ${product.city}</p>
+
+            <p>${product.description}</p>
+
+        </div>
+        `;
 
     });
+
+}
 
 }
 </script>
