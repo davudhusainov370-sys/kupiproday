@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+          content="width=device-width,
+                   initial-scale=1.0,
+                   maximum-scale=1.0,
+                   user-scalable=no">
 
     <title>Купи Продай</title>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -18,6 +22,10 @@
             color: white;
             font-family: Arial, sans-serif;
         }
+
+        /* =========================
+           ГЛАВНЫЙ ЭКРАН
+        ========================= */
 
         .header {
             background: #111111;
@@ -49,6 +57,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 28px;
             padding: 0 36px;
+            padding-bottom: 150px;
         }
 
         .category {
@@ -61,6 +70,10 @@
             justify-content: center;
 
             font-size: 27px;
+        }
+
+        .emoji {
+            margin-right: 12px;
         }
 
         .sell-button {
@@ -80,27 +93,157 @@
             font-weight: 700;
         }
 
-        .emoji {
-            margin-right: 12px;
+
+        /* =========================
+           ЭКРАН "ПРОДАТЬ ТОВАР"
+        ========================= */
+
+        #sellForm {
+            display: none;
+
+            position: fixed;
+            inset: 0;
+
+            background: #202020;
+
+            z-index: 1000;
+
+            overflow-y: auto;
+
+            padding: 25px 20px 40px;
         }
+
+        .sell-header {
+            display: flex;
+            align-items: center;
+
+            margin-bottom: 30px;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+
+            color: white;
+
+            font-size: 42px;
+
+            padding: 0 15px 0 0;
+        }
+
+        .sell-title {
+            margin: 0;
+
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+
+        /* =========================
+           ПОЛЯ ФОРМЫ
+        ========================= */
+
+        .input-field,
+        .select-field,
+        .textarea-field {
+
+            width: 100%;
+
+            padding: 18px;
+
+            margin-bottom: 16px;
+
+            border: none;
+
+            border-radius: 18px;
+
+            background: #383838;
+
+            color: white;
+
+            font-size: 18px;
+
+            outline: none;
+        }
+
+        .input-field::placeholder,
+        .textarea-field::placeholder {
+            color: #999;
+        }
+
+        .select-field {
+            appearance: auto;
+        }
+
+        .textarea-field {
+            height: 150px;
+
+            resize: none;
+        }
+
+
+        /* =========================
+           КНОПКА ПУБЛИКАЦИИ
+        ========================= */
+
+        .publish-button {
+
+            width: 100%;
+
+            padding: 20px;
+
+            margin-top: 5px;
+
+            border: none;
+
+            border-radius: 20px;
+
+            background: #111111;
+
+            color: white;
+
+            font-size: 20px;
+
+            font-weight: 700;
+        }
+
+        .publish-button:active,
+        .sell-button:active,
+        .category:active {
+            transform: scale(0.98);
+        }
+
     </style>
 </head>
 
+
 <body>
 
+
+<!-- =====================================
+     ГЛАВНЫЙ ЭКРАН
+===================================== -->
+
+<div id="mainScreen">
+
     <div class="header">
+
         <div class="logo">
             🛍️ Купи Продай
         </div>
+
     </div>
 
+
     <div class="search">
-        🔍 Что хотите найти?
+        🔍&nbsp; Что хотите найти?
     </div>
+
 
     <div class="title">
         Категории
     </div>
+
 
     <div class="categories">
 
@@ -136,9 +279,246 @@
 
     </div>
 
-    <button class="sell-button">
+
+    <button
+        class="sell-button"
+        onclick="openSellForm()">
+
         ＋&nbsp; Продать товар
+
     </button>
+
+</div>
+
+
+
+<!-- =====================================
+     ЭКРАН ПРОДАЖИ
+===================================== -->
+
+<div id="sellForm">
+
+
+    <div class="sell-header">
+
+        <button
+            class="back-button"
+            onclick="closeSellForm()">
+
+            ‹
+
+        </button>
+
+        <h2 class="sell-title">
+            Продать товар
+        </h2>
+
+    </div>
+
+
+    <!-- Название -->
+
+    <input
+        id="productName"
+        class="input-field"
+        type="text"
+        placeholder="Название товара"
+    >
+
+
+    <!-- Цена -->
+
+    <input
+        id="productPrice"
+        class="input-field"
+        type="number"
+        placeholder="Цена, ₽"
+    >
+
+
+    <!-- Категория -->
+
+    <select
+        id="productCategory"
+        class="select-field">
+
+        <option value="">
+            Выберите категорию
+        </option>
+
+        <option value="Электроника">
+            📱 Электроника
+        </option>
+
+        <option value="Авто">
+            🚗 Авто
+        </option>
+
+        <option value="Одежда">
+            👕 Одежда
+        </option>
+
+        <option value="Дом">
+            🏠 Дом
+        </option>
+
+        <option value="Игры">
+            🎮 Игры
+        </option>
+
+        <option value="Другое">
+            📦 Другое
+        </option>
+
+    </select>
+
+
+    <!-- Город -->
+
+    <input
+        id="productCity"
+        class="input-field"
+        type="text"
+        placeholder="Город"
+    >
+
+
+    <!-- Описание -->
+
+    <textarea
+        id="productDescription"
+        class="textarea-field"
+        placeholder="Описание товара"
+    ></textarea>
+
+
+    <!-- Публикация -->
+
+    <button
+        class="publish-button"
+        onclick="publishProduct()">
+
+        🚀 Опубликовать объявление
+
+    </button>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =====================================
+   ОТКРЫТЬ ФОРМУ
+===================================== */
+
+function openSellForm() {
+
+    document.getElementById("mainScreen").style.display = "none";
+
+    document.getElementById("sellForm").style.display = "block";
+
+}
+
+
+
+/* =====================================
+   ЗАКРЫТЬ ФОРМУ
+===================================== */
+
+function closeSellForm() {
+
+    document.getElementById("sellForm").style.display = "none";
+
+    document.getElementById("mainScreen").style.display = "block";
+
+}
+
+
+
+/* =====================================
+   ПУБЛИКАЦИЯ ТОВАРА
+===================================== */
+
+function publishProduct() {
+
+
+    const name =
+        document.getElementById("productName").value.trim();
+
+
+    const price =
+        document.getElementById("productPrice").value.trim();
+
+
+    const category =
+        document.getElementById("productCategory").value;
+
+
+    const city =
+        document.getElementById("productCity").value.trim();
+
+
+    const description =
+        document.getElementById("productDescription").value.trim();
+
+
+
+    /* Проверяем заполнение */
+
+    if (
+        !name ||
+        !price ||
+        !category ||
+        !city ||
+        !description
+    ) {
+
+        alert("Пожалуйста, заполните все поля.");
+
+        return;
+
+    }
+
+
+
+    /* Пока просто показываем сообщение */
+
+    alert(
+        "Объявление создано!\n\n" +
+        name + "\n" +
+        price + " ₽\n" +
+        category + "\n" +
+        city
+    );
+
+
+
+    /* Очищаем форму */
+
+    document.getElementById("productName").value = "";
+
+    document.getElementById("productPrice").value = "";
+
+    document.getElementById("productCategory").value = "";
+
+    document.getElementById("productCity").value = "";
+
+    document.getElementById("productDescription").value = "";
+
+
+
+    /* Возвращаемся на главный экран */
+
+    closeSellForm();
+
+}
+
+
+</script>
+
 
 </body>
 </html>
