@@ -972,6 +972,9 @@ showProducts();
 }
 function showProducts() {
 
+   document.addEventListener("DOMContentLoaded", function() {
+    showProducts();
+});
     const list = document.getElementById("productsList");
 
     if (!list) return;
