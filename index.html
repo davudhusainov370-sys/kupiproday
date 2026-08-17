@@ -467,7 +467,42 @@
                 font-size: 20px;
 
             }
-        }
+        /* Карточки товаров */
+
+#productsList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 100px;
+}
+
+.product-card {
+    background: #ffffff;
+    color: #222;
+    border-radius: 20px;
+    padding: 15px;
+    width: calc(100% - 32px);
+    max-width: 350px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.product-card img {
+    width: 100% !important;
+    height: 220px !important;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+.product-card h3 {
+    margin: 12px 0;
+    font-size: 24px;
+}
+
+.product-card p {
+    margin: 8px 0;
+    font-size: 17px;
+}}
 
     </style>
 
