@@ -34,6 +34,43 @@
   .search input::placeholder { color: var(--text-mute); }
   .icon-btn { width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text); display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
   .icon-btn:active { background: #222; }
+  .balance-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 10px; }
+  .balance-value { font-size: 30px; font-weight: 800; color: var(--text); margin: 2px 0 6px; }
+  .balance-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .balance-label { font-size: 12px; color: var(--text-dim); }
+  .balance-value { font-size: 24px; font-weight: 700; }
+  .balance-note { font-size: 12px; color: var(--text-mute); margin-top: 8px; }
+  .topup-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+  .chip-btn { padding: 12px 6px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text); font-size: 14px; cursor: pointer; }
+  .chip-btn.active { border-color: var(--blue); background: var(--blue-dim); border-width: 2px; }
+  .op-list { display: flex; flex-direction: column; gap: 6px; }
+  .op-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 13px; color: var(--text); }
+  .op-row .op-date { font-size: 11.5px; color: var(--text-mute); margin-top: 2px; }
+  .seg { display: flex; gap: 6px; margin: 6px 0 12px; }
+  .ad.premium { border-color: #d4af37; box-shadow: 0 0 0 1px rgba(212,175,55,.35), 0 8px 20px rgba(212,175,55,.12); }
+  .ad-badge { position: absolute; right: 8px; border-radius: 10px; padding: 2px 8px; font-size: 10px; font-weight: 700; backdrop-filter: blur(6px); background: rgba(10,10,10,.6); }
+  .badge-pin { top: 42px; color: #ffd54a; }
+  .badge-boost { top: 72px; color: #7ee0ff; }
+  .ad-badges { position: absolute; left: 8px; bottom: 8px; display: flex; gap: 4px; flex-wrap: wrap; max-width: 74%; pointer-events: none; }
+  .ad-pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; color: #fff; backdrop-filter: blur(4px); margin-right: 4px; }
+  .b-new { background: rgba(46,160,67,.88); }
+  .b-trade { background: rgba(59,130,246,.88); }
+  .b-urgent { background: rgba(239,68,68,.88); }
+  .b-premium { background: rgba(212,175,55,.92); color: #1c1400; }
+  .badge-row { display: flex; gap: 10px; }
+  .badge-check { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text); background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; }
+  .badge-check input { width: 18px; height: 18px; accent-color: var(--blue); }
+  .pro-label { font-size: 9px; font-weight: 700; color: #d4af37; border: 1px solid rgba(212,175,55,.5); padding: 0 4px; border-radius: 6px; margin-left: 5px; vertical-align: 1px; }
+  .plan-pro { color: #d4af37; font-weight: 600; margin: 4px 0 10px !important; }
+  .seg { display: flex; gap: 8px; margin-bottom: 10px; }
+  .seg-btn { flex: 1; padding: 10px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim); font-size: 14px; cursor: pointer; }
+  .seg-btn.active { color: #fff; border-color: var(--blue); background: var(--blue-dim); }
+  .shop-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 8px; }
+  .shop-item .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .shop-item .nm { font-size: 14px; font-weight: 600; }
+  .shop-item .ds { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .shop-price { font-size: 14px; font-weight: 700; color: var(--blue); white-space: nowrap; }
+  .btn-sm { padding: 8px 14px; font-size: 13px; }
   .badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px; background: var(--blue); color: #fff; font-size: 11px; font-weight: 600; border-radius: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg); }
   .city-row { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 13px; color: var(--text-dim); cursor: pointer; }
   .city-row b { color: var(--text); font-weight: 600; }
@@ -145,6 +182,9 @@
 <div id="app">
   <header id="header">
     <div class="top-row">
+      <button class="icon-btn back-btn hidden" id="catBack" onclick="exitCategory()" aria-label="Назад">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
       <div class="search" onclick="goTab('search')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="searchInput" placeholder="Поиск товаров..." oninput="onSearch(this.value)" />
@@ -190,6 +230,12 @@
         <div class="field"><label>Категория</label><select id="f-cat" onchange="renderExtraFields()"></select></div>
         <div id="extraFields"></div>
         <div class="field"><label>Цена, ₽</label><input id="f-price" type="number" placeholder="0" /></div>
+        <div class="field"><label>Бейджи</label>
+          <div class="badge-row">
+            <label class="badge-check"><input type="checkbox" id="f-trade" /> Торг</label>
+            <label class="badge-check"><input type="checkbox" id="f-urgent" /> Срочно</label>
+          </div>
+        </div>
         <div class="field"><label>Описание</label><textarea id="f-desc" placeholder="Опишите товар, состояние, причину продажи..."></textarea></div>
         <div class="field"><label>Город</label><input id="f-city" readonly /></div>
         <div class="field"><label>Связь: @username Telegram</label><input id="f-tg" placeholder="@username" /></div>
@@ -206,6 +252,11 @@
 
     <section id="view-profile" class="hidden">
       <div style="padding:10px 4px 4px">
+        <div class="seg" id="profSeg">
+        <button class="seg-btn active" id="profSegMain" onclick="setProfTab('main')">Профиль</button>
+        <button class="seg-btn" id="profSegOps" onclick="setProfTab('ops')">История операций</button>
+      </div>
+      <div id="profTab">
         <div class="seller-card">
           <div class="top">
             <div class="ava" id="profAva">У</div>
@@ -216,10 +267,21 @@
             <span>В избранном: <b style="color:var(--text)" id="profFav">0</b></span>
           </div>
         </div>
+        <div class="balance-card">
+          <div class="balance-label">Баланс</div>
+          <div class="balance-value" id="profBalance">0 ₽</div>
+          <div class="balance-note">Баланс не выводится и не возвращается — тратится на услуги внутри приложения</div>
+          <button class="btn" onclick="openTopUp()">Пополнить баланс</button>
+        </div>
+        <button class="btn ghost" style="margin-bottom:10px" onclick="openShop(false)">🏪 Магазин услуг</button>
         <button class="btn ghost" style="margin-bottom:10px" onclick="myAds()">Мои объявления</button>
         <button class="btn ghost" style="margin-bottom:10px" onclick="openCity()">Сменить город</button>
         <button class="btn ghost hidden" id="adminBtn" style="margin-bottom:10px;color:var(--blue);border-color:var(--blue-dim)" onclick="openAdmin()">Админ-панель</button>
         <button class="btn ghost" onclick="showAbout()">О приложении</button>
+      </div>
+      <div id="opsTab" class="hidden">
+        <div class="section-title" style="margin-top:6px">История операций</div>
+        <div class="op-list" id="profOps"></div>
       </div>
     </section>
 
@@ -291,6 +353,12 @@
             <button class="btn ghost" style="flex:1" onclick="editAd()">Редактировать</button>
             <button class="btn ghost" style="flex:1;color:#ff5a5a;border-color:#5a2222" onclick="deleteAd()">Удалить</button>
           </div>
+          <div id="promoActions" class="hidden" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+            <button class="btn ghost btn-sm" onclick="buyPromo('boost')">⚡ Поднять в топ</button>
+            <button class="btn ghost btn-sm" onclick="buyPromo('highlight')">🎨 Выделить</button>
+            <button class="btn ghost btn-sm" onclick="buyPromo('pin')">📌 Закрепить</button>
+            <button class="btn ghost btn-sm" onclick="openShop(false)">🏪 Все услуги</button>
+          </div>
           <button id="statusBtn" class="btn ghost hidden" style="margin-top:10px" onclick="toggleStatus()"></button>
           <button id="renewBtn" class="btn ghost hidden" style="margin-top:10px;color:var(--blue);border-color:var(--blue-dim)" onclick="renewAd()">Продлить на 30 дней</button>
           <button id="reportBtn" class="btn ghost hidden" style="margin-top:10px;color:var(--text-dim)" onclick="openReport()">Пожаловаться</button>
@@ -323,6 +391,28 @@
       <div class="ads" id="adminList"></div>
       <p class="sub" style="margin-top:18px">Журнал модерации</p>
       <div class="ads" id="modList"></div>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="topUpSheet" onclick="if(event.target===this)closeSheet('topUpSheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <h2>Пополнить баланс</h2>
+      <p class="sub">Баланс не выводится и не возвращается</p>
+      <div class="topup-presets" id="topUpPresets"></div>
+      <button class="btn" id="topUpPayBtn" onclick="payTopUp()">Оплатить картой или СБП</button>
+      <p class="sub" id="topUpInfo" style="text-align:center"></p>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="shopSheet" onclick="if(event.target===this)closeSheet('shopSheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <h2>Магазин услуг</h2>
+      <p class="sub" id="shopSub">Услуги по продвижению объявлений</p>
+      <div id="shopServices"></div>
+      <div class="section-title" style="margin-top:14px">Тарифы</div>
+      <div id="shopPlans"></div>
     </div>
   </div>
 
@@ -462,6 +552,7 @@ let state = {
   loading: false,
   newImages: [],
   backToMine: false,
+  activeCat: null,
 };
 function mineViewActive() { return !document.getElementById('view-mine').classList.contains('hidden'); }
 
@@ -530,12 +621,36 @@ function accentAlpha(hex) {
   return hex + '40';
 }
 
+const BADGE_MAP = {
+  new: { t: 'Новое', c: 'b-new' },
+  trade: { t: 'Торг', c: 'b-trade' },
+  urgent: { t: 'Срочно', c: 'b-urgent' },
+  premium: { t: 'Премиум', c: 'b-premium' },
+};
+function badgeIds(a) {
+  const ids = [];
+  const p = a.promo || {};
+  if (a.createdAt && a.createdAt * 1000 > Date.now() - 3 * 86400000) ids.push('new');
+  if ((a.badges || []).includes('trade')) ids.push('trade');
+  if ((a.badges || []).includes('urgent')) ids.push('urgent');
+  if (p.highlight) ids.push('premium');
+  return ids;
+}
+function badgePills(a) {
+  return badgeIds(a).map(b => `<span class="ad-pill ${BADGE_MAP[b].c}">${BADGE_MAP[b].t}</span>`).join('');
+}
+
 function adHTML(a, opts) {
   const timer = (opts && opts.my && a.isMine) ? daysLeftText(a) : '';
+  const p = a.promo || {};
+  const badges = (p.pin ? '<span class="ad-badge badge-pin">📌 Закреплено</span>' : '') + (p.boost ? '<span class="ad-badge badge-boost">⚡ В топе</span>' : '');
+  const pills = badgePills(a);
   return `
-  <div class="ad" onclick="openAd(${a.id})">
+  <div class="ad${p.highlight ? ' premium' : ''}" onclick="openAd(${a.id})">
     <div class="ad-img">
       ${timer}
+      ${badges}
+      ${pills ? `<div class="ad-badges">${pills}</div>` : ''}
       ${a.images && a.images.length ? `<img class="ad-cover" src="${a.images[0]}" alt="" />` : `<svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>`}
       <button class="fav ${a.fav ? 'active' : ''}" onclick="event.stopPropagation();toggleFav(${a.id})">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="${a.fav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
@@ -546,8 +661,8 @@ function adHTML(a, opts) {
       <div class="ad-title">${escapeHtml(a.title)}</div>
       <div class="ad-meta"><span>${escapeHtml(a.city)}</span><span class="dot"></span><span>${catName(a.category)}</span>${cardExtra(a)}${a.status === 'sold' ? '<span class="dot"></span><span style="color:var(--blue)">Продано</span>' : ''}${a.status === 'expired' ? '<span class="dot"></span><span style="color:#ff5a5a">Срок истёк</span>' : ''}</div>
       <div class="ad-seller">
-        <div class="ava">${(a.seller || '?')[0]}</div>
-        <div class="name">${escapeHtml(a.seller || 'Пользователь')}</div>
+        <div class="ava" style="${a.sellerPro ? 'border-color:#d4af37' : ''}">${(a.seller || '?')[0]}</div>
+        <div class="name">${escapeHtml(a.seller || 'Пользователь')}${a.sellerPro ? '<span class="pro-label">PRO</span>' : ''}</div>
         <div class="contact">${a.tg ? 'Telegram' : 'Телефон'}</div>
       </div>
     </div>
@@ -573,7 +688,7 @@ async function loadAds() {
 }
 
 async function loadMe() {
-  try { state.me = await api('/api/me'); renderProfile(); } catch (e) { /* ignore */ }
+  try { state.me = await api('/api/me'); renderProfile(); renderBalance(); } catch (e) { /* ignore */ }
 }
 
 /* ===== Render ===== */
@@ -604,8 +719,135 @@ function renderProfile() {
   $('#adminBtn').classList.toggle('hidden', !(me && me.isAdmin));
 }
 
+function fmtRub(kopecks) { return ((kopecks || 0) / 100).toLocaleString('ru-RU') + ' ₽'; }
+function fmtDate(ts) { return ts ? new Date(ts * 1000).toLocaleDateString('ru-RU') : ''; }
+function fmtKop(kopecks) { return ((kopecks || 0) / 100).toLocaleString('ru-RU', { maximumFractionDigits: 0 }); }
+
+/* ===== Balance / Top-up ===== */
+let topUpAmount = 10000;
+const TOPUP_PRESETS = [10000, 50000, 100000, 300000, 1000000];
+let profTab = 'main';
+function setProfTab(tab) {
+  profTab = tab;
+  $('#profSegMain').classList.toggle('active', tab === 'main');
+  $('#profSegOps').classList.toggle('active', tab === 'ops');
+  $('#profTab').classList.toggle('hidden', tab !== 'main');
+  $('#opsTab').classList.toggle('hidden', tab !== 'ops');
+  if (tab === 'ops') renderBalance();
+}
+async function renderBalance() {
+  try {
+    const b = await api('/api/balance');
+    $('#profBalance').textContent = fmtRub(b.balance);
+    const ops = (b.ops || []).slice(0, 50);
+    $('#profOps').innerHTML = ops.length ? ops.map(op => {
+      const label = escapeHtml(op.note || (op.amount > 0 ? 'Пополнение' : 'Списание'));
+      const date = op.created_at ? `<div class="op-date">${fmtDate(op.created_at)}</div>` : '';
+      return `<div class="op-row"><span>${label}${date}</span><span style="color:${op.amount > 0 ? '#4ad98c' : '#ff5a5a'}">${op.amount > 0 ? '+' : '−'}${fmtRub(Math.abs(op.amount))}</span></div>`;
+    }).join('') : emptyHTML('Операций пока нет');
+  } catch (e) {}
+}
+async function openTopUp() {
+  const m = await api('/api/pay/methods').then(r => r).catch(() => ({}));
+  topUpAmount = TOPUP_PRESETS[0];
+  renderTopUpPresets();
+  $('#topUpInfo').textContent = m.yookassa ? '' : 'Приём платежей не настроен — пополнение пока недоступно';
+  openSheet('topUpSheet');
+}
+function renderTopUpPresets() {
+  $('#topUpPresets').innerHTML = TOPUP_PRESETS.map(s =>
+    `<button class="chip-btn${s === topUpAmount ? ' active' : ''}" onclick="pickTopUp(${s})" style="${s === topUpAmount ? 'font-size:16px;font-weight:700' : ''}">${fmtKop(s)} ₽</button>`
+  ).join('');
+}
+function pickTopUp(s) { topUpAmount = s; renderTopUpPresets(); }
+async function payTopUp() {
+  const btn = $('#topUpPayBtn');
+  btn.disabled = true;
+  try {
+    const r = await api('/api/checkout/create', { method: 'POST', body: { amount_kopecks: topUpAmount } });
+    if (r.confirmation_url) window.open(r.confirmation_url, '_blank');
+    closeSheet('topUpSheet');
+    $('#topUpInfo').textContent = '';
+    toast('Открываем оплату картой или СБП…');
+    await loadMe();
+  } catch (e) {
+    toast(e.message);
+  }
+  btn.disabled = false;
+}
+
+/* ===== Shop: promo & plans ===== */
+state.shop = null;
+let shopAdId = null;
+async function loadShop() {
+  if (!state.shop) state.shop = await api('/api/shop');
+  return state.shop;
+}
+async function openShop(fromAd) {
+  shopAdId = fromAd || shopAdId;
+  $('#shopServices').innerHTML = '<div class="loading">Загрузка…</div>';
+  $('#shopPlans').innerHTML = '';
+  openSheet('shopSheet');
+  try {
+    const s = await loadShop();
+    const limits = s.limits || {};
+    $('#shopSub').textContent = 'Ваш тариф: ' + limits.planName + (limits.endsAt ? ' · до ' + fmtDate(limits.endsAt) : '');
+    $('#shopServices').innerHTML = s.services.length ? s.services.map(sv => `
+      <div class="shop-item"><div class="row">
+        <div><div class="nm">${escapeHtml(sv.name)}</div><div class="ds">${escapeHtml(sv.desc || '')}</div></div>
+        <div class="row" style="flex:0"><span class="shop-price">${fmtKop(sv.kopecks)} ₽</span><button class="btn btn-sm" onclick="buyService('${sv.id}')">Купить</button></div>
+      </div></div>`).join('') : emptyHTML('Пока нет услуг');
+    $('#shopPlans').innerHTML = s.plans.map(p => {
+      const perks = fmtPerks(p.perks);
+      return `<div class="shop-item"><div class="row">
+        <div><div class="nm">${escapeHtml(p.name)}${limits.planName === p.name ? ' <span class="pro-label">активен</span>' : ''}${p.price === 0 ? ' <span style="color:var(--text-dim);font-size:12px">бесплатно</span>' : ''}</div>
+        <div class="ds">${escapeHtml(perks)} · ${p.duration_days} дней</div></div>
+        <div class="row" style="flex:0"><span class="shop-price">${p.price === 0 ? '0 ₽' : fmtKop(p.price) + ' ₽'}</span><button class="btn btn-sm" onclick="buyPlan(${p.id})">${p.price === 0 ? 'Подключить' : 'Купить'}</button></div>
+      </div></div>`;
+    }).join('');
+  } catch (e) { $('#shopServices').innerHTML = emptyHTML('Ошибка загрузки'); }
+}
+function fmtPerks(perks) {
+  const arr = [];
+  if (perks.maxAds === 0) arr.push('∞ объявлений'); else if (perks.maxAds) arr.push('до ' + perks.maxAds + ' объявлений');
+  if (perks.maxPhotos) arr.push(perks.maxPhotos + ' фото');
+  if (perks.promos) arr.push(perks.promos + ' продвижений/мес.');
+  if (perks.highlight) arr.push('выделение');
+  if (perks.pin) arr.push('закрепление');
+  if (perks.analytics) arr.push('аналитика');
+  return arr.join(', ') || 'без лимитов';
+}
+async function buyService(serviceId) {
+  if (!shopAdId) { toast('Сначала откройте своё объявление'); return; }
+  const s = state.shop && state.shop.services.find(x => x.id === serviceId);
+  if (s && !confirm('Купить «' + s.name + '» за ' + fmtKop(s.kopecks) + ' ₽ с баланса?')) return;
+  try {
+    const r = await api('/api/ads/' + shopAdId + '/promo', { method: 'POST', body: { service: serviceId } });
+    await loadMe();
+    state.shop = null;
+    toast('Готово: ' + fmtKop(r.balance) + ' ₽ на балансе');
+    openShop(true);
+  } catch (e) { toast(e.message); }
+}
+async function buyPlan(planId) {
+  const p = state.shop && state.shop.plans.find(x => x.id === planId);
+  if (p && !confirm('Купить тариф «' + p.name + '» за ' + (p.price === 0 ? '0 ₽' : fmtKop(p.price) + ' ₽') + ' с баланса?')) return;
+  try {
+    const r = await api('/api/plans/' + planId + '/buy', { method: 'POST', body: { auto_renew: true } });
+    await loadMe();
+    state.shop = null;
+    toast('Тариф «' + (p ? p.name : '') + '» активен до ' + fmtDate(r.limits.endsAt));
+    openShop(false);
+  } catch (e) { toast(e.message); }
+}
+async function buyPromo(serviceId) {
+  if (!state.current || !state.current.isMine) return;
+  shopAdId = state.current.id;
+  await buyService(serviceId);
+}
+
 /* ===== Actions ===== */
-function goTab(tab) {
+function goTab(tab, keep) {
   document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
   document.getElementById('view-' + tab).classList.remove('hidden');
   const pb = document.getElementById('placeBar');
@@ -614,19 +856,41 @@ function goTab(tab) {
   const nt = document.querySelector(`.tab[data-tab="${tab}"]`);
   if (nt) nt.classList.add('active');
   if (tab === 'home') renderHome();
-  if (tab === 'search') renderSearch();
+  if (tab === 'search') {
+    if (!keep) state.activeCat = null;
+    $('#searchInput').value = state.activeCat ? catName(state.activeCat) : '';
+    updateCatBack();
+    renderSearch(state.activeCat ? catName(state.activeCat) : '');
+  }
   if (tab === 'fav') renderFav();
   if (tab === 'mine') openMine();
-  if (tab === 'profile') { loadMe(); }
+  if (tab === 'profile') {
+    if (profTab !== 'main') setProfTab('main');
+    loadMe();
+  }
   if (tab === 'place') { openPlace(); }
   $('#main').scrollTop = 0;
 }
 function filterCat(id) {
-  goTab('search');
-  $('#searchInput').value = catName(id);
-  renderSearch(catName(id));
+  state.activeCat = id;
+  goTab('search', true);
 }
-function onSearch(v) { renderSearch(v); }
+function exitCategory() {
+  state.activeCat = null;
+  $('#searchInput').value = '';
+  updateCatBack();
+  renderHome();
+  goTab('home');
+}
+function updateCatBack() {
+  const b = document.getElementById('catBack');
+  if (b) b.classList.toggle('hidden', !state.activeCat);
+}
+function onSearch(v) {
+  if (!v && state.activeCat) state.activeCat = null;
+  updateCatBack();
+  renderSearch(v);
+}
 
 async function toggleFav(id) {
   const a = state.ads.find(x => x.id === id);
@@ -646,7 +910,7 @@ async function openAd(id) {
     state.current = ad;
     $('#dPrice').textContent = priceFmt(ad.price);
     $('#dTitle').textContent = ad.title;
-    $('#dMeta').innerHTML = `<span class="chip">${escapeHtml(ad.city)}</span><span class="chip">${catName(ad.category)}</span>`;
+    $('#dMeta').innerHTML = `<span class="chip">${escapeHtml(ad.city)}</span><span class="chip">${catName(ad.category)}</span>${badgePills(ad)}`;
     $('#dExtra').innerHTML = extraChipsHTML(ad);
     $('#dDesc').textContent = ad.description || 'Описание не указано';
     const gal = $('#dGallery');
@@ -659,6 +923,8 @@ async function openAd(id) {
     $('#dPhone').style.display = ad.phone ? 'block' : 'none';
     if (!ad.tg && !ad.phone) $('#dTg').style.display = 'block';
     $('#ownerActions').classList.toggle('hidden', !ad.isMine);
+    $('#promoActions').classList.toggle('hidden', !ad.isMine);
+    if (ad.isMine) shopAdId = ad.id;
     $('#statusBtn').classList.toggle('hidden', !ad.isMine);
     $('#reportBtn').classList.toggle('hidden', ad.isMine);
     updateStatusBtn();
@@ -747,6 +1013,8 @@ function openPlace() {
     $('#f-city').value = a.city;
     $('#f-tg').value = a.tg || '';
     $('#f-phone').value = a.phone || '';
+    $('#f-trade').checked = (a.badges || []).includes('trade');
+    $('#f-urgent').checked = (a.badges || []).includes('urgent');
     state.newImages = a.images ? a.images.slice() : [];
     renderImgPick();
     $('#publishBtn').textContent = 'Сохранить изменения';
@@ -754,6 +1022,7 @@ function openPlace() {
   } else {
     $('#f-title').value = ''; $('#f-price').value = ''; $('#f-desc').value = '';
     $('#f-tg').value = ''; $('#f-phone').value = '';
+    $('#f-trade').checked = false; $('#f-urgent').checked = false;
     fillCatSelect();
     $('#f-cat').value = 'auto';
     renderExtraFields();
@@ -833,7 +1102,10 @@ async function publishAd() {
   if (!title || !price) { toast('Заполните заголовок и цену'); return; }
   if (!city) { toast('Сначала выберите город'); openCity(); return; }
   if (!validateExtra()) return;
-  const body = { title, category: cat, price, description: desc, city, tg: tgU, phone: ph, images: state.newImages, extra: collectExtra() };
+  const badges = [];
+  if ($('#f-trade').checked) badges.push('trade');
+  if ($('#f-urgent').checked) badges.push('urgent');
+  const body = { title, category: cat, price, description: desc, city, tg: tgU, phone: ph, images: state.newImages, extra: collectExtra(), badges };
   try {
     if (state.editing) {
       await api('/api/ads/' + state.editing.id, { method: 'PUT', body });
