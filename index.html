@@ -79,6 +79,19 @@
   .section-title { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 12px; font-size: 17px; font-weight: 600; }
   .section-title .more { font-size: 13px; color: var(--blue); font-weight: 500; cursor: pointer; }
   .categories { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 26px; }
+  .search-list { display: flex; flex-direction: column; gap: 8px; }
+  .search-cat, .search-sub { display: flex; align-items: center; gap: 10px; padding: 12px 13px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; }
+  .search-cat:active, .search-sub:active { background: var(--bg-elev); }
+  .sc-ico { font-size: 18px; }
+  .sc-name { flex: 1; font-size: 15px; font-weight: 500; }
+  .search-cat .sc-name, .search-sub.all .sc-name { font-weight: 600; }
+  .sc-sub { font-size: 11.5px; color: var(--text-dim); }
+  .sc-count { font-size: 12px; color: var(--text-dim); background: var(--bg); border-radius: 10px; padding: 2px 8px; }
+  .search-sub.sel { border-color: var(--blue); background: var(--blue-dim); }
+  .sc-arrow { color: var(--text-dim); font-size: 18px; }
+  .crumbs { display: flex; align-items: center; gap: 6px; margin: 2px 0 12px; font-size: 13px; flex-wrap: wrap; }
+  .crumb { cursor: pointer; color: var(--blue); }
+  .crumb-sep { color: var(--text-dim); }
   .cat { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .cat .ico { width: 58px; height: 58px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; transition: transform .15s, box-shadow .15s; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
   .cat:active .ico { transform: scale(.88); box-shadow: 0 1px 3px rgba(0,0,0,.18); }
@@ -112,7 +125,7 @@
   .tab .plus svg { stroke: #fff; }
   main > section { animation: viewIn .24s ease; }
   @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-  .placebar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(70px + var(--safe-b)); width: 100%; max-width: 480px; padding: 10px 16px 4px; z-index: 29; background: linear-gradient(to top, rgba(15,15,15,.97) 55%, transparent); }
+  .placebar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(92px + var(--safe-b)); width: 100%; max-width: 480px; padding: 10px 16px 4px; z-index: 29; background: linear-gradient(to top, rgba(15,15,15,.97) 55%, transparent); }
   .placebar .btn { box-shadow: 0 8px 24px rgba(47,123,255,.4); margin: 0; }
   main.has-placebar { padding-bottom: calc(150px + var(--safe-b)); }
   .sheet-mask { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 50; opacity: 0; pointer-events: none; transition: .25s; }
@@ -189,10 +202,6 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="searchInput" placeholder="Поиск товаров..." oninput="onSearch(this.value)" />
       </div>
-      <button class="icon-btn" onclick="openChats()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-9 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"/></svg>
-        <span class="badge" id="chatBadge" style="display:none">0</span>
-      </button>
       <button class="icon-btn" onclick="openNotifs()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
         <span class="badge" id="notifBadge" style="display:none">0</span>
@@ -214,8 +223,12 @@
 
     <section id="view-search" class="hidden">
       <div class="section-title">Поиск</div>
-      <div class="categories" id="catGridSearch"></div>
-      <div class="section-title" style="margin-top:10px">Найдено</div>
+      <div id="searchCrumbs" class="crumbs hidden"></div>
+      <div id="searchCatList" class="search-list"></div>
+      <div id="searchSubWrap" class="hidden">
+        <div id="searchSubList" class="search-list"></div>
+      </div>
+      <div class="section-title" style="margin-top:12px">Объявления</div>
       <div class="ads" id="adListSearch"></div>
     </section>
 
@@ -367,9 +380,6 @@
     </div>
   </div>
 
-  <div class="sheet-mask" id="chatSheet" onclick="if(event.target===this)closeSheet('chatSheet')">
-    <div class="sheet"><div class="grab"></div><h2>Чаты</h2><p class="sub">Диалоги с продавцами и покупателями</p><div id="chatList"></div></div>
-  </div>
   <div class="sheet-mask" id="notifSheet" onclick="if(event.target===this)closeSheet('notifSheet')">
     <div class="sheet"><div class="grab"></div><h2>Уведомления</h2><p class="sub">Ответы, новые объявления в вашем городе</p><div id="notifList"></div></div>
   </div>
@@ -427,19 +437,172 @@ if (tg) { tg.expand(); tg.ready(); }
 /* ===== Config ===== */
 const API = '';
 const CATEGORIES = [
-  { id:'tech', name:'Техника', emoji:'💻', color:'#1a2a4a', accent:'#4a90d9' },
-  { id:'auto', name:'Авто', emoji:'🚗', color:'#3a2a1a', accent:'#d98c4a' },
-  { id:'home', name:'Дом', emoji:'🏠', color:'#1a3a2a', accent:'#4ad98c' },
-  { id:'cloth', name:'Одежда', emoji:'👕', color:'#3a1a3a', accent:'#d94aaa' },
-  { id:'sport', name:'Спорт', emoji:'⚽', color:'#3a1a1a', accent:'#d94a4a' },
-  { id:'job', name:'Работа', emoji:'💼', color:'#2a1a3a', accent:'#9a4ad9' },
-  { id:'kids', name:'Детям', emoji:'🧸', color:'#3a3a1a', accent:'#d9d44a' },
-  { id:'other', name:'Другое', emoji:'📦', color:'#222', accent:'#888' },
+  { id:'tech', name:'Электроника', color:'#1a2a4a', accent:'#4a90d9', icon:'<rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>' },
+  { id:'auto', name:'Авто', color:'#33220f', accent:'#d98c4a', icon:'<path d="M18.7 17.2H20c.6 0 1-.4 1-1v-3.4c0-.9-.7-1.7-1.5-1.9C17.8 10.4 15 10 15 10s-1.3-1.5-2.2-2.4c-.5-.4-1.1-.6-1.8-.6H5.5c-.6 0-1.1.4-1.4.9L2.5 11a2.7 2.7 0 0 0-.5 1.2V16c0 .6.4 1 1 1h1.3"/><circle cx="7" cy="17.2" r="2"/><path d="M9 17.2h6"/><circle cx="17" cy="17.2" r="2"/>' },
+  { id:'home', name:'Недвижимость', color:'#12291c', accent:'#4ad98c', icon:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M16 18h.01"/>' },
+  { id:'cloth', name:'Одежда', color:'#2a1130', accent:'#d94aaa', icon:'<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>' },
+  { id:'sport', name:'Спорт', color:'#2e1212', accent:'#d94a4a', icon:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>' },
+  { id:'job', name:'Работа', color:'#1e1030', accent:'#9a4ad9', icon:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' },
+  { id:'kids', name:'Детям', color:'#2c2c10', accent:'#d9d44a', icon:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18"/><path d="M3 12h18"/>' },
+  { id:'other', name:'Другое', color:'#1c1c1c', accent:'#939393', icon:'<path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>' },
 ];
+/* Доп. поля по категориям (универсальная система). type: text|number|select */
+/* Справочник: марка -> список моделей (для категории «Авто») */
+const CAR_MODELS = {
+  'LADA (ВАЗ)': ['1111 Ока','2101','2102','2103','2104','2105','2106','2107','2108','2109','21099','2110','2111','2112','2113','2114','2115','2120','2121','2123','2131','2329','4x4','21213','21214','Granta','Granta Cross','Kalina','Largus','Largus Cross','Niva','Priora','Revolution','Vesta','Vesta Cross','Vesta Sport','XRAY','XRAY Cross','Ока','Нива','Нива Легенда','Нива Travel','Спектр','СеАЗ Ока'],
+  'ГАЗ': ['21','22','24','69','3102','31029','3110','31105','3302','3307','3308','3309','2217','2206','2310','2330','2705','2752','3221','3910','Волга','Волга 21','Волга 24','Газель','Газель Next','Газель Бизнес','Соболь','Садко','Тигр','Валдай','Некст','Юнкер'],
+  'УАЗ': ['3151','31512','3153','3159','3160','3162','3741','3909','3962','452','469','2206','2217','Хантер','Hunter','Patriot','Патриот','Пикап','Pickup','Профи','Profi','Симбир','Симба','Буханка','74','Классик'],
+  'Москвич': ['400','401','402','403','407','408','410','411','412','2138','2140','2141','2142','426','427','433','434','АЗЛК','3','3e','6','Князь Волконский','Купе','Святогор','Престиж','Юрий Долгорукий'],
+  'ЗАЗ': ['965','966','968','968-М','1102 Таврия','1103 Славута','1105 Дана','11055','Chance','Шанс','Sens','Vida','Forza','Lanos','Таврия','Славута','Дана'],
+  'ИЖ': ['2125','21251','2126','2126 Ода','2715','2717','27175','ОДА','Ода','Москвич-412','Планета'],
+  'СеАЗ': ['Ока','1111','11113','11116'],
+  'ТагАЗ': ['C10','C30','Aquila','Aquilla','Road Partner','Tager','Vega','Vortex','ГАЗ-3302'],
+  'ВИС': ['2345','2347','2349','23452','ВИС-2346'],
+  'Аурус': ['Senat','Сенат','Komendant','Комендант'],
+  'Alfa Romeo': ['33','75','90','145','146','147','155','156','159','164','166','1750','2000','Alfasud','Alfetta','Brera','Giulia','Giulietta','GT','GTV','MiTo','Spider','Stelvio','Tonale','Zagato','SZ','RZ'],
+  'Alpina': ['B3','B4','B5','B6','B7','B8','D3','D4','D5','XB7','XD3','XD4','B10','B11','B12'],
+  'Alpine': ['A110','A290','A310','A442','A610','V6'],
+  'AMC': ['Ambassador','Concord','Eagle','Gremlin','Hornet','Javelin','Matador','Pacer','Rebel','Wagoneer','Marlin'],
+  'Aston Martin': ['Cygnet','DB7','DB9','DB11','DBS','DBX','One-77','Rapide','Valhalla','Valkyrie','Vanquish','Vantage','Virage','DB4','DB5','DB6','Lagonda','Victor'],
+  'Audi': ['100','200','80','90','A1','A2','A3','A3 Sportback','A4','A4 Allroad','A5','A5 Sportback','A6','A6 Allroad','A7','A8','Cabriolet','Coupé','Q2','Q3','Q4 e-tron','Q5','Q5 Sportback','Q6','Q7','Q8','R8','RS3','RS4','RS5','RS6','RS7','S3','S4','S5','S6','S7','S8','TT','Quattro','V8','e-tron','e-tron GT','SQ5','SQ7','RS Q3','TT RS','A5 Cabriolet','A3 Cabriolet','A8 L'],
+  'BAIC': ['BJ30','BJ40','BJ60','BJ80','D20','D50','EU5','EU260','M50F','U5','U5 Plus','X5','X7','X55','X3','U7','BJ20'],
+  'Baltijas Dzips': ['BDD 3310','3310'],
+  'Baojun': ['E100','E300','E500','E530','RC-5','RC-6','RM-5','RS-3','RS-5','RS-7','510','730'],
+  'Bentley': ['Arnage','Azure','Bentayga','Brooklands','Continental','Continental GT','Continental Flying Spur','Corniche','Mulsanne','Turbo R','Turbo RT','Turbo S'],
+  'Bestune': ['B50','B70','E01','Nata','T55','T77','T99','X40','X80','B90'],
+  'BMW': ['1 серия','2 серия','3 серия','4 серия','5 серия','6 серия','7 серия','8 серия','M2','M3','M4','M5','M6','M8','X1','X2','X3','X4','X5','X6','X7','XM','Z1','Z3','Z4','Z8','i3','i4','i5','i7','i8','iX','iX1','iX2','iX3','318','320','323','325','328','330','335','520','523','525','528','530','535','540','550','620','623','630','635','640','645','650','728','730','735','740','745','750','760','M3 GTR','M5 CS','e36','e39','e46','e60','e90','f10','f30','g30','2002','E21','E28','E30','E34','E38','E46','E60','E65','F01','F02','G11','G12','iX3','M8 GTS'],
+  'Bogdan': ['2110','2111','2112','А091','А092','А093'],
+  'Brilliance': ['BS2','BS4','BS6','H230','H320','H330','H530','M2','M3','V3','V5','V6','V7','Frv','M2 (H230)'],
+  'Buick': ['Century','Electra','Enclave','Encore','Envision','GL8','Lacrosse','LeSabre','Lucerne','Park Avenue','Regal','Rendezvous','Riviera','Roadmaster','Skyhawk','Skylark','Verano','Wildcat','Encore GX','LaCrosse'],
+  'BYD': ['Atto 3','Dolphin','E2','E5','E6','F3','Flyer','Han','Han EV','Qin','Seagull','Seal','Seal U','Song','Song Plus','Song Max','Suri','Tang','Tang EV','T3','Yuan Plus','Yuan Up','Tang DM','Song L'],
+  'Cadillac': ['ATS','BLS','Brougham','CT4','CT5','CT6','CTS','Coupe','DTS','DeVille','Eldorado','Escalade','Fleetwood','Seville','SRX','STS','XT4','XT5','XT6','XLR','XTS','Calais','Cimarron'],
+  'Changan': ['Alsvin','CS15','CS35','CS35 Plus','CS55','CS75','CS85','CS95','Eado','E-Rock','Hunter','Lamore','Lumin','Raeton','Uni-K','Uni-T','Uni-V','Benben','CX20','Eado Plus'],
+  'Changhe': ['Freedom','Ideal','A6','Старт'],
+  'Chery': ['Arrizo 5','Arrizo 6','Arrizo 7','Arrizo 8','Bonus','Fora','Fulwin','Fulwin A8','Kimo','M11','QQ','Sweet','Tiggo','Tiggo 2','Tiggo 3','Tiggo 4','Tiggo 5','Tiggo 7','Tiggo 8','Tiggo 9','Tiggo Cross','Very','Zhu Lin','eQ1'],
+  'Chevrolet': ['Astro','Aveo','Beretta','Blazer','Bolt','C1500','Camaro','Caprice','Captiva','Cavalier','Celebrity','Celta','Citation','Cobalt','Colorado','Corsica','Corvette','Cruze','Epica','Equinox','Evanda','Express','HHR','Impala','Kalos','Lacetti','Lanos','Lumina','Malibu','Maverick','Metro','Monte Carlo','Niva','Orlando','Rezzo','S-10','Silverado','Sonic','Spark','Suburban','Tacuma','Tahoe','Tracker','TrailBlazer','Traverse','Uplander','Van','Venture','Viva','Volt'],
+  'Chrysler': ['300','300C','200','Concorde','Crossfire','Grand Voyager','Intrepid','LeBaron','Neon','New Yorker','Pacifica','PT Cruiser','Sebring','Stratus','Town & Country','Voyager','Vision','Aspen','Fifth Avenue'],
+  'Citroen': ['Berlingo','C1','C2','C3','C3 Aircross','C3 Picasso','C4','C4 Cactus','C4 Picasso','C4 SpaceTourer','C5','C5 Aircross','C6','C8','C-Crosser','C-Elysee','DS3','DS4','DS5','Evasion','Grand C4 Picasso','Jumpy','Nemo','Picasso','Saxo','Xantia','XM','Xsara','Xsara Picasso','C15'],
+  'Dacia': ['1310','1410','Dokker','Duster','Logan','Lodgy','Nova','Sandero','Solenza','Spring','SuperNova','MCV'],
+  'Daewoo': ['Espero','Gentra','Kalos','Lacetti','Lanos','Leganza','Magnus','Matiz','Nexia','Nubira','Prince','Racer','Tico','Winstorm','International','Alpheon'],
+  'Daihatsu': ['Applause','Charade','Copen','Cuore','Esse','Hijet','Gran Max','Materia','Mira','Move','Rocky','Sirion','Sonica','Terios','YRV','Max','Naked','Opti'],
+  'Datsun': ['GO','go+','mi-DO','on-DO','on-DO FA','on-DO MA','on-DO MI','GO'],
+  'Denza': ['D9','Z9'],
+  'Derways': ['Antelope','Aurora','Cowboy','Land Crown','Pluto','Saladin','Shuttle'],
+  'Dodge': ['Avenger','Caliber','Caravan','Challenger','Charger','Dakota','Dart','Durango','Grand Caravan','Intrepid','Journey','Magnum','Monaco','Neon','Nitro','Omni','Ram','Shadow','Spirit','Stealth','Stratus','Viper','Aries','Diplomat'],
+  'Dongfeng': ['580','A30','AX7','DX3','DX5','E70','H30','S30','S50','Aeolus','A9','Fengon','Mini'],
+  'DS': ['3','4','5','7','9','3 Crossback','7 Crossback'],
+  'Eagle': ['Summit','Talon','Vision','Premier'],
+  'Exeed': ['LX','RX','Sterra ES','Sterra ET','TX','VX','Exlantix ES','Exlantix ET'],
+  'FAW': ['B50','B70','Besturn','Besturn T55','C40','E-HS9','HS5','HS7','Oley','T77','V2','V5','X40','X80'],
+  'Ferrari': ['308','328','348','360','400','412','456','458','488','512','550','575','599','612','812','California','Enzo','F355','F40','F430','F50','F8','F12berlinetta','GTC4Lusso','LaFerrari','Mondial','Portofino','Roma','SF90','Testarossa','Dino','Maranello','512 TR'],
+  'Fiat': ['124','126','127','128','131','500','500L','500X','Albea','Barchetta','Brava','Bravo','Coupe','Croma','Doblò','Ducato','Fiorino','Freemont','Grande Punto','Idea','Linea','Marea','Multipla','Palio','Panda','Punto','Scudo','Siena','Stilo','Tipo','Ulysse','Viaggio'],
+  'Fisker': ['Karma','Ocean'],
+  'Ford': ['Bronco','Bronco Sport','C-Max','Capri','Edge','Escape','Escort','Expedition','Explorer','F-150','Festiva','Fiesta','Figo','Focus','Fusion','Galaxy','Granada','Ka','Kuga','Maverick','Mondeo','Mustang','Mustang Mach-E','Orion','Probe','Puma','Ranger','S-Max','Scorpio','Sierra','Taurus','Tempo','Thunderbird','Tourneo','Transit','Transit Connect','Crown Victoria','Focus RS','Focus ST'],
+  'Foton': ['Auman','Midam','Sauvana','Tunland','View','WOW'],
+  'GAC': ['Emkoo','GN8','GS3','GS4','GS5','GS8','M6','M8','Trumpchi','Aion S','Aion V','Aion Y'],
+  'Geely': ['Atlas','Atlas Pro','Coolray','Emgrand','Emgrand 7','Emgrand GT','Geometry','GS','Icon','Jiaji','LC','MK','Monjaro','Okavango','Otaka','Panda','Preface','Tugella','Vision','Xingyue'],
+  'Genesis': ['G70','G80','G90','GV60','GV70','GV80','GV90','EQ900'],
+  'GMC': ['Acadia','Canyon','Envoy','Jimmy','Safari','Savana','Sierra','Sonoma','Suburban','Terrain','Typhoon','Vandura','Yukon','Yukon XL'],
+  'Gonow': ['GX6','Phoenix','Star','Troy'],
+  'Great Wall': ['Coolbear','Deer','Florid','Hover','Hover H3','Hover H5','Hover H6','Hover M2','Hover M4','Pegasus','Peri','Sailor','Sing','Voleex','Wingle','Safe'],
+  'Hafei': ['Brio','Lobo','Saibao','Simbo','Zhongyi'],
+  'Haval': ['Dargo','F7','F7x','H2','H3','H4','H5','H6','H6 Coupe','H9','Jolion','M6','Raptor','Shenyue','Xiaolong','H2S'],
+  'Honda': ['Accord','Acty','Civic','CR-V','CR-X','Crosstour','Edix','Element','Elysion','Fit','FR-V','HR-V','Insight','Integra','Jazz','Legend','Life','Mobilio','Odyssey','Passport','Pilot','Prelude','Ridgeline','S2000','Stepwgn','Stream','Vezel','Zest','City','Capa','Saber','Torneo','Vigor'],
+  'Hongqi': ['E-HS9','E-QM5','H5','H6','H7','H9','HS3','HS5','HS7','LS7','S9'],
+  'Hozon': ['Neta Aya','Neta S','Neta U','Neta V','Neta X','Neta L'],
+  'Hummer': ['EV','H1','H2','H2 SUT','H3','H3T'],
+  'Hyundai': ['Accent','Atos','Creta','Elantra','Eon','Equus','Excel','Galloper','Genesis','Getz','Grandeur','Grand Starex','H-1','HB20','i10','i20','i30','i40','Ioniq','Ioniq 5','Ioniq 6','ix35','Kona','Lantra','Matrix','Nexo','Palisade','Pony','Porter','Santa Fe','Solaris','Sonata','Starex','Staria','Terracan','Tiburon','Trajet','Tucson','Tuscani','Veloster','Veracruz','Verna','XG','H100','Coupe'],
+  'Infiniti': ['EX','FX','G20','G25','G35','G37','I30','I35','J30','JX','M25','M30','M35','M37','M45','Q30','Q40','Q50','Q60','Q70','QX30','QX4','QX50','QX55','QX56','QX60','QX70','QX80'],
+  'Iran Khodro': ['Dena','Runna','Samand','Sarir','Soren'],
+  'Isuzu': ['Ascender','Axiom','Bighorn','D-Max','Elf','Fargo','Gemini','Hombre','Midi','Mu','Rodeo','Trooper','VehiCross'],
+  'Iveco': ['Daily','EuroCargo','Massif','New Daily','TurboDaily','Stralis'],
+  'Jaecoo': ['J5','J6','J7','J8','J9'],
+  'Jaguar': ['E-Pace','E-Type','F-Pace','F-Type','I-Pace','Mark II','S-Type','XF','XJ','XJ40','XJS','XK','XKR','XE','X-Type','X200','F-Type Coupe'],
+  'Jeep': ['Cherokee','CJ','Commander','Compass','Gladiator','Grand Cherokee','Liberty','Patriot','Renegade','Wagoneer','Wrangler','Grand Wagoneer','Comanche'],
+  'Jetour': ['Dashing','Ice Cream','T2','T3','T5','X70','X70 Plus','X90','X90 Plus','Kigoa X95'],
+  'JMC': ['Baodian','Basas','Vigus'],
+  'Jonway': ['A380','UFO','A430','A150'],
+  'Kaiyi': ['E5','FX','FS','X3 Pro','X7'],
+  'Kia': ['Avella','Borrego','Carens','Carnival','Capital','Ceed','Cerato','Clarus','e-Niro','EV3','EV6','EV9','K3','K5','K7','K9','K900','Magentis','Mohave','Niro','Optima','Pegas','Picanto','Pride','Retona','Rio','Rio X','Ray','Seltos','Shuma','Sorento','Soul','Spectra','Sportage','Stinger','Venga','XCeed','Amanti','Sephia'],
+  'Lamborghini': ['Aventador','Countach','Diablo','Espada','Gallardo','Huracán','Jalpa','LM002','Miura','Murciélago','Reventón','Revuelto','Urus','350 GT','400 GT','Urus S','Aventador SV'],
+  'Lancia': ['2000','Arna','Aurelia','Beta','Dedra','Delta','Flavia','Fulvia','Gamma','Kappa','Lybra','Musa','Prisma','Thema','Thesis','Trevi','Y10','Ypsilon','Zagato'],
+  'Land Rover': ['Defender','Defender 90','Defender 110','Discovery','Discovery Sport','Evoque','Freelander','LR2','LR3','LR4','Range Rover','Range Rover Evoque','Range Rover Sport','Range Rover Velar','Series','Discovery 3','Discovery 4','Series II','Series III'],
+  'Leapmotor': ['C10','C11','C16','T03'],
+  'Lexus': ['CT','ES','GS','GX','HS','IS','LC','LF-A','LM','LS','LX','NX','RC','RX','RZ','SC','TX','UX','LBX','NX Hybrid','RX Hybrid','IS F','GS F'],
+  'Lifan': ['620','650','820','Breez','Cebrium','Murman','Smily','Solano','X50','X60','520','720'],
+  'LiXiang': ['L7','L8','L9','MEGA','ONE'],
+  'Lincoln': ['Aviator','Blackwood','Continental','Corsair','LS','Mark LT','MKS','MKT','MKX','MKZ','Navigator','Nautilus','Town Car','Zephyr'],
+  'Lotus': ['Eclat','Elise','Elite','Elan','Emira','Esprit','Evora','Excel','Exige','Europa'],
+  'Lucid': ['Air','Gravity'],
+  'Luxgen': ['M7','S5','U5','U6','U7','V7'],
+  'Lynk&Co': ['01','02','03','05','07','08','09','Z10'],
+  'Maruti': ['Alto','Esteem','Gypsy','Swift','Wagon R','Zen','Omni'],
+  'Maserati': ['3200GT','Biturbo','Coupé','Ghibli','GranCabrio','GranTurismo','Grecale','Karif','Levante','MC20','Merak','Quattroporte','Shamal','Spyder'],
+  'Maybach': ['57','62','S 580','S 680','Zeppelin','Exelero'],
+  'Mazda': ['2','3','5','6','8','323','626','929','Astina','Atenza','Axela','BT-50','Bongo','Carol','CX-3','CX-30','CX-4','CX-5','CX-50','CX-7','CX-8','CX-9','Demio','Familia','Lantis','Laputa','Millenia','MPV','MX-3','MX-5','MX-6','Premacy','Protege','Roadster','RX-7','RX-8','Sentia','Tribute','Verisa'],
+  'McLaren': ['12C','540C','570GT','570S','600LT','620R','650S','675LT','720S','750S','765LT','Artura','GTS','MP4-12C','P1','Senna','Speedtail','Elva'],
+  'Mercedes-Benz': ['A-класс','B-класс','C-класс','CL-класс','CLA','CLS','Citan','CLK','E-класс','G-класс','GLA','GLB','GLC','GLE','GLK','GLS','GT','M-класс','ML','R-класс','S-класс','SL','SLC','SLK','SLS','Sprinter','V-класс','Vaneo','Viano','Vito','Metris','AMG GT','190','EQC','EQA','EQB','EQE','EQS','EQS SUV','A45 AMG','G 63','G 500','W123','W124','W126','W140','W201','W210','W211','W212','W220','W221','W222','CLS 63'],
+  'Mercury': ['Cougar','Grand Marquis','Mariner','Marquis','Milan','Montego','Mountaineer','Mystique','Sable','Topaz','Tracer','Villager','Capri'],
+  'MG': ['3','5','6','Cyberster','EZS','GT','HS','Marvel R','MG4','MG5','RX5','ZS','ZS EV','350','750'],
+  'Mini': ['Cabrio','Clubman','Cooper','Cooper S','Countryman','Countryman S','Coupé','JCW','Paceman','Roadster','Mini One','Mini 3-door','Mini 5-door'],
+  'Mitsubishi': ['3000GT','ASX','Attrage','Carisma','Colt','Delica','Diamante','Eclipse','Endeavor','Eterna','Galant','Grandis','i-MiEV','L200','Lancer','Lancer Evolution','Lancer X','Magna','Mirage','Montero','Nativa','Outlander','Pajero','Pajero Junior','Pajero Mini','Pajero Pinin','Pajero Sport','RVR','Space Gear','Space Runner','Space Star','Starion','Tredia','Triton','Lancer Cedia'],
+  'Mitsuoka': ['Galue','Le-Seyde','Nue','Orochi','Rock Star','Ryoga','Viewt','Yuga','Zero1'],
+  'Nissan': ['100NX','200SX','240SX','300ZX','350Z','370Z','Almera','Almera Classic','Armada','Avenir','Bluebird','Cedric','Cefiro','Cube','Expert','Fairlady','Figaro','Gloria','Grand Livina','GT-R','Juke','Largo','Laurel','Leaf','Liberty','Livina','March','Maxima','Micra','Murano','Navara','Note','Pathfinder','Patrol','President','Primera','Qashqai','R\'nessa','Rasheen','Rogue','Safari','Sentra','Serena','Skyline','Stagea','Sunny','Teana','Terrano','Terrano II','Tiida','Titan','Vanette','Versa','Wingroad','X-Trail','Z','Aria','Bassara','Clipper','Moco','Otti','Piño','Prairie','Pulsar'],
+  'Oldsmobile': ['88','98','Achieva','Alero','Aurora','Bravada','Cutlass','Intrigue','Omega','Silhouette','Starfire','Toronado'],
+  'Omoda': ['C5','C6','C7','E5','S5','Omoda 5'],
+  'Opel': ['Adam','Agila','Antara','Ascona','Astra','Calibra','Cascada','Combo','Corsa','Frontera','GT','Insignia','Kadett','Manta','Meriva','Mokka','Monza','Movano','Olympia','Omega','Rekord','Senator','Signum','Tigra','Vectra','Vivaro','Zafira'],
+  'Panoz': ['Esperante','AIV Roadster'],
+  'Peugeot': ['106','107','108','1007','2008','205','206','207','208','3008','301','306','307','308','309','4007','4008','404','405','406','407','408','5008','504','505','508','605','607','806','807','Bipper','Boxer','Expert','Partner','Traveller'],
+  'Plymouth': ['Barracuda','Breeze','Duster','Fury','Neon','Prowler','Reliant','Road Runner','Sundance','Volare','Voyager','Acclaim','Cranbrook'],
+  'Pontiac': ['Aztek','Bonneville','Catalina','Firebird','G6','G8','Grand Am','Grand Prix','GTO','LeMans','Montana','Solstice','Sunbird','Sunfire','Tempest','Trans Am','Trans Sport','Vibe'],
+  'Porsche': ['356','718','911','911 Carrera','911 GT3','911 GT3 RS','911 GT2','911 Turbo','912','914','918','924','928','944','968','Boxster','Cayenne','Cayenne Coupe','Cayman','Macan','Panamera','Taycan','996','997','991','992'],
+  'Premier': ['Padmini','Premier 118NE'],
+  'Proton': ['Arena','Inspira','Persona','Perdana','Saga','Satria','Waja','Wira'],
+  'Qoros': ['3','5'],
+  'Ravon': ['Gentra','Matiz','Nexia R3','R2','R4','R5','R6'],
+  'Renault': ['12','14','19','21','25','4','5','9','Arkana','Captur','Clio','Duster','Espace','Fluence','Kadjar','Kangoo','Kaptur','Koleos','Laguna','Latitude','Logan','Logan Stepway','Master','Megane','Modus','Premium','Safrane','Sandero','Sandero Stepway','Scala','Scenic','Symbol','Talisman','Thalia','Trafic','Twingo','Vel Satis','Express'],
+  'Roewe': ['550','750','i5','i6','RX5','RX8','Marvel R','eRX5'],
+  'Rolls-Royce': ['Cloud','Cullinan','Dawn','Ghost','Phantom','Silver Cloud','Silver Shadow','Silver Spirit','Silver Spur','Spectre','Wraith','Park Ward'],
+  'Rover': ['200','25','400','45','600','75','800','Metro','Mini','Streetwise','Vitesse','P6','SD1'],
+  'Saab': ['9-2X','9-3','9-4X','9-5','9-7X','90','900','9000','Sonett'],
+  'Saturn': ['Astra','Aura','Ion','L200','LS','LW','Outlook','Relay','Sky','SL','SW','Vue'],
+  'Scion': ['FR-S','iA','iM','tC','xA','xB','xD'],
+  'Seat': ['Alhambra','Altea','Arosa','Ateca','Cordoba','Exeo','Ibiza','Inca','Leon','Malaga','Marbella','Mii','Terra','Toledo'],
+  'Seres': ['3','5','SF5','M5'],
+  'Shuanghuan': ['A6','Noble','SCEO','MPV'],
+  'Skoda': ['105','120','130','135','136','Citigo','Enyaq','Fabia','Felicia','Favorit','Forman','Kamiq','Karoq','Kodiaq','Octavia','Octavia A5','Octavia A7','Rapid','Roomster','Scout','Scala','Superb','Yeti','Elroq'],
+  'Skywell': ['ET5','HT5'],
+  'Smart': ['#1','#3','City Coupe','Crossblade','Forfour','Fortwo','Roadster','EQ fortwo'],
+  'Soueast': ['DX3','DX5','Lioncel','Soveran','Zinger'],
+  'SsangYong': ['Actyon','Actyon Sports','Chairman','Family','Kallus','Korando','Kyron','Musso','Nomad','Rexton','Rodius','Stavic','Tivoli','Torres','XLV'],
+  'Subaru': ['Ascent','Baja','BRZ','Crosstrek','Exiga','Forester','Impreza','Justy','Legacy','Levorg','Libero','Outback','Solterra','SVX','Tribeca','WRX','XV','Dias','R2'],
+  'Suzuki': ['Aerio','Alto','Baleno','Cappuccino','Celerio','Cultus','Escudo','Every','Grand Vitara','Ignis','Jimny','Kizashi','Liana','MR Wagon','Samurai','Splash','Swift','SX-4','Vitara','Wagon R','XL-7','SJ-410'],
+  'SWM': ['G01','G03','G05','X7'],
+  'Tank': ['300','400','500','700','800'],
+  'Tatra': ['603','613','700','Tatraphan','Beta'],
+  'Tesla': ['Cybertruck','Model 3','Model S','Model X','Model Y','Roadster','Semi'],
+  'Togg': ['T10F','T10X'],
+  'Toyota': ['4Runner','Agya','Allion','Alphard','Altezza','Aqua','Auris','Avalon','Avensis','Aygo','bB','Belta','C-HR','Caldina','Camry','Camry Solara','Celica','Celsior','Chaser','Corolla','Corolla Cross','Corolla Fielder','Corolla Rumion','Cressida','Crown','Dyna','Estima','FJ Cruiser','Fortuner','Fun Cargo','GT86','Harrier','HiAce','Highlander','Hilux','Ipsum','Ist','Land Cruiser','Land Cruiser Prado','Mark II','Mark X','Matrix','Mirai','Noah','Passo','Picnic','Premio','Prius','Probox','RAV4','Regius','Rush','Sai','Sequoia','Sienna','Sienta','Starlet','Succeed','Supra','Tacoma','Tercel','Tundra','Venza','Verso','Vios','Vista','Vitz','Voxy','WiLL','Windom','Yaris','Yaris Cross'],
+  'Triumph': ['1500','2000','2500','Acclaim','Dolomite','Herald','Spitfire','Stag','TR6','TR7','TR8'],
+  'Volvo': ['240','244','245','340','343','440','460','480','66','740','745','760','780','850','940','960','Amazon','C30','C40','C70','P1800','PV544','S40','S60','S70','S80','S90','V40','V50','V60','V70','V90','XC40','XC60','XC70','XC90','S60 Cross Country','V60 Cross Country','V90 Cross Country'],
+  'Volkswagen': ['Amarok','Arteon','Beetle','Bora','Caddy','California','CC','Corrado','Crafter','Eos','Fox','Golf','Golf Plus','Golf R','Golf Sportsvan','ID.3','ID.4','ID.5','ID.6','ID.7','Jetta','Lupo','Multivan','New Beetle','Passat','Passat CC','Phaeton','Polo','Polo Sedan','Scirocco','Sharan','Taigo','T-Cross','T-Roc','Tiguan','Tiguan Allspace','Touareg','Touran','Transporter','Up!','Vento'],
+  'Vortex': ['Corda','Estina','Tingo','Tino'],
+  'Voyah': ['Dream','Free','Passion','Courage'],
+  'Wartburg': ['1.3','311','312','313','353'],
+  'Wey': ['Blue Mountain','Coffee 01','Coffee 02','Latte','Mocha'],
+  'Wuling': ['Air EV','Cloud EV','Hongguang','Mini EV','Sunshine'],
+  'Xiali': ['7100','7180','New Central'],
+  'Xpeng': ['G6','G9','Mona M03','P5','P7','P8','X9'],
+  'Zeekr': ['001','007','009','7X','Mix','X'],
+  'Zotye': ['2008','300','5008','Coupa','E200','SR7','SR9','T300','T500','T600','Z100','Z300','Z7','T600 Coupe'],
+  'ВАЗ': ['2101','2102','2103','2104','2105','2106','2107','2108','2109','21099','2110','2111','2112','2113','2114','2115','2121','2123','2131','2329','4x4','Калина','Приора','Гранта','Нива','Vesta','XRAY','Ларгус','Ока'],
+  'Другая': [],
+};
 /* Доп. поля по категориям (универсальная система). type: text|number|select */
 const CATEGORY_FIELDS = {
   auto: [
-    { key:'brand', label:'Марка', type:'select', required:true, options:['LADA (ВАЗ)','Toyota','Kia','Hyundai','Volkswagen','Renault','Nissan','Mitsubishi','Skoda','Ford','BMW','Mercedes-Benz','Audi','Honda','Mazda','Geely','Chery','Haval','BYD','ГАЗ','УАЗ','Другая'] },
+    { key:'brand', label:'Марка', type:'select', required:true, onchange:'renderCarModel()', options:Object.keys(CAR_MODELS) },
+    { key:'model', label:'Модель', type:'select', required:true, dynamic:true },
     { key:'year', label:'Год выпуска', type:'number', required:true, placeholder:'Например: 2018' },
     { key:'mileage', label:'Пробег, км', type:'number', required:true, placeholder:'0' },
     { key:'owners', label:'Владельцев', type:'number', required:false, placeholder:'1' },
@@ -447,6 +610,36 @@ const CATEGORY_FIELDS = {
     { key:'drive', label:'Привод', type:'select', required:false, options:['Передний','Задний','Полный'] },
     { key:'condition', label:'Состояние', type:'select', required:false, options:['Отличное','Хорошее','Среднее','Требуется ремонт'] },
     { key:'vin', label:'VIN (необязательно)', type:'text', required:false, placeholder:'XXXXXX' },
+  ],
+  tech: [
+    { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Смартфоны','Планшеты','Ноутбуки и ПК','Мониторы','Телевизоры и аудио','Наушники и аксессуары','Фото и видеотехника','Игровые приставки','Умные часы и гаджеты','Бытовая техника','Умный дом','Другая электроника'] },
+    { key:'condition', label:'Состояние', type:'select', required:false, options:['Новое','Как новое','Отличное','Хорошее','Среднее','Требуется ремонт'] },
+  ],
+  home: [
+    { key:'subcategory', label:'Тип недвижимости', type:'select', required:true, options:['Гараж','Дом','Дача','Коттедж','Квартира','Земельный участок','Коммерческая недвижимость'] },
+    { key:'rooms', label:'Комнат', type:'number', required:false, placeholder:'1' },
+    { key:'area', label:'Площадь, м²', type:'number', required:false, placeholder:'0' },
+    { key:'floor', label:'Этаж', type:'number', required:false, placeholder:'1' },
+  ],
+  cloth: [
+    { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Женская одежда','Мужская одежда','Верхняя одежда','Платья и костюмы','Обувь','Сумки и рюкзаки','Часы и украшения','Аксессуары','Бельё и домашняя одежда','Другое'] },
+    { key:'size', label:'Размер', type:'text', required:false, placeholder:'Например: S, M, 42, 45' },
+    { key:'condition', label:'Состояние', type:'select', required:false, options:['Новое с биркой','Новое','Как новое','Отличное','Хорошее','Среднее'] },
+  ],
+  sport: [
+    { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Велосипеды','Самокаты и гироскутеры','Ролики и скейтборды','Лыжи и сноуборды','Тренажёры и фитнес','Командные виды спорта','Туризм и кемпинг','Охота и рыбалка','Другое'] },
+    { key:'condition', label:'Состояние', type:'select', required:false, options:['Новое','Как новое','Отличное','Хорошее','Среднее','Требуется ремонт'] },
+  ],
+  job: [
+    { key:'subcategory', label:'Сфера', type:'select', required:true, options:['Офис и администрация','IT и разработка','Торговля сфера услуг','Производство и строительство','Водители и логистика','Медицина и образование','Красота и здоровье','Общепит','Работа с частичной занятостью','Удалённая работа','Другое'] },
+    { key:'schedule', label:'График', type:'select', required:false, options:['Полный день','Сменный график','Гибкий график','Работа по выходным','Вахта'] },
+  ],
+  kids: [
+    { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Коляски и кресла','Автокресла','Игрушки','Одежда для малышей','Детская мебель','Питание и уход','Книги и развитие','Школьные принадлежности','Игровые площадки и бассейны','Другое'] },
+    { key:'age', label:'Возраст', type:'text', required:false, placeholder:'Например: 0-3, 3-7, 7+' },
+  ],
+  other: [
+    { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Дом и сад','Инструменты','Товары для животных','Хобби и рукоделие','Коллекционирование','Книги и журналы','Музыкальные инструменты','Подарки и сувениры','Разное'] },
   ],
 };
 const REGIONS = [
@@ -611,10 +804,13 @@ function pluralDays(n) {
 }
 const priceFmt = p => Number(p).toLocaleString('ru-RU') + ' ₽';
 
+function catIco(c, size = 26) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${c.icon}</svg>`;
+}
 function renderCategories(elId) {
   document.getElementById(elId).innerHTML = CATEGORIES.map(c => `
     <div class="cat" onclick="filterCat('${c.id}')">
-      <div class="ico" style="background:linear-gradient(135deg,#3a3a3a,#2a2a2a);box-shadow:0 6px 16px rgba(0,0,0,.12)">${c.emoji}</div><span>${c.name}</span>
+      <div class="ico" style="color:#fff;background:linear-gradient(150deg,${c.color},#141414)">${catIco(c, 30)}</div><span>${c.name}</span>
     </div>`).join('');
 }
 function accentAlpha(hex) {
@@ -698,11 +894,81 @@ function renderHome() {
   const local = state.ads;
   $('#adListHome').innerHTML = local.length ? local.map(adHTML).join('') : emptyHTML('В вашем городе пока нет объявлений');
 }
+function subOf(a) {
+  if (!a.extra) return '';
+  return a.category === 'auto' ? (a.extra.brand || '') : (a.extra.subcategory || '');
+}
+function subList(cat) {
+  if (cat === 'auto') return Object.keys(CAR_MODELS);
+  const f = (CATEGORY_FIELDS[cat] || []).find(x => x.key === 'subcategory');
+  return f ? f.options : [];
+}
 function renderSearch(q = '') {
-  const list = state.ads.filter(a =>
-    !q || a.title.toLowerCase().includes(q.toLowerCase()) || catName(a.category).toLowerCase().includes(q.toLowerCase())
-  );
-  $('#adListSearch').innerHTML = list.length ? list.map(adHTML).join('') : emptyHTML('Ничего не найдено');
+  const cat = state.activeCat;
+  const sub = state.activeSub;
+  $('#searchCatList').classList.toggle('hidden', !!cat);
+  $('#searchSubWrap').classList.toggle('hidden', !cat || !!sub);
+  const crumbs = $('#searchCrumbs');
+  if (cat) {
+    crumbs.classList.remove('hidden');
+    crumbs.innerHTML = sub
+      ? `<span class="crumb" onclick="backToSubs()">${catName(cat)}</span><span class="crumb-sep">›</span><span class="crumb" onclick="pickSearchSub(-1)">${escapeHtml(sub)} ✕</span>`
+      : `<span class="crumb" onclick="backToSubs()">${catName(cat)}</span>`;
+    $('#searchSubList').innerHTML = renderSubList(cat);
+  } else {
+    crumbs.classList.add('hidden');
+    $('#searchCatList').innerHTML = renderCatList();
+  }
+  let list = cat ? state.ads.filter(a => a.category === cat) : state.ads;
+  if (sub) list = list.filter(a => subOf(a) === sub);
+  const Q = q ? q.toLowerCase().trim() : '';
+  if (Q) list = list.filter(a => a.title.toLowerCase().includes(Q));
+  $('#adListSearch').innerHTML = list.length ? list.map(adHTML).join('') : emptyHTML('Объявлений не найдено');
+}
+function renderCatList() {
+  return CATEGORIES.map(c => {
+    const n = state.ads.filter(a => a.category === c.id).length;
+    return `<div class="search-cat" onclick="pickSearchCat('${c.id}')">
+      <span class="sc-ico" style="color:${c.accent}">${catIco(c, 20)}</span>
+      <span class="sc-name">${c.name}</span>
+      <span class="sc-count">${n}</span>
+      <span class="sc-arrow">›</span>
+    </div>`;
+  }).join('');
+}
+function renderSubList(cat) {
+  const opts = subList(cat);
+  const counts = {};
+  state.ads.forEach(a => { if (a.category === cat) { const s = subOf(a); if (s) counts[s] = (counts[s] || 0) + 1; } });
+  const total = state.ads.filter(a => a.category === cat).length;
+  let rows = `<div class="search-sub all${state.activeSub ? '' : ' sel'}" onclick="pickSearchSub(-1)">
+    <span class="sc-name">Все объявления</span><span class="sc-count">${total}</span><span class="sc-arrow">›</span>
+  </div>`;
+  rows += opts.map((o, i) => `
+    <div class="search-sub${state.activeSub === o ? ' sel' : ''}" onclick="pickSearchSub(${i})">
+      <span class="sc-name">${escapeHtml(o)}</span><span class="sc-count">${counts[o] || 0}</span>
+    </div>`).join('');
+  return rows;
+}
+function pickSearchCat(id) {
+  state.activeCat = id || null;
+  state.activeSub = null;
+  updateCatBack();
+  renderSearch($('#searchInput').value);
+}
+function pickSearchSub(i) {
+  if (i < 0) state.activeSub = null;
+  else {
+    const opts = subList(state.activeCat);
+    state.activeSub = opts[i] != null ? opts[i] : null;
+  }
+  renderSearch($('#searchInput').value);
+}
+function backToSubs() {
+  if (!state.activeCat) return;
+  state.activeSub = null;
+  updateCatBack();
+  renderSearch($('#searchInput').value);
 }
 function renderFav() {
   const list = (state.me ? state.me.favAds : []);
@@ -725,7 +991,7 @@ function fmtKop(kopecks) { return ((kopecks || 0) / 100).toLocaleString('ru-RU',
 
 /* ===== Balance / Top-up ===== */
 let topUpAmount = 10000;
-const TOPUP_PRESETS = [10000, 50000, 100000, 300000, 1000000];
+const TOPUP_PRESETS = [10000, 30000, 50000, 100000, 300000, 1000000];
 let profTab = 'main';
 function setProfTab(tab) {
   profTab = tab;
@@ -857,10 +1123,9 @@ function goTab(tab, keep) {
   if (nt) nt.classList.add('active');
   if (tab === 'home') renderHome();
   if (tab === 'search') {
-    if (!keep) state.activeCat = null;
-    $('#searchInput').value = state.activeCat ? catName(state.activeCat) : '';
+    if (!keep) { state.activeCat = null; state.activeSub = null; }
     updateCatBack();
-    renderSearch(state.activeCat ? catName(state.activeCat) : '');
+    renderSearch($('#searchInput').value);
   }
   if (tab === 'fav') renderFav();
   if (tab === 'mine') openMine();
@@ -873,22 +1138,21 @@ function goTab(tab, keep) {
 }
 function filterCat(id) {
   state.activeCat = id;
+  state.activeSub = null;
   goTab('search', true);
 }
 function exitCategory() {
-  state.activeCat = null;
-  $('#searchInput').value = '';
+  if (state.activeSub) state.activeSub = null;
+  else if (state.activeCat) state.activeCat = null;
+  else { renderHome(); goTab('home'); return; }
   updateCatBack();
-  renderHome();
-  goTab('home');
+  renderSearch($('#searchInput').value);
 }
 function updateCatBack() {
   const b = document.getElementById('catBack');
-  if (b) b.classList.toggle('hidden', !state.activeCat);
+  if (b) b.classList.toggle('hidden', !(state.activeCat || state.activeSub));
 }
 function onSearch(v) {
-  if (!v && state.activeCat) state.activeCat = null;
-  updateCatBack();
   renderSearch(v);
 }
 
@@ -970,7 +1234,9 @@ function renderExtraFields(prefill = {}) {
     const req = f.required ? ' (обязательно)' : '';
     let input;
     if (f.type === 'select') {
-      input = `<select id="ef-${f.key}">${f.options.map(o => `<option value="${escapeHtml(o)}" ${String(o) === String(v) ? 'selected' : ''}>${escapeHtml(o)}</option>`).join('')}</select>`;
+      const oc = f.onchange ? ` onchange="${f.onchange}"` : '';
+      const opts = f.dynamic ? '' : f.options.map(o => `<option value="${escapeHtml(o)}" ${String(o) === String(v) ? 'selected' : ''}>${escapeHtml(o)}</option>`).join('');
+      input = `<select id="ef-${f.key}"${oc}>${opts}</select>`;
     } else {
       const ph = f.placeholder ? ` placeholder="${escapeHtml(f.placeholder)}"` : '';
       const num = f.type === 'number' ? ' type="number" inputmode="numeric" min="0"' : ' type="text"';
@@ -978,6 +1244,29 @@ function renderExtraFields(prefill = {}) {
     }
     return `<div class="field"><label>${escapeHtml(f.label)}${req}</label>${input}</div>`;
   }).join('');
+  if (cat === 'auto') renderCarModel(prefill && prefill.model);
+}
+function renderCarModel(saved) {
+  const brandEl = document.getElementById('ef-brand');
+  const brand = brandEl ? brandEl.value : '';
+  const sel = document.getElementById('ef-model');
+  if (!sel) return;
+  const models = (brand && brand !== 'Другая' && CAR_MODELS[brand]) || [];
+  if (brand && brand !== 'Другая' && models.length) {
+    if (sel.tagName.toLowerCase() !== 'select') {
+      sel.outerHTML = '<select id="ef-model"></select>';
+    }
+    const node = document.getElementById('ef-model');
+    node.innerHTML = '<option value="">— выберите модель —</option>' + models.map(o =>
+      `<option value="${escapeHtml(o)}" ${String(o) === String(saved || '') ? 'selected' : ''}>${escapeHtml(o)}</option>`).join('');
+    if (saved) node.value = saved;
+  } else {
+    if (sel.tagName.toLowerCase() === 'select') {
+      sel.outerHTML = `<input id="ef-model" type="text" value="${escapeHtml(saved || '')}" placeholder="Модель" />`;
+    } else if (saved !== undefined) {
+      sel.value = saved || '';
+    }
+  }
 }
 function collectExtra() {
   const cat = $('#f-cat').value;
@@ -1357,11 +1646,7 @@ async function setCity(c) {
   toast('Город: ' + c);
 }
 
-/* ===== Chats / Notifs (demo UI) ===== */
-function openChats() {
-  $('#chatList').innerHTML = emptyHTML('Функция чатов появится в следующем обновлении');
-  openSheet('chatSheet');
-}
+/* ===== Notifs (demo UI) ===== */
 function openNotifs() {
   $('#notifList').innerHTML = emptyHTML('Пока нет уведомлений');
   openSheet('notifSheet');
@@ -1379,7 +1664,6 @@ function toast(msg) {
 /* ===== Init ===== */
 async function init() {
   renderCategories('catGrid');
-  renderCategories('catGridSearch');
   fillCatSelect();
   try {
     state.me = await api('/api/auth', { method: 'POST', body: {} });
