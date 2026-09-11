@@ -22,6 +22,13 @@
     --radius: 14px;
     --safe-b: env(safe-area-inset-bottom, 0px);
     --safe-t: env(safe-area-inset-top, 0px);
+    --nav-bg: rgba(15,15,15,.92);
+    --placebar-bg: rgba(15,15,15,.97);
+    --cat-ico-to: #141414;
+    --cat-ico-fg: #ffffff;
+  }
+  html.theme-switch *, html.theme-switch *::before, html.theme-switch *::after {
+    transition: background-color .35s ease, color .35s ease, border-color .35s ease, box-shadow .35s ease, fill .35s ease, stroke .35s ease, filter .35s ease !important;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; overscroll-behavior: none; -webkit-font-smoothing: antialiased; }
@@ -46,7 +53,7 @@
   .op-list { display: flex; flex-direction: column; gap: 6px; }
   .op-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 13px; color: var(--text); }
   .op-row .op-date { font-size: 11.5px; color: var(--text-mute); margin-top: 2px; }
-  .seg { display: flex; gap: 6px; margin: 6px 0 12px; }
+  .seg { display: flex; gap: 6px; margin: 0 0 12px; }
   .ad.premium { border-color: #d4af37; box-shadow: 0 0 0 1px rgba(212,175,55,.35), 0 8px 20px rgba(212,175,55,.12); }
   .ad-badge { position: absolute; right: 8px; border-radius: 10px; padding: 2px 8px; font-size: 10px; font-weight: 700; backdrop-filter: blur(6px); background: rgba(10,10,10,.6); }
   .badge-pin { top: 42px; color: #ffd54a; }
@@ -63,8 +70,9 @@
   .pro-label { font-size: 9px; font-weight: 700; color: #d4af37; border: 1px solid rgba(212,175,55,.5); padding: 0 4px; border-radius: 6px; margin-left: 5px; vertical-align: 1px; }
   .plan-pro { color: #d4af37; font-weight: 600; margin: 4px 0 10px !important; }
   .seg { display: flex; gap: 8px; margin-bottom: 10px; }
-  .seg-btn { flex: 1; padding: 10px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim); font-size: 14px; cursor: pointer; }
+    .seg-btn { flex: 1; padding: 10px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim); font-size: 14px; cursor: pointer; }
   .seg-btn.active { color: #fff; border-color: var(--blue); background: var(--blue-dim); }
+  .home-tabs .seg-btn { font-size: 13px; padding: 8px; }
   .shop-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 8px; }
   .shop-item .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .shop-item .nm { font-size: 14px; font-weight: 600; }
@@ -92,6 +100,35 @@
   .crumbs { display: flex; align-items: center; gap: 6px; margin: 2px 0 12px; font-size: 13px; flex-wrap: wrap; }
   .crumb { cursor: pointer; color: var(--blue); }
   .crumb-sep { color: var(--text-dim); }
+  .filters { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .f-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .f-city { font-size: 14px; font-weight: 600; }
+  .ff-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .ff-head .back-btn { margin-right: auto; }
+  .ff-title { font-size: 18px; font-weight: 700; margin-right: auto; }
+  .filters-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; }
+  .reg-list { margin-top: 8px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-card); }
+  .reg-row { display: flex; align-items: center; gap: 8px; padding: 11px 12px; cursor: pointer; font-size: 13.5px; font-weight: 500; background: var(--bg-card); border-bottom: 1px solid var(--border); }
+  .reg-row:last-child { border-bottom: none; }
+  .reg-togg { transition: transform .15s; color: var(--text-mute); font-size: 11px; }
+  .reg-row.open .reg-togg { transform: rotate(90deg); }
+  .reg-name { flex: 1; }
+  .reg-meta { font-size: 11.5px; color: var(--text-mute); background: var(--bg); padding: 2px 8px; border-radius: 10px; }
+  .reg-body { display: none; }
+  .reg-body.open { display: block; }
+  .reg-body .c-item { display: flex; align-items: center; gap: 9px; padding: 9px 12px 9px 16px; font-size: 13px; color: var(--text-dim); cursor: pointer; background: var(--bg); border-bottom: 1px solid var(--border); }
+  .reg-body .c-item:last-child { border-bottom: none; }
+  .c-item .c-check { accent-color: var(--blue); width: 16px; height: 16px; flex-shrink: 0; }
+  .csel-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .csel-chips .c-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-dim); border-radius: 12px; padding: 5px 9px; cursor: pointer; user-select: none; }
+  .mini-tag { font-size: 11px; color: var(--text-mute); background: var(--bg); padding: 2px 8px; border-radius: 10px; }
+  .ff-sep { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--text-dim); margin: 14px 0 8px; }
+  .ff-note { font-size: 13px; color: var(--text-dim); background: var(--bg); border: 1px dashed var(--border); border-radius: 12px; padding: 12px; margin-top: 8px; }
+  .f-input { flex: 1; min-width: 0; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; color: var(--text); font-size: 13.5px; outline: none; }
+  .f-select { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; color: var(--text); font-size: 13.5px; outline: none; }
+  .f-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 7px 10px; cursor: pointer; user-select: none; }
+  .f-chip input { accent-color: var(--blue); }
+  .btn.mini { padding: 7px 12px; font-size: 12.5px; border-radius: 10px; }
   .cat { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .cat .ico { width: 58px; height: 58px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; transition: transform .15s, box-shadow .15s; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
   .cat:active .ico { transform: scale(.88); box-shadow: 0 1px 3px rgba(0,0,0,.18); }
@@ -114,7 +151,7 @@
   .ad-seller .ava { width: 20px; height: 20px; border-radius: 50%; background: var(--blue-dim); color: #fff; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .ad-seller .name { font-size: 11px; color: var(--text-dim); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ad-seller .contact { font-size: 11px; color: var(--blue); font-weight: 500; flex-shrink: 0; }
-  nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: rgba(15,15,15,.92); backdrop-filter: blur(14px); border-top: 1px solid var(--border); display: flex; padding: 8px 6px calc(8px + var(--safe-b)); z-index: 30; }
+  nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--nav-bg); backdrop-filter: blur(14px); border-top: 1px solid var(--border); display: flex; padding: 8px 6px calc(8px + var(--safe-b)); z-index: 30; }
   .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10.5px; color: var(--text-mute); cursor: pointer; position: relative; padding: 4px 0; transition: color .2s; }
   .tab svg { stroke: var(--text-mute); transition: stroke .2s, transform .2s; }
   .tab:active { transform: scale(.92); }
@@ -125,7 +162,7 @@
   .tab .plus svg { stroke: #fff; }
   main > section { animation: viewIn .24s ease; }
   @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-  .placebar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(92px + var(--safe-b)); width: 100%; max-width: 480px; padding: 10px 16px 4px; z-index: 29; background: linear-gradient(to top, rgba(15,15,15,.97) 55%, transparent); }
+  .placebar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(92px + var(--safe-b)); width: 100%; max-width: 480px; padding: 10px 16px 4px; z-index: 29; background: linear-gradient(to top, var(--placebar-bg) 55%, transparent); }
   .placebar .btn { box-shadow: 0 8px 24px rgba(47,123,255,.4); margin: 0; }
   main.has-placebar { padding-bottom: calc(150px + var(--safe-b)); }
   .sheet-mask { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 50; opacity: 0; pointer-events: none; transition: .25s; }
@@ -174,7 +211,7 @@
   .contact-btns .btn.ph { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-dim); }
   .empty { text-align: center; color: var(--text-mute); padding: 60px 20px; font-size: 14px; grid-column: 1 / -1; }
   .empty svg { margin-bottom: 14px; opacity: .5; }
-  .loading { text-align: center; color: var(--text-mute); padding: 40px 20px; font-size: 14px; }
+  .loading { grid-column: 1 / -1; text-align: center; color: var(--text-mute); padding: 48px 20px; font-size: 14px; }
   .ad-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .gallery { position: absolute; inset: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #111; }
   .gallery img { height: 100%; width: 100%; object-fit: cover; flex-shrink: 0; scroll-snap-align: start; }
@@ -189,6 +226,70 @@
   .hidden { display: none !important; }
   .toast { position: fixed; top: calc(var(--safe-t) + 14px); left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--bg-elev); border: 1px solid var(--border); color: var(--text); padding: 12px 18px; border-radius: 12px; font-size: 14px; z-index: 100; transition: .3s; box-shadow: 0 8px 30px rgba(0,0,0,.5); max-width: 90%; }
   .toast.show { transform: translateX(-50%) translateY(0); }
+  .g-count { position: absolute; top: 12px; right: 12px; z-index: 3; background: rgba(0,0,0,.6); color: #fff; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 10px; backdrop-filter: blur(6px); }
+  .sk { position: relative; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; height: 210px; }
+  .sk::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent); animation: shimmer 1.2s infinite; }
+  @keyframes shimmer { 100% { transform: translateX(100%); } }
+  .sk.img { height: 120px; border-radius: 14px 14px 0 0; border: none; background: var(--bg-elev); }
+  .sk.line { height: 12px; border-radius: 6px; border: none; background: var(--bg-elev); margin: 10px 10px 0; }
+  .sk.line.short { width: 55%; }
+  .sk-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; height: 205px; }
+  .rev-list { display: flex; flex-direction: column; gap: 8px; }
+  .rev-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 13px; }
+  .rev-row .rev-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .rev-row .rev-stars { color: #f5b301; letter-spacing: 1px; }
+  .rev-row .rev-txt { color: var(--text-dim); margin-top: 6px; }
+  .rev-row .rev-date { font-size: 11px; color: var(--text-mute); }
+  .stars { display: flex; justify-content: center; gap: 10px; font-size: 38px; color: #4a4a4a; margin: 6px 0; cursor: pointer; user-select: none; }
+  .stars span { transition: .15s; }
+  .stars span.on { color: #f5b301; transform: scale(1.05); }
+  .rate-link { color: var(--blue); font-size: 12.5px; cursor: pointer; }
+  .rt .r-avg { color: #f5b301; font-weight: 600; }
+  html.light {
+    --bg: #f2f3f5; --bg-elev: #ffffff; --bg-card: #ffffff; --border: #e4e6eb;
+    --text: #14161a; --text-dim: #6b7280; --text-mute: #9aa0a6;
+    --blue: #2563eb; --blue-dim: #1d4ed8; --blue-soft: rgba(37, 99, 235, 0.1); --danger: #dc2626;
+    --nav-bg: rgba(255,255,255,.94);
+    --placebar-bg: rgba(255,255,255,.97);
+    --cat-ico-fg: #2c3138;
+    --cat-ico-to: #999fa8;
+  }
+  html.light .cat .ico { filter: saturate(1.15) brightness(1.5); }
+  html.light .ad-img, html.light .detail-img { background: linear-gradient(135deg, #e8eaee, #f2f3f5); }
+  html.light .sk::after { background: linear-gradient(90deg, transparent, rgba(0,0,0,.05), transparent); }
+  html.light .toast { box-shadow: 0 8px 30px rgba(0,0,0,.18); }
+  html.light .cat .ico { box-shadow: 0 1px 4px rgba(0,0,0,.10); }
+  .prof-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .prof-stat { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 9px 4px; text-align: center; }
+  .prof-stat .v { font-size: 15px; font-weight: 600; color: var(--text); }
+  .prof-stat .l { font-size: 10.5px; color: var(--text-mute); margin-top: 2px; }
+  .onboard { position: fixed; inset: 0; z-index: 70; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
+  .onboard.hidden { display: none; }
+  .ob-track { display: flex; width: 300%; height: 100%; transition: transform .32s ease; }
+  .ob-slide { width: 33.3334%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 28px; text-align: center; }
+  .ob-ico { width: 118px; height: 118px; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 52px; margin-bottom: 24px; box-shadow: 0 12px 32px rgba(0,0,0,.25); }
+  .ob-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+  .ob-text { font-size: 14px; color: var(--text-dim); line-height: 1.5; max-width: 300px; }
+  .ob-foot { margin-top: auto; padding: 0 24px calc(28px + env(safe-area-inset-bottom, 0px)); width: 100%; box-sizing: border-box; }
+  .ob-dots { display: flex; justify-content: center; gap: 7px; margin-bottom: 18px; }
+  .ob-dot { width: 8px; height: 8px; border-radius: 99px; background: var(--border); transition: .25s; }
+  .ob-dot.on { width: 22px; background: var(--blue); }
+  .ob-foot .btn { margin: 0; }
+  .ob-skip { display: block; margin: 14px auto 0; background: none; border: none; color: var(--text-mute); font-size: 13px; cursor: pointer; }
+  .cmp-bar { display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 6px 8px; margin-bottom: 12px; font-size: 13px; }
+  .cmp-bar .grow { flex: 1; }
+  .cmp-btn { margin: 0 !important; padding: 8px 12px !important; font-size: 13px !important; width: auto !important; }
+  .cmp-pick { position: absolute; top: 8px; left: 8px; z-index: 3; width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.9); background: rgba(10,10,10,.5); color: #fff; font-size: 15px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+  .cmp-pick.on { background: var(--blue); }
+  .cmp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .cmp-table th, .cmp-table td { border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+  .cmp-table tr:last-child td, .cmp-table tr:last-child th { border-bottom: none; }
+  .cmp-table th { font-size: 11px; color: var(--text-mute); font-weight: 500; line-height: 1.35; }
+  .cmp-table td:first-child { color: var(--text-mute); white-space: nowrap; }
+  .dnf-box { padding: 16px 4px 8px; text-align: center; }
+  .dnf-t { font-size: 16px; font-weight: 700; }
+  .dnf-s { font-size: 13px; color: var(--text-dim); margin: 10px 0 16px; }
+  .dnf-box #dnfOk:disabled { opacity: .5; }
 </style>
 </head>
 <body>
@@ -202,6 +303,10 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="searchInput" placeholder="Поиск товаров..." oninput="onSearch(this.value)" />
       </div>
+      <button class="icon-btn" onclick="goTab('filter', true)" aria-label="Фильтры">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg>
+        <span class="badge" id="filtBadge" style="display:none">0</span>
+      </button>
       <button class="icon-btn" onclick="openNotifs()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
         <span class="badge" id="notifBadge" style="display:none">0</span>
@@ -217,8 +322,18 @@
     <section id="view-home">
       <div class="section-title">Категории</div>
       <div class="categories" id="catGrid"></div>
-      <div class="section-title"><span>Рекомендуем в <span id="cityInTitle">…</span></span><span class="more" onclick="goTab('search')">Все</span></div>
-      <div class="ads" id="adListHome"></div>
+      <div class="home-tabs seg">
+        <button class="seg-btn active" id="homeTabRec" onclick="pickHomeTab('rec')">Рекомендуем</button>
+        <button class="seg-btn" id="homeTabRecent" onclick="pickHomeTab('recent')">Недавно</button>
+      </div>
+      <div id="homeRecWrap">
+        <div class="section-title"><span>Рекомендуем в <span id="cityInTitle">…</span></span><span class="more" onclick="goTab('search')">Все</span></div>
+        <div class="ads" id="adListHome"></div>
+      </div>
+      <div id="homeRecentWrap" class="hidden">
+        <div class="section-title">Недавно просмотренные</div>
+        <div class="ads" id="recentHome"></div>
+      </div>
     </section>
 
     <section id="view-search" class="hidden">
@@ -230,6 +345,56 @@
       </div>
       <div class="section-title" style="margin-top:12px">Объявления</div>
       <div class="ads" id="adListSearch"></div>
+      <div id="moreWrap" style="display:none;margin-top:12px">
+        <button class="btn ghost" style="width:100%" onclick="showMore()">Показать ещё</button>
+      </div>
+    </section>
+
+    <section id="view-filter" class="hidden">
+      <div class="ff-head">
+        <button class="icon-btn back-btn" onclick="goTab('search', true)" aria-label="Назад">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <span class="ff-title">Фильтры</span>
+        <button class="btn ghost mini" onclick="resetFilters()">Сбросить</button>
+      </div>
+      <div class="filters-card">
+        <div class="field">
+          <label>Города поиска <span class="mini-tag" id="citySelCount"></span></label>
+          <label class="f-chip" style="width:100%;justify-content:flex-start;gap:8px">
+            <input type="checkbox" id="ffAllRegions" onchange="setAllRegions(this.checked)" style="accent-color:var(--blue)">
+            <span>Все регионы</span>
+          </label>
+          <div id="citySelRegions" class="reg-list"></div>
+          <div id="citySelChips" class="csel-chips"></div>
+        </div>
+        <div class="field">
+          <label>Категория</label>
+          <select class="f-select" style="width:100%" id="ffCat" onchange="setFiltCat(this.value)"></select>
+        </div>
+        <div id="ffCatBlock"></div>
+        <div class="ff-sep">Общие</div>
+        <div class="field">
+          <label>Цена, ₽</label>
+          <div class="f-row">
+            <input class="f-input" id="fMin" type="number" inputmode="numeric" placeholder="от" oninput="setGlobal('min',this.value)" />
+            <input class="f-input" id="fMax" type="number" inputmode="numeric" placeholder="до" oninput="setGlobal('max',this.value)" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Сортировка</label>
+          <select class="f-select" style="width:100%" id="fSort" onchange="setGlobal('sort',this.value)">
+            <option value="new">Сначала новые</option>
+            <option value="cheap">Сначала дешевле</option>
+            <option value="exp">Сначала дороже</option>
+          </select>
+        </div>
+        <div class="f-row">
+          <label class="f-chip"><input type="checkbox" id="fPhoto" onchange="setGlobal('photo',this.checked)"><span>📷 Только с фото</span></label>
+          <label class="f-chip"><input type="checkbox" id="fPromo" onchange="setGlobal('promo',this.checked)"><span>⭐ С продвижением</span></label>
+        </div>
+        <button class="btn" style="width:100%;margin-top:4px" onclick="goTab('search', true)">Показать объявления</button>
+      </div>
     </section>
 
     <section id="view-place" class="hidden">
@@ -259,12 +424,20 @@
     </section>
 
     <section id="view-fav" class="hidden">
-      <div class="section-title">Избранное</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div class="section-title" style="margin:0">Избранное</div>
+        <button class="btn ghost mini" id="cmpToggle" onclick="toggleCompareMode()">⚖ Сравнить</button>
+      </div>
+      <div class="cmp-bar hidden" id="cmpBar" style="margin-top:12px">
+        <span class="grow" id="cmpCount">Выбрано: 0</span>
+        <button class="btn cmp-btn" onclick="openCompare()">Сравнить</button>
+        <button class="btn ghost cmp-btn" onclick="clearCompare()">Сброс</button>
+      </div>
       <div class="ads" id="adListFav"></div>
     </section>
 
     <section id="view-profile" class="hidden">
-      <div style="padding:10px 4px 4px">
+      <div style="padding:0 4px 4px">
         <div class="seg" id="profSeg">
         <button class="seg-btn active" id="profSegMain" onclick="setProfTab('main')">Профиль</button>
         <button class="seg-btn" id="profSegOps" onclick="setProfTab('ops')">История операций</button>
@@ -279,6 +452,11 @@
             <span>Объявлений: <b style="color:var(--text)" id="profAds">0</b></span>
             <span>В избранном: <b style="color:var(--text)" id="profFav">0</b></span>
           </div>
+          <div class="prof-stats">
+            <div class="prof-stat"><div class="v" id="profViews">0</div><div class="l">Просмотры</div></div>
+            <div class="prof-stat"><div class="v" id="profSold">0</div><div class="l">Продано</div></div>
+            <div class="prof-stat"><div class="v" id="profRate">—</div><div class="l" id="profRateLbl">Рейтинг</div></div>
+          </div>
         </div>
         <div class="balance-card">
           <div class="balance-label">Баланс</div>
@@ -289,6 +467,7 @@
         <button class="btn ghost" style="margin-bottom:10px" onclick="openShop(false)">🏪 Магазин услуг</button>
         <button class="btn ghost" style="margin-bottom:10px" onclick="myAds()">Мои объявления</button>
         <button class="btn ghost" style="margin-bottom:10px" onclick="openCity()">Сменить город</button>
+        <button class="btn ghost" style="margin-bottom:10px" onclick="toggleTheme()">🌗 <span id="themeLbl">Светлая тема</span></button>
         <button class="btn ghost hidden" id="adminBtn" style="margin-bottom:10px;color:var(--blue);border-color:var(--blue-dim)" onclick="openAdmin()">Админ-панель</button>
         <button class="btn ghost" onclick="showAbout()">О приложении</button>
       </div>
@@ -353,7 +532,7 @@
         <div class="detail-extra" id="dExtra"></div>
         <div class="detail-desc" id="dDesc"></div>
         <div class="seller-card">
-          <div class="top"><div class="ava" id="dAva"></div><div><div class="nm" id="dSeller"></div><div class="rt">Продавец на площадке</div></div></div>
+          <div class="top"><div class="ava" id="dAva"></div><div><div class="nm" id="dSeller"></div><div class="rt" id="dRating"></div></div></div>
           <div class="contact-btns">
             <button class="btn tg" id="dTg" onclick="contactTg()">Написать в Telegram</button>
             <button class="btn ph" id="dPhone" onclick="contactPhone()">Позвонить</button>
@@ -376,6 +555,14 @@
           <button id="renewBtn" class="btn ghost hidden" style="margin-top:10px;color:var(--blue);border-color:var(--blue-dim)" onclick="renewAd()">Продлить на 30 дней</button>
           <button id="reportBtn" class="btn ghost hidden" style="margin-top:10px;color:var(--text-dim)" onclick="openReport()">Пожаловаться</button>
         </div>
+        <div id="dReviewsSec" class="hidden">
+          <div class="section-title" style="margin-top:14px">Отзывы</div>
+          <div id="dReviews" class="rev-list"></div>
+        </div>
+        <div id="dSimilarSec" class="hidden">
+          <div class="section-title" style="margin-top:14px">Похожие объявления</div>
+          <div class="ads" id="dSimilar"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -390,6 +577,19 @@
       <h2>Пожаловаться</h2>
       <p class="sub">Выберите причину — мы проверим объявление</p>
       <div class="city-list" id="reportOptions"></div>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="reviewSheet" onclick="if(event.target===this)closeSheet('reviewSheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <h2>Оценить объявление</h2>
+      <p class="sub">Насколько продавец оправдал ожидания?</p>
+      <div class="stars" id="revStars">
+        <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+      </div>
+      <textarea class="f-input" id="revText" rows="3" maxlength="500" placeholder="Комментарий (необязательно)" style="width:100%;margin:12px 0;resize:none"></textarea>
+      <button class="btn" style="width:100%" onclick="submitReview()">Отправить оценку</button>
     </div>
   </div>
 
@@ -423,6 +623,40 @@
       <div id="shopServices"></div>
       <div class="section-title" style="margin-top:14px">Тарифы</div>
       <div id="shopPlans"></div>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="compareSheet" onclick="if(event.target===this)closeSheet('compareSheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <h2>Сравнение объявлений</h2>
+      <p class="sub" id="cmpSub"></p>
+      <table class="cmp-table" id="cmpTable"></table>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="confirmSheet" onclick="if(event.target===this)closeSheet('confirmSheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="dnf-box">
+        <div class="dnf-t">Удалить объявление?</div>
+        <div class="dnf-s">Действие необратимо. Кнопка активируется через <b id="dnfLeft">10</b> сек</div>
+        <button class="btn" id="dnfOk" style="background:#e53935" onclick="doDeleteAd()" disabled>Удалить навсегда</button>
+        <button class="btn ghost" style="margin-top:8px" onclick="closeSheet('confirmSheet')">Отменить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="onboard hidden" id="onboard">
+    <div class="ob-track" id="obTrack">
+      <div class="ob-slide"><div class="ob-ico" style="background:linear-gradient(150deg,#4a90d9,#141414)">📍</div><div class="ob-title">Объявления рядом</div><div class="ob-text">Выберите свой город и регионы — в поиске можно смотреть объявления сразу из нескольких городов.</div></div>
+      <div class="ob-slide"><div class="ob-ico" style="background:linear-gradient(150deg,#4ad98c,#141414)">🔍</div><div class="ob-title">Умный поиск и фильтры</div><div class="ob-text">Ищите по категориям, цене и характеристикам, сравнивайте варианты и сохраняйте в избранное.</div></div>
+      <div class="ob-slide"><div class="ob-ico" style="background:linear-gradient(150deg,#d94a4a,#141414)">📦</div><div class="ob-title">Размещайте легко</div><div class="ob-text">Добавляйте фото, указывайте цену и контакты — объявление опубликуется за минуту.</div></div>
+    </div>
+    <div class="ob-foot">
+      <div class="ob-dots" id="obDots"></div>
+      <button class="btn" id="obNext" onclick="nextOnb()">Далее</button>
+      <button class="ob-skip" onclick="finishOnb()">Пропустить</button>
     </div>
   </div>
 
@@ -598,6 +832,33 @@ const CAR_MODELS = {
   'ВАЗ': ['2101','2102','2103','2104','2105','2106','2107','2108','2109','21099','2110','2111','2112','2113','2114','2115','2121','2123','2131','2329','4x4','Калина','Приора','Гранта','Нива','Vesta','XRAY','Ларгус','Ока'],
   'Другая': [],
 };
+const MODELS_TECH = {
+  'Apple': ['iPhone 16 Pro Max','iPhone 16 Pro','iPhone 16','iPhone 16 Plus','iPhone 15 Pro Max','iPhone 15 Pro','iPhone 15','iPhone 15 Plus','iPhone 14 Pro Max','iPhone 14 Pro','iPhone 14','iPhone 14 Plus','iPhone 13','iPhone 13 mini','iPhone SE 3','MacBook Pro 14','MacBook Pro 16','MacBook Air 13','MacBook Air 15','iMac 24','Mac mini','Mac Studio','iPad Pro 11','iPad Pro 12.9','iPad Air','iPad 10','iPad mini 6','Apple Watch Ultra 2','Apple Watch Series 9','Apple Watch SE','AirPods Pro 2','AirPods 3','AirPods Max','HomePod mini','Apple TV 4K','Apple Vision Pro'],
+  'Samsung': ['Galaxy S25 Ultra','Galaxy S25','Galaxy S25+','Galaxy S24 Ultra','Galaxy S24','Galaxy S24+','Galaxy S23 FE','Galaxy Z Fold 6','Galaxy Z Flip 6','Galaxy Z Fold 5','Galaxy Z Flip 5','Galaxy A56','Galaxy A55','Galaxy A35','Galaxy A16','Galaxy Tab S10 Ultra','Galaxy Tab S9','Galaxy Tab A9+','Galaxy Book 4 Pro','Galaxy Book 4 Edge','Galaxy Watch Ultra','Galaxy Watch 7','Galaxy Buds 3 Pro','Smart Monitor M8','Odyssey G9','BESPOKE Jet'],
+  'Xiaomi': ['Xiaomi 15 Pro','Xiaomi 15','Xiaomi 15 Ultra','Xiaomi 14 Ultra','Xiaomi 14','Xiaomi 14T','Xiaomi 13T','Redmi Note 14 Pro','Redmi Note 14','Redmi Note 13 Pro+','Redmi Note 13','Redmi 13C','Redmi 12','Poco F6 Pro','Poco X6 Pro','Poco M6 Pro','Poco C65','Xiaomi Pad 6S Pro','Xiaomi Pad 6','Redmi Pad SE','Xiaomi Smart Band 9','Redmi Buds 6','Xiaomi TV A 55'],
+  'Huawei': ['Mate 60 Pro','Mate 60','Mate X5','P60 Pro','P60','Nova 12 Ultra','Nova 12','MatePad Pro 13.2','MatePad 11','MateBook 14s','MateBook D16','Watch GT 5 Pro','Watch GT 4','FreeBuds Pro 3','Vision Smart TV'],
+  'Honor': ['Magic 6 Pro','Magic 6','Honor 200 Pro','Honor 200','Honor 90','Honor X9b','Honor X8b','Honor Pad 9','MagicPad 2','Honor Watch 5'],
+  'Oppo': ['Find X8 Pro','Find X8','Reno 13 Pro','Reno 13','A80'],
+  'Google': ['Pixel 9 Pro XL','Pixel 9 Pro','Pixel 9','Pixel 9 Pro Fold','Pixel 8a','Pixel 8 Pro','Pixel Watch 3','Pixel Buds Pro 2','Pixel Tablet'],
+  'Sony': ['Xperia 1 VI','Xperia 5 VI','Xperia 10 VI','PlayStation 5 Pro','PlayStation 5 Slim','PlayStation 5','PlayStation 4 Pro','PlayStation 4','WH-1000XM5','WH-CH720N','LinkBuds S','WF-1000XM5','A7C II','A7 IV','A6400','ZV-E10','BRAVIA XR A95L','Bravia 4K'],
+  'LG': ['OLED G4','OLED C4','OLED B4','QNED 90T','UltraGear 27','Gram 17','Gram 16','Gram Pro 16','LG Soundbar','LG Q60 4K'],
+  'Lenovo': ['ThinkPad X1 Carbon G12','ThinkPad T14s','ThinkPad E16','IdeaPad 5 2-in-1','IdeaPad Slim 3','IdeaPad Pro 5','Legion Pro 7i','Legion 5 Pro','LOQ 15IRX','Yoga Slim 7x','Tab P12','Tab M11'],
+  'Asus': ['ROG Strix G16','ROG Zephyrus G14','ROG Strix Scar 18','TUF Gaming A15','TUF Gaming F15','Vivobook 15','Vivobook S15 OLED','Zenbook 14 OLED','Zenbook Duo','ROG Ally','ProArt','ROG Phone 9'],
+  'HP': ['Pavilion 15','Pavilion x360 14','Envy x360 15','Spectre x360 14','Omen 16','Victus 16','EliteBook 840 G11','ProBook 450','LaserJet M111','OMEN Transcend 14'],
+  'Dell': ['XPS 13','XPS 15','XPS 14','Inspiron 15','Inspiron 14 Plus','Alienware M16 R2','Alienware x16','Latitude 7450','Precision 5680','UltraSharp 27'],
+  'MSI': ['Katana 15','Katana 17','Sword 16 HX','Raider GE68','Stealth 14','Modern 15','Titan 18 HZ','Vector 16'],
+  'Canon': ['EOS R5 Mark II','EOS R6 Mark II','EOS R50','EOS R10','EOS 90D','EOS M50 Mark II','PowerShot G7 X Mark III','EOS RP'],
+  'Nikon': ['Z9','Z8','Z6 III','Z50 II','D850','Z 50','Z 5'],
+  'GoPro': ['HERO12 Black','HERO11 Black','HERO10 Black','HERO9 Black','Fusion'],
+  'JBL': ['Charge 5','Flip 6','Xtreme 3','Boombox 3','PartyBox 310','Tune 510','Live 770NC','Quantum 360P'],
+  'Bose': ['QuietComfort Ultra','QuietComfort','QuietComfort 45','SoundLink Flex','SoundLink Revolve+ II','Soundbar 600','QC Earbuds'],
+  'Garmin': ['Fenix 7 Pro','Forerunner 265','Forerunner 965','Venu 3','Instinct 2','Edge 1040'],
+  'Logitech': ['MX Master 3S','MX Mechanical','MX Keys S','G502 X Plus','G213','G Pro X','C920','Brio','G915','Blue Yeti'],
+  'Razer': ['Viper V3 Pro','DeathAdder V3 Pro','BlackWidow V4','Huntsman V2','Kraken V3','Blade 16','Naga'],
+  'OnePlus': ['OnePlus 13','OnePlus 12','OnePlus Nord 4','OnePlus Pad 2'],
+  'Realme': ['Realme 14 Pro+','Realme 13 Pro','Realme 12','Realme C75','Realme Note 50'],
+  'Motorola': ['Edge 50 Ultra','Edge 50 Pro','Moto Razr 50 Ultra','Moto G84','Moto G54'],
+};
 /* Доп. поля по категориям (универсальная система). type: text|number|select */
 const CATEGORY_FIELDS = {
   auto: [
@@ -613,6 +874,8 @@ const CATEGORY_FIELDS = {
   ],
   tech: [
     { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Смартфоны','Планшеты','Ноутбуки и ПК','Мониторы','Телевизоры и аудио','Наушники и аксессуары','Фото и видеотехника','Игровые приставки','Умные часы и гаджеты','Бытовая техника','Умный дом','Другая электроника'] },
+    { key:'brand', label:'Производитель', type:'select', required:false, onchange:"renderElaModel()", options:['Apple','Samsung','Xiaomi','Huawei','Honor','Oppo','Realme','Google','Sony','LG','Lenovo','Asus','Acer','HP','Dell','MSI','Toshiba','Philips','Panasonic','Bosch','Siemens','Dyson','Canon','Nikon','GoPro','Logitech','Razer','Nokia','Motorola','OnePlus','Nothing','Tecno','Infinix','Poco','Garmin','JBL','Bose','Другой'] },
+    { key:'model', label:'Модель', type:'text', required:false, placeholder:'Модель' },
     { key:'condition', label:'Состояние', type:'select', required:false, options:['Новое','Как новое','Отличное','Хорошее','Среднее','Требуется ремонт'] },
   ],
   home: [
@@ -642,6 +905,19 @@ const CATEGORY_FIELDS = {
     { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Дом и сад','Инструменты','Товары для животных','Хобби и рукоделие','Коллекционирование','Книги и журналы','Музыкальные инструменты','Подарки и сувениры','Разное'] },
   ],
 };
+const RANGE_KEYS = { year:1, mileage:1, area:1, rooms:1, floor:1 };
+const TEXT_KEYS = { size:1, age:1 };
+const CATEGORY_FILTERS = {
+  auto: ['brand', 'year', 'mileage', 'transmission', 'drive', 'condition'],
+  tech: ['subcategory', 'brand', 'condition'],
+  home: ['subcategory', 'rooms', 'area', 'floor'],
+  cloth: ['subcategory', 'size', 'condition'],
+  sport: ['subcategory', 'condition'],
+  job: ['subcategory', 'schedule'],
+  kids: ['subcategory', 'age'],
+  other: ['subcategory'],
+};
+function fieldBy(cat, key) { return (CATEGORY_FIELDS[cat] || []).find(x => x.key === key) || {}; }
 const REGIONS = [
   { name: 'Москва', cities: ['Москва'] },
   { name: 'Санкт-Петербург', cities: ['Санкт-Петербург'] },
@@ -746,6 +1022,17 @@ let state = {
   newImages: [],
   backToMine: false,
   activeCat: null,
+  activeSub: null,
+  searchRes: null,
+  filters: { min: '', max: '', photo: false, promo: false, sort: 'new', extra: {} },
+  recent: (() => { try { return JSON.parse(localStorage.getItem('m_recent') || '[]'); } catch (e) { return []; } })(),
+  searchLimit: 20,
+  filterCities: (() => { try { const s = JSON.parse(localStorage.getItem('m_cityfilters') || '{"all":false,"cities":[]}'); return { all: !!s.all, cities: Array.isArray(s.cities) ? s.cities.filter(Boolean) : [] }; } catch (e) { return { all: false, cities: [] }; } })(),
+  scopeAds: null,
+  scopeKey: '',
+  compareMode: false,
+  compare: [],
+  homeTab: 'rec',
 };
 function mineViewActive() { return !document.getElementById('view-mine').classList.contains('hidden'); }
 
@@ -810,7 +1097,7 @@ function catIco(c, size = 26) {
 function renderCategories(elId) {
   document.getElementById(elId).innerHTML = CATEGORIES.map(c => `
     <div class="cat" onclick="filterCat('${c.id}')">
-      <div class="ico" style="color:#fff;background:linear-gradient(150deg,${c.color},#141414)">${catIco(c, 30)}</div><span>${c.name}</span>
+      <div class="ico" style="color:var(--cat-ico-fg);background:linear-gradient(150deg,${c.color},var(--cat-ico-to))">${catIco(c, 30)}</div><span>${c.name}</span>
     </div>`).join('');
 }
 function accentAlpha(hex) {
@@ -844,6 +1131,7 @@ function adHTML(a, opts) {
   return `
   <div class="ad${p.highlight ? ' premium' : ''}" onclick="openAd(${a.id})">
     <div class="ad-img">
+      ${(opts && opts.cmp) ? cmpPickHTML(a) : ''}
       ${timer}
       ${badges}
       ${pills ? `<div class="ad-badges">${pills}</div>` : ''}
@@ -869,7 +1157,16 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;',
 function emptyHTML(t = 'Ничего не найдено') {
   return `<div class="empty"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><div>${t}</div></div>`;
 }
-function loadingHTML(){ return `<div class="loading">Загрузка…</div>`; }
+function skeletonHTML(n = 6) {
+  return Array(n).fill(`
+  <div class="sk-card">
+    <div class="sk img"></div>
+    <div class="sk line"></div>
+    <div class="sk line short"></div>
+    <div class="sk line short" style="width:40%"></div>
+  </div>`).join('');
+}
+function loadingHTML(){ return skeletonHTML(6); }
 
 /* ===== Data loading ===== */
 async function loadAds() {
@@ -878,9 +1175,13 @@ async function loadAds() {
     const p = new URLSearchParams({ city: state.city });
     const { ads } = await api('/api/ads?' + p.toString());
     state.ads = ads;
+  } catch (e) {
+    toast(e.message);
+    state.ads = state.ads || [];
+  } finally {
     renderHome();
     if (document.getElementById('view-search').classList.contains('hidden') === false) renderSearch($('#searchInput').value);
-  } catch (e) { toast(e.message); }
+  }
 }
 
 async function loadMe() {
@@ -890,9 +1191,131 @@ async function loadMe() {
 /* ===== Render ===== */
 function renderHome() {
   $('#cityLabel').textContent = state.city || '—';
-  $('#cityInTitle').textContent = state.city || '…';
-  const local = state.ads;
+  const titleCity = document.getElementById('cityInTitle');
+  if (titleCity) titleCity.textContent = state.city || '…';
+  const local = state.ads || [];
+  const recItems = (state.recent || []).map(id => local.find(a => a.id === id)).filter(Boolean);
+  const showRecent = recItems.length > 0;
+  document.getElementById('homeTabRecent').classList.toggle('hidden', !showRecent);
+  if (!showRecent && state.homeTab === 'recent') state.homeTab = 'rec';
+  document.getElementById('homeTabRec').classList.toggle('active', state.homeTab === 'rec');
+  document.getElementById('homeTabRecent').classList.toggle('active', state.homeTab === 'recent');
+  document.getElementById('homeRecWrap').classList.toggle('hidden', state.homeTab !== 'rec');
+  document.getElementById('homeRecentWrap').classList.toggle('hidden', state.homeTab !== 'recent');
   $('#adListHome').innerHTML = local.length ? local.map(adHTML).join('') : emptyHTML('В вашем городе пока нет объявлений');
+  $('#recentHome').innerHTML = recItems.slice(0, 6).map(a => adHTML(a)).join('');
+}
+function pickHomeTab(tab) {
+  tap();
+  state.homeTab = tab;
+  renderHome();
+}
+function recordViewed(id) {
+  state.recent = [id, ...state.recent.filter(x => x !== id)].slice(0, 12);
+  try { localStorage.setItem('m_recent', JSON.stringify(state.recent)); } catch (e) {}
+}
+function timeAgo(ts) {
+  const d = Math.max(0, Math.floor(Date.now() / 1000) - (Number(ts) || 0));
+  if (d < 60) return 'только что';
+  if (d < 3600) return Math.floor(d / 60) + ' мин назад';
+  if (d < 86400) return Math.floor(d / 3600) + ' ч назад';
+  return Math.floor(d / 86400) + ' дн назад';
+}
+function starsHTML(n) {
+  return '★'.repeat(n || 0) + '☆'.repeat(Math.max(0, 5 - (n || 0)));
+}
+function renderRating(ad) {
+  const el = $('#dRating'); if (!el) return;
+  const r = ad.rating;
+  let html = 'Продавец на площадке';
+  if (r && r.count) html = `★ <span class="r-avg">${r.avg}</span> &middot; ${r.count} ${r.count === 1 ? 'отзыв' : (r.count < 5 ? 'отзыва' : 'отзывов')}`;
+  if (!r) return void (el.textContent = 'Продавец на площадке');
+  if (r.already) html += ' <span style="color:var(--text-dim)">· вы оценили</span>';
+  else if (r.canRate) html += ' <span class="rate-link" onclick="openReview()">Оценить</span>';
+  el.innerHTML = html;
+}
+function renderReviews(ad) {
+  const sec = $('#dReviewsSec'); if (!sec) return;
+  const list = (ad.rating && ad.rating.list) || [];
+  if (!list.length) { sec.classList.add('hidden'); return; }
+  $('#dReviews').innerHTML = list.map(x => `
+    <div class="rev-row">
+      <div class="rev-head"><span class="rev-stars">${starsHTML(x.rating)}</span><span class="rev-date">${timeAgo(x.created_at)}</span></div>
+      ${x.text ? '<div class="rev-txt">' + escapeHtml(x.text) + '</div>' : ''}
+    </div>`).join('');
+  sec.classList.remove('hidden');
+}
+let revRate = 5;
+function paintStars() {
+  document.querySelectorAll('#revStars span').forEach(s => s.classList.toggle('on', Number(s.dataset.v) <= revRate));
+}
+function openReview() {
+  revRate = 5;
+  paintStars();
+  $('#revText').value = '';
+  openSheet('reviewSheet');
+}
+function pickRev(v) { revRate = v; paintStars(); tap('impact'); }
+async function submitReview() {
+  const a = state.current; if (!a) return;
+  try {
+    const r = await api('/api/ads/' + a.id + '/review', { method: 'POST', body: { rating: revRate, text: $('#revText').value.trim() } });
+    a.rating = r.rating;
+    closeSheet('reviewSheet');
+    renderRating(a); renderReviews(a);
+    toast('Спасибо за оценку!');
+    tap('success');
+  } catch (e) { toast(e.message); tap('error'); }
+}
+function renderSimilar(ad) {
+  const sec = $('#dSimilarSec'); if (!sec) return;
+  const sim = (state.ads || []).filter(x => x.category === ad.category && x.id !== ad.id && x.status !== 'sold' && x.status !== 'expired').slice(0, 6);
+  if (!sim.length) { sec.classList.add('hidden'); return; }
+  $('#dSimilar').innerHTML = sim.map(a => adHTML(a)).join('');
+  sec.classList.remove('hidden');
+}
+function renderGalleryCounter(gal, n) {
+  const old = $('#dCount'); if (old) old.remove();
+  if (n < 2) return;
+  const b = document.createElement('div');
+  b.className = 'g-count'; b.id = 'dCount'; b.textContent = '1 / ' + n;
+  (gal.parentElement || document.body).appendChild(b);
+  let ticking = false;
+  const upd = () => {
+    const w = gal.clientWidth || gal.parentElement.clientWidth;
+    if (w) b.textContent = (Math.min(n - 1, Math.max(0, Math.round(gal.scrollLeft / w))) + 1) + ' / ' + n;
+    ticking = false;
+  };
+  gal.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(upd); } }, { passive: true });
+  setTimeout(upd, 60);
+}
+function showMore() {
+  state.searchLimit += 20;
+  renderSearch($('#searchInput').value);
+}
+function tap(kind) {
+  try {
+    const hf = tg && tg.HapticFeedback;
+    if (!hf) return;
+    if (kind === 'success') hf.notificationOccurred('success');
+    else if (kind === 'error') hf.notificationOccurred('error');
+    else hf.impactOccurred(kind === 'heavy' ? 'heavy' : 'light');
+  } catch (e) {}
+}
+function applyTheme() {
+  const t = localStorage.getItem('m_theme') || 'dark';
+  document.documentElement.classList.toggle('light', t === 'light');
+  const lbl = $('#themeLbl'); if (lbl) lbl.textContent = t === 'light' ? 'Тёмная тема' : 'Светлая тема';
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.setAttribute('content', t === 'light' ? '#f2f3f5' : '#0a0a0a');
+}
+function toggleTheme() {
+  const t = localStorage.getItem('m_theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.classList.add('theme-switch');
+  localStorage.setItem('m_theme', t);
+  applyTheme();
+  tap('impact');
+  setTimeout(() => document.documentElement.classList.remove('theme-switch'), 420);
 }
 function subOf(a) {
   if (!a.extra) return '';
@@ -902,6 +1325,10 @@ function subList(cat) {
   if (cat === 'auto') return Object.keys(CAR_MODELS);
   const f = (CATEGORY_FIELDS[cat] || []).find(x => x.key === 'subcategory');
   return f ? f.options : [];
+}
+function matchesQuery(a, q) {
+  const t = (a.title + ' ' + (a.description || '')).toLowerCase();
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every(w => t.includes(w));
 }
 function renderSearch(q = '') {
   const cat = state.activeCat;
@@ -919,15 +1346,49 @@ function renderSearch(q = '') {
     crumbs.classList.add('hidden');
     $('#searchCatList').innerHTML = renderCatList();
   }
-  let list = cat ? state.ads.filter(a => a.category === cat) : state.ads;
+  const base = state.searchRes == null ? (state.scopeAds || state.ads) : state.searchRes;
+  let list = cat ? base.filter(a => a.category === cat) : base;
   if (sub) list = list.filter(a => subOf(a) === sub);
   const Q = q ? q.toLowerCase().trim() : '';
-  if (Q) list = list.filter(a => a.title.toLowerCase().includes(Q));
-  $('#adListSearch').innerHTML = list.length ? list.map(adHTML).join('') : emptyHTML('Объявлений не найдено');
+  if (Q) list = list.filter(a => matchesQuery(a, Q));
+  const f = state.filters;
+  const min = parseFloat(f.min) || 0, max = parseFloat(f.max) || Infinity;
+  list = list.filter(a => a.price >= min * 100 && a.price <= max * 100);
+  if (f.photo) list = list.filter(a => a.images && a.images.length > 0);
+  if (f.promo) list = list.filter(a => hasPromo(a));
+  const ef = (f.extra || {})[cat] || {};
+  for (const key of (CATEGORY_FILTERS[cat] || [])) {
+    const from = ef[key + 'From'], to = ef[key + 'To'];
+    if (from || to) {
+      list = list.filter(a => {
+        const v = Number((a.extra || {})[key]);
+        if (isNaN(v)) return false;
+        if (from && v < Number(from)) return false;
+        if (to && v > Number(to)) return false;
+        return true;
+      });
+    } else if (ef[key]) {
+      const want = String(ef[key]).toLowerCase();
+      const isText = !!(TEXT_KEYS[key] || !fieldBy(cat, key).options);
+      list = list.filter(a => {
+        const got = (a.extra || {})[key];
+        if (got == null) return false;
+        return isText ? String(got).toLowerCase().includes(want) : String(got).toLowerCase() === want;
+      });
+    }
+  }
+  if (f.sort === 'cheap') list = [...list].sort((a, b) => a.price - b.price);
+  else if (f.sort === 'exp') list = [...list].sort((a, b) => b.price - a.price);
+  const shown = list.slice(0, state.searchLimit);
+  $('#adListSearch').innerHTML = shown.length ? shown.map(adHTML).join('') : emptyHTML('Объявлений не найдено');
+  const moreWrap = $('#moreWrap');
+  if (moreWrap) moreWrap.style.display = list.length > shown.length ? 'block' : 'none';
+  syncFilterBadge();
 }
 function renderCatList() {
+  const base = state.scopeAds || state.ads;
   return CATEGORIES.map(c => {
-    const n = state.ads.filter(a => a.category === c.id).length;
+    const n = base.filter(a => a.category === c.id).length;
     return `<div class="search-cat" onclick="pickSearchCat('${c.id}')">
       <span class="sc-ico" style="color:${c.accent}">${catIco(c, 20)}</span>
       <span class="sc-name">${c.name}</span>
@@ -939,8 +1400,9 @@ function renderCatList() {
 function renderSubList(cat) {
   const opts = subList(cat);
   const counts = {};
-  state.ads.forEach(a => { if (a.category === cat) { const s = subOf(a); if (s) counts[s] = (counts[s] || 0) + 1; } });
-  const total = state.ads.filter(a => a.category === cat).length;
+  const scope = state.scopeAds || state.ads;
+  scope.forEach(a => { if (a.category === cat) { const s = subOf(a); if (s) counts[s] = (counts[s] || 0) + 1; } });
+  const total = scope.filter(a => a.category === cat).length;
   let rows = `<div class="search-sub all${state.activeSub ? '' : ' sel'}" onclick="pickSearchSub(-1)">
     <span class="sc-name">Все объявления</span><span class="sc-count">${total}</span><span class="sc-arrow">›</span>
   </div>`;
@@ -972,7 +1434,69 @@ function backToSubs() {
 }
 function renderFav() {
   const list = (state.me ? state.me.favAds : []);
-  $('#adListFav').innerHTML = list.length ? list.map(adHTML).join('') : emptyHTML('Нет избранных объявлений');
+  $('#adListFav').innerHTML = list.length ? list.map(a => adHTML(a, { cmp: state.compareMode })).join('') : emptyHTML('Нет избранных объявлений');
+  updateCmpBar();
+}
+function cmpPickHTML(a) {
+  const on = state.compare.includes(a.id);
+  return `<button class="cmp-pick${on ? ' on' : ''}" onclick="event.stopPropagation();toggleCompare(${a.id})">${on ? '✓' : '⚖'}</button>`;
+}
+function toggleCompareMode() {
+  state.compareMode = !state.compareMode;
+  state.compare = [];
+  const b = document.getElementById('cmpToggle');
+  if (b) b.textContent = '⚖ Сравнить' + (state.compareMode ? ' ✓' : '');
+  goTab('fav', true);
+}
+function toggleCompare(id) {
+  const i = state.compare.indexOf(id);
+  if (i >= 0) state.compare.splice(i, 1);
+  else {
+    if (state.compare.length >= 3) { toast('Максимум 3 объявления'); return; }
+    state.compare.push(id);
+  }
+  renderFav();
+}
+function clearCompare() { state.compare = []; renderFav(); }
+function updateCmpBar() {
+  const bar = document.getElementById('cmpBar');
+  if (!bar) return;
+  const n = state.compare.length;
+  document.getElementById('cmpCount').textContent = 'Выбрано: ' + n;
+  bar.classList.toggle('hidden', !(state.compareMode && n > 0));
+}
+function openCompare() {
+  if (state.compare.length < 2) { toast('Выберите 2–3 объявления для сравнения'); return; }
+  const items = state.compare.map(id => (state.me.favAds || []).find(a => a.id === id)).filter(Boolean);
+  if (items.length < 2) { toast('Ошибка сравнения'); return; }
+  document.getElementById('cmpSub').textContent = 'Сравниваются ' + items.length + ' объявления';
+  fillCompareTable(items);
+  openSheet('compareSheet');
+}
+function fillCompareTable(items) {
+  const rows = [
+    ['Цена', a => priceFmt(a.price)],
+    ['Город', a => escapeHtml(a.city)],
+    ['Категория', a => catName(a.category)],
+    ['Фото', a => (a.images && a.images.length ? (a.images.length + ' шт') : '—')],
+    ['Статус', a => a.status === 'sold' ? 'Продано' : (a.status === 'expired' ? 'Истёк' : 'Активно')],
+    ['Продавец', a => escapeHtml(a.seller || '—') + (a.sellerPro ? ' PRO' : '')],
+    ['Рейтинг', a => (a.rating && a.rating.count) ? ('★ ' + a.rating.avg + ' (' + a.rating.count + ')') : '—'],
+  ];
+  const extra = [];
+  items.forEach(a => {
+    (CATEGORY_FIELDS[a.category] || []).forEach(f => {
+      const v = a.extra && a.extra[f.key];
+      if (v == null || v === '') return;
+      extra.push({ label: f.label, key: f.key, val: String(v) });
+    });
+  });
+  const seen = new Set();
+  const extraRows = extra.filter(e => { if (seen.has(e.key + e.label)) return false; seen.add(e.key + e.label); return true; }).slice(0, 6);
+  const th = `<tr><th style="width:90px"></th>${items.map(a => `<th>${escapeHtml(a.title)}<br><span style="font-weight:500;color:var(--blue)">${priceFmt(a.price)}</span></th>`).join('')}</tr>`;
+  const body = rows.map(r => `<tr><td>${r[0]}</td>${items.map(a => `<td>${r[1](a)}</td>`).join('')}</tr>`).join('');
+  const extraHtml = extraRows.map(r => `<tr><td>${escapeHtml(r.label)}</td>${items.map(a => { const v = a.extra && a.extra[r.key]; return `<td>${v == null || v === '' ? '—' : escapeHtml(String(v))}</td>`; }).join('')}</tr>`).join('');
+  document.getElementById('cmpTable').innerHTML = th + body + extraHtml;
 }
 function renderProfile() {
   const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
@@ -983,6 +1507,26 @@ function renderProfile() {
   $('#profAds').textContent = me && Array.isArray(me.myAds) ? me.myAds.length : 0;
   $('#profFav').textContent = me && me.favCount ? me.favCount : 0;
   $('#adminBtn').classList.toggle('hidden', !(me && me.isAdmin));
+  const st = me && me.stats;
+  if (st) {
+    $('#profViews').textContent = st.totalViews || 0;
+    $('#profSold').textContent = st.soldCount || 0;
+    const rt = document.getElementById('profRate');
+    const lbl = document.getElementById('profRateLbl');
+    if (st.ratingCount) {
+      rt.textContent = String((st.ratingAvg || 0).toFixed(1));
+      lbl.textContent = '★ ' + st.ratingCount + ' ' + pluralWord(st.ratingCount, 'отзыв', 'отзыва', 'отзывов');
+    } else {
+      rt.textContent = '—';
+      lbl.textContent = 'Рейтинг';
+    }
+  }
+}
+function pluralWord(n, one, few, many) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
 }
 
 function fmtRub(kopecks) { return ((kopecks || 0) / 100).toLocaleString('ru-RU') + ' ₽'; }
@@ -1051,7 +1595,7 @@ async function loadShop() {
 }
 async function openShop(fromAd) {
   shopAdId = fromAd || shopAdId;
-  $('#shopServices').innerHTML = '<div class="loading">Загрузка…</div>';
+  $('#shopServices').innerHTML = loadingHTML(3);
   $('#shopPlans').innerHTML = '';
   openSheet('shopSheet');
   try {
@@ -1114,6 +1658,7 @@ async function buyPromo(serviceId) {
 
 /* ===== Actions ===== */
 function goTab(tab, keep) {
+  tap();
   document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
   document.getElementById('view-' + tab).classList.remove('hidden');
   const pb = document.getElementById('placeBar');
@@ -1123,9 +1668,14 @@ function goTab(tab, keep) {
   if (nt) nt.classList.add('active');
   if (tab === 'home') renderHome();
   if (tab === 'search') {
-    if (!keep) { state.activeCat = null; state.activeSub = null; }
+    ensureScope();
+    if (!keep) { state.activeCat = null; state.activeSub = null; state.searchLimit = 20; }
     updateCatBack();
     renderSearch($('#searchInput').value);
+  }
+  if (tab === 'filter') {
+    if (!keep) { state.activeCat = null; state.activeSub = null; }
+    renderFilterView();
   }
   if (tab === 'fav') renderFav();
   if (tab === 'mine') openMine();
@@ -1152,19 +1702,218 @@ function updateCatBack() {
   const b = document.getElementById('catBack');
   if (b) b.classList.toggle('hidden', !(state.activeCat || state.activeSub));
 }
+let searchTimer = null;
+async function searchAds(q) {
+  const Q = (q || '').trim();
+  if (!Q) { state.searchRes = null; state.searchLimit = 20; renderSearch(''); return; }
+  state.searchLimit = 20;
+  let server = [];
+  try {
+    const p = new URLSearchParams();
+    if (state.filterCities.all) { /* все регионы — без фильтра города */ }
+    else if (state.filterCities.cities.length) p.set('cities', state.filterCities.cities.join(','));
+    else p.set('city', state.city || '');
+    p.set('q', Q);
+    const d = await api('/api/ads?' + p.toString());
+    server = d.ads || [];
+  } catch (e) { server = []; }
+  const local = state.ads.filter(a => matchesQuery(a, Q));
+  const byId = new Map();
+  [...server, ...local].forEach(a => { if (!byId.has(a.id)) byId.set(a.id, a); });
+  state.searchRes = [...byId.values()];
+  renderSearch($('#searchInput').value);
+}
+function filterHTML(cat) {
+  const ef = (state.filters.extra || {})[cat] || {};
+  return (CATEGORY_FILTERS[cat] || []).map(key => {
+    const fb = fieldBy(cat, key);
+    const val = ef[key] || '';
+    if (RANGE_KEYS[key]) {
+      return `<div class="field">
+        <label>${fb.label}</label>
+        <div class="f-row">
+          <input class="f-input" type="number" inputmode="numeric" placeholder="от" value="${ef[key + 'From'] || ''}" oninput="setF('${cat}','${key}','from',this.value)" />
+          <input class="f-input" type="number" inputmode="numeric" placeholder="до" value="${ef[key + 'To'] || ''}" oninput="setF('${cat}','${key}','to',this.value)" />
+        </div>
+      </div>`;
+    }
+    if (fb.type === 'select') {
+      const opts = fb.options || [];
+      return `<div class="field">
+        <label>${fb.label}</label>
+        <select class="f-select" style="width:100%" onchange="setF('${cat}','${key}','',this.value)">
+          <option value="">Любая</option>
+          ${opts.map(o => `<option ${val === o ? 'selected' : ''}>${o}</option>`).join('')}
+        </select>
+      </div>`;
+    }
+    return `<div class="field">
+      <label>${fb.label}</label>
+      <input class="f-input" type="text" style="width:100%" value="${val}" placeholder="Любое" oninput="setF('${cat}','${key}','',this.value)" />
+    </div>`;
+  }).join('');
+}
+function cityFilterHTML() {
+  return REGIONS.map((r, ri) => {
+    const selN = r.cities.filter(c => state.filterCities.cities.includes(c)).length;
+    return `<div class="reg-row" onclick="toggleRegion(${ri})">
+        <span class="reg-togg">▶</span><span class="reg-name">${escapeHtml(r.name)}</span>
+        <span class="reg-meta">${selN}/${r.cities.length}</span>
+      </div>
+      <div class="reg-body" id="regBody-${ri}">
+        ${r.cities.map((c, ci) => `
+          <label class="c-item"><input type="checkbox" class="c-check" ${state.filterCities.cities.includes(c) ? 'checked' : ''} onchange="setCitySel(${ri},${ci},this.checked)"><span>${escapeHtml(c)}</span></label>`).join('')}
+      </div>`;
+  }).join('');
+}
+function toggleRegion(ri) {
+  const row = document.querySelectorAll('.reg-row')[ri];
+  const body = document.getElementById('regBody-' + ri);
+  if (!row || !body) return;
+  row.classList.toggle('open');
+  body.classList.toggle('open');
+}
+function saveCityFilters() {
+  try { localStorage.setItem('m_cityfilters', JSON.stringify({ all: state.filterCities.all, cities: state.filterCities.cities })); } catch (e) {}
+}
+function setCitySel(ri, ci, on) {
+  const c = (REGIONS[ri] && REGIONS[ri].cities[ci]) || '';
+  if (!c) return;
+  if (on && !state.filterCities.cities.includes(c)) state.filterCities.cities.push(c);
+  if (!on && state.filterCities.cities.includes(c)) state.filterCities.cities = state.filterCities.cities.filter(x => x !== c);
+  saveCityFilters();
+  state.filterCities.all = false;
+  const allOn = document.getElementById('ffAllRegions');
+  if (allOn) allOn.checked = false;
+  applyCityScope();
+}
+function setAllRegions(on) {
+  state.filterCities.all = !!on;
+  if (on) state.filterCities.cities = [];
+  saveCityFilters();
+  applyCityScope();
+}
+function chipRemoveCity(city) {
+  state.filterCities.cities = state.filterCities.cities.filter(x => x !== city);
+  saveCityFilters();
+  applyCityScope();
+}
+function updateCitySelUI() {
+  const count = document.getElementById('citySelCount');
+  if (count) count.textContent = state.filterCities.all ? 'все' : (state.filterCities.cities.length ? state.filterCities.cities.length : 'не выбраны');
+  const chips = document.getElementById('citySelChips');
+  if (!chips) return;
+  if (state.filterCities.all || !state.filterCities.cities.length) {
+    chips.innerHTML = '';
+    return;
+  }
+  chips.innerHTML = state.filterCities.cities.map(c => `<span class="c-chip" onclick="chipRemoveCity('${c.replace(/'/g, "\\'")}')">${escapeHtml(c)} ✕</span>`).join('');
+}
+function scopeParams() {
+  if (state.filterCities.all) return '';
+  if (state.filterCities.cities.length) return 'cities=' + encodeURIComponent(state.filterCities.cities.join(','));
+  return 'city=' + encodeURIComponent(state.city || '');
+}
+function ensureScope() {
+  const key = scopeParams();
+  if (key === state.scopeKey && state.scopeAds != null) return;
+  state.scopeKey = key;
+  state.scopeAds = null;
+  api('/api/ads' + (key ? '?' + key : '')).then(d => {
+    state.scopeAds = d.ads || [];
+    const inp = document.getElementById('searchInput');
+    renderSearch(inp ? inp.value : '');
+  }).catch(() => {});
+}
+function applyCityScope() {
+  updateCitySelUI();
+  syncFilterBadge();
+  ensureScope();
+  renderSearch($('#searchInput').value);
+}
+function renderFilterView() {
+  const allOn = document.getElementById('ffAllRegions');
+  if (allOn) allOn.checked = !!state.filterCities.all;
+  const regions = document.getElementById('citySelRegions');
+  if (regions) regions.innerHTML = cityFilterHTML();
+  updateCitySelUI();
+  const sel = document.getElementById('ffCat');
+  sel.innerHTML = '<option value="">Все категории</option>' + CATEGORIES.map(c =>
+    `<option value="${c.id}"${state.activeCat === c.id ? ' selected' : ''}>${c.name}</option>`).join('');
+  const block = document.getElementById('ffCatBlock');
+  block.innerHTML = state.activeCat
+    ? `<div class="ff-sep">${catName(state.activeCat)}</div>` + filterHTML(state.activeCat)
+    : `<div class="ff-note">Выберите категорию в поиске или выше — появятся её фильтры (например, для «Авто»: год, пробег, КПП, привод).</div>`;
+  $('#fMin').value = state.filters.min || '';
+  $('#fMax').value = state.filters.max || '';
+  $('#fSort').value = state.filters.sort || 'new';
+  $('#fPhoto').checked = !!state.filters.photo;
+  $('#fPromo').checked = !!state.filters.promo;
+  syncFilterBadge();
+}
+function setGlobal(k, v) {
+  state.filters[k] = v;
+  renderSearch($('#searchInput').value);
+}
+function setF(cat, key, part, val) {
+  state.filters.extra[cat] = state.filters.extra[cat] || {};
+  state.filters.extra[cat][key + (part === 'from' ? 'From' : part === 'to' ? 'To' : '')] = val;
+  renderSearch($('#searchInput').value);
+}
+function setFiltCat(v) {
+  state.activeCat = v || null;
+  state.activeSub = null;
+  goTab('filter', true);
+  renderFilterView();
+}
+function countActiveFilters() {
+  const f = state.filters;
+  let n = 0;
+  if (f.min || f.max) n++;
+  if (f.photo) n++;
+  if (f.promo) n++;
+  if (f.sort && f.sort !== 'new') n++;
+  Object.values(f.extra || {}).forEach(e => { if (e && Object.values(e).some(Boolean)) n++; });
+  if (state.filterCities.all || state.filterCities.cities.length) n++;
+  return n;
+}
+function syncFilterBadge() {
+  const b = document.getElementById('filtBadge');
+  if (!b) return;
+  const n = countActiveFilters();
+  b.style.display = n ? 'flex' : 'none';
+  b.textContent = n;
+}
+function resetFilters() {
+  state.filters = { min: '', max: '', photo: false, promo: false, sort: 'new', extra: {} };
+  state.filterCities.all = false;
+  state.filterCities.cities = [];
+  saveCityFilters();
+  state.scopeAds = null; state.scopeKey = '';
+  renderFilterView();
+  renderSearch($('#searchInput').value);
+  toast('Фильтры сброшены');
+}
+function hasPromo(a) {
+  const p = a.promo || {};
+  return !!(p.pin || p.boost || p.highlight);
+}
 function onSearch(v) {
-  renderSearch(v);
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => searchAds(v), 260);
 }
 
 async function toggleFav(id) {
   const a = state.ads.find(x => x.id === id);
+  tap('impact');
   try {
     const { fav } = await api('/api/fav', { method: 'POST', body: { adId: id } });
     if (a) a.fav = fav;
     if (state.me) { await loadMe(); }
     renderHome(); renderSearch($('#searchInput').value); renderFav();
     toast(fav ? 'Добавлено в избранное' : 'Убрано из избранного');
-  } catch (e) { toast(e.message); }
+    tap(fav ? 'success' : 'impact');
+  } catch (e) { toast(e.message); tap('error'); }
 }
 
 async function openAd(id) {
@@ -1174,15 +1923,19 @@ async function openAd(id) {
     state.current = ad;
     $('#dPrice').textContent = priceFmt(ad.price);
     $('#dTitle').textContent = ad.title;
-    $('#dMeta').innerHTML = `<span class="chip">${escapeHtml(ad.city)}</span><span class="chip">${catName(ad.category)}</span>${badgePills(ad)}`;
+    $('#dMeta').innerHTML = `<span class="chip">${escapeHtml(ad.city)}</span><span class="chip">${catName(ad.category)}</span><span class="chip">👁 ${ad.views || 0}</span>${badgePills(ad)}`;
     $('#dExtra').innerHTML = extraChipsHTML(ad);
     $('#dDesc').textContent = ad.description || 'Описание не указано';
     const gal = $('#dGallery');
     gal.innerHTML = (ad.images && ad.images.length)
       ? ad.images.map(s => `<img src="${s}" alt="" />`).join('')
       : `<div style="margin:auto;color:#3a3a3a"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></div>`;
+    renderGalleryCounter(gal, (ad.images || []).length);
     $('#dAva').textContent = (ad.seller || '?')[0];
     $('#dSeller').textContent = ad.seller || 'Пользователь';
+    renderRating(ad);
+    renderReviews(ad);
+    renderSimilar(ad);
     $('#dTg').style.display = ad.tg ? 'block' : 'none';
     $('#dPhone').style.display = ad.phone ? 'block' : 'none';
     if (!ad.tg && !ad.phone) $('#dTg').style.display = 'block';
@@ -1192,6 +1945,7 @@ async function openAd(id) {
     $('#statusBtn').classList.toggle('hidden', !ad.isMine);
     $('#reportBtn').classList.toggle('hidden', ad.isMine);
     updateStatusBtn();
+    recordViewed(ad.id);
     openSheet('detailSheet');
   } catch (e) { toast(e.message); }
 }
@@ -1245,13 +1999,14 @@ function renderExtraFields(prefill = {}) {
     return `<div class="field"><label>${escapeHtml(f.label)}${req}</label>${input}</div>`;
   }).join('');
   if (cat === 'auto') renderCarModel(prefill && prefill.model);
+  if (cat === 'tech') renderElaModel(prefill && prefill.model);
 }
-function renderCarModel(saved) {
+function renderCarModel(saved, brands) {
   const brandEl = document.getElementById('ef-brand');
   const brand = brandEl ? brandEl.value : '';
   const sel = document.getElementById('ef-model');
   if (!sel) return;
-  const models = (brand && brand !== 'Другая' && CAR_MODELS[brand]) || [];
+  const models = (brand && brand !== 'Другая' && (brands || CAR_MODELS)[brand]) || [];
   if (brand && brand !== 'Другая' && models.length) {
     if (sel.tagName.toLowerCase() !== 'select') {
       sel.outerHTML = '<select id="ef-model"></select>';
@@ -1267,6 +2022,9 @@ function renderCarModel(saved) {
       sel.value = saved || '';
     }
   }
+}
+function renderElaModel(saved) {
+  renderCarModel(saved, MODELS_TECH);
 }
 function collectExtra() {
   const cat = $('#f-cat').value;
@@ -1422,8 +2180,31 @@ function editAd() {
 }
 function deleteAd() {
   if (!state.current) return;
-  confirmDialog('Удалить это объявление безвозвратно?', async (ok) => {
-    if (!ok) return;
+  showDeleteConfirm();
+}
+let dnfTimer = null;
+function showDeleteConfirm() {
+  let n = 10;
+  const left = document.getElementById('dnfLeft');
+  const ok = document.getElementById('dnfOk');
+  openSheet('confirmSheet');
+  if (left) left.textContent = n;
+  ok.disabled = true;
+  clearInterval(dnfTimer);
+  dnfTimer = setInterval(() => {
+    n--;
+    if (left) left.textContent = n;
+    if (n <= 0) {
+      clearInterval(dnfTimer); dnfTimer = null;
+      ok.disabled = false;
+    }
+  }, 1000);
+}
+function doDeleteAd() {
+  clearInterval(dnfTimer); dnfTimer = null;
+  closeSheet('confirmSheet');
+  if (!state.current) return;
+  (async () => {
     try {
       await api('/api/ads/' + state.current.id, { method: 'DELETE' });
       toast('Объявление удалено');
@@ -1433,7 +2214,7 @@ function deleteAd() {
       if (state.backToMine) { state.backToMine = false; myAds(); }
       else goTab('home');
     } catch (e) { toast(e.message); }
-  });
+  })();
 }
 function cancelEdit() {
   state.editing = null;
@@ -1541,8 +2322,8 @@ async function adminAction(id, action) {
 }
 function renderMine() {
   const list = (state.me && Array.isArray(state.me.myAds)) ? state.me.myAds : [];
-  const msg = state.me ? (list.length ? '' : 'Вы ещё не размещали объявления') : 'Загрузка…';
-  $('#adListMine').innerHTML = list.length ? list.map(a => adHTML(a, { my: true })).join('') : emptyHTML(msg);
+  const msg = state.me ? (list.length ? '' : 'Вы ещё не размещали объявления') : '…';
+  $('#adListMine').innerHTML = list.length ? list.map(a => adHTML(a, { my: true })).join('') : (state.me ? emptyHTML(msg) : loadingHTML(3));
 }
 async function openMine() {
   if (!state.me || !Array.isArray(state.me.myAds)) await loadMe();
@@ -1642,6 +2423,7 @@ async function setCity(c) {
   state.city = c;
   localStorage.setItem('m_city', c);
   closeSheet('citySheet');
+  state.scopeAds = null; state.scopeKey = '';
   await loadAds();
   toast('Город: ' + c);
 }
@@ -1662,16 +2444,54 @@ function toast(msg) {
 }
 
 /* ===== Init ===== */
+let obIndex = 0;
+function initOnb() {
+  try { if (localStorage.getItem('m_onboarded')) return false; } catch (e) {}
+  obIndex = 0;
+  const dots = document.getElementById('obDots');
+  if (dots) dots.innerHTML = Array.from({ length: 3 }, (_, i) => `<span class="ob-dot${i === 0 ? ' on' : ''}"></span>`).join('');
+  updateOb();
+  const ob = document.getElementById('onboard');
+  if (ob) ob.classList.remove('hidden');
+  return true;
+}
+function updateOb() {
+  const track = document.getElementById('obTrack');
+  if (track) track.style.transform = `translateX(-${obIndex * 33.3334}%)`;
+  document.querySelectorAll('#obDots .ob-dot').forEach((d, i) => d.classList.toggle('on', i === obIndex));
+  const nxt = document.getElementById('obNext');
+  if (nxt) nxt.textContent = obIndex === 2 ? 'Начать' : 'Далее';
+}
+function nextOnb() {
+  tap();
+  if (obIndex < 2) { obIndex++; updateOb(); }
+  else finishOnb();
+}
+function finishOnb() {
+  try { localStorage.setItem('m_onboarded', '1'); } catch (e) {}
+  const ob = document.getElementById('onboard');
+  if (ob) ob.classList.add('hidden');
+  if (!state.city) {
+    openCity();
+    $('#adListHome').innerHTML = emptyHTML('Выберите город, чтобы увидеть объявления');
+  }
+}
+
 async function init() {
+  applyTheme();
+  const fresh = initOnb();
+  document.querySelectorAll('#revStars span').forEach(s => s.addEventListener('click', () => pickRev(Number(s.dataset.v))));
   renderCategories('catGrid');
   fillCatSelect();
   try {
     state.me = await api('/api/auth', { method: 'POST', body: {} });
     if (state.me.debug) console.warn('DEBUG mode: BOT_TOKEN not set on server.');
   } catch (e) { toast('Ошибка авторизации'); }
-  if (!state.city) {
+  if (!state.city && !fresh) {
     openCity();
-    $('#adListHome').innerHTML = loadingHTML();
+    $('#adListHome').innerHTML = emptyHTML('Выберите город, чтобы увидеть объявления');
+  } else if (!state.city) {
+    $('#adListHome').innerHTML = emptyHTML('Выберите город, чтобы увидеть объявления');
   } else {
     $('#adListHome').innerHTML = loadingHTML();
     await loadAds();
