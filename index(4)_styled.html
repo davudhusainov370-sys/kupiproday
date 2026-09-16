@@ -1,0 +1,2828 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0a0a" />
+<title>КупиПродай — площадка объявлений</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --bg: #0e1621;
+    --bg-elev: #17212b;
+    --bg-card: #1c2733;
+    --border: #24303d;
+    --text: #f4f5f5;
+    --text-dim: #98a5b3;
+    --text-mute: #616d7a;
+    --blue: #2aabee;
+    --blue-dim: #1596d8;
+    --blue-soft: rgba(42,171,238,.14);
+    --danger: #e5533d;
+    --radius: 14px;
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-t: env(safe-area-inset-top, 0px);
+    --nav-bg: rgba(14,22,33,.95);
+    --placebar-bg: rgba(14,22,33,.97);
+    --cat-ico-fg: #ffffff;
+    --cat-ico-to: #0e1621;
+  }
+  html.theme-switch *, html.theme-switch *::before, html.theme-switch *::after {
+    transition: background-color .35s ease, color .35s ease, border-color .35s ease, box-shadow .35s ease, fill .35s ease, stroke .35s ease, filter .35s ease !important;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; overscroll-behavior: none; -webkit-font-smoothing: antialiased; }
+  body { display: flex; justify-content: center; }
+  #app { width: 100%; max-width: 480px; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); position: relative; overflow: hidden; }
+  header { padding: calc(var(--safe-t) + 10px) 16px 10px; background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
+  .top-row { display: flex; align-items: center; gap: 10px; }
+  .search { flex: 1; display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; color: var(--text-dim); font-size: 15px; }
+  .search input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-size: 15px; }
+  .search input::placeholder { color: var(--text-mute); }
+  .icon-btn { width: 42px; height: 42px; flex-shrink: 0; border-radius: 14px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text); display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
+  .icon-btn:active { background: var(--blue-soft); }
+  .balance-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 10px; }
+  .balance-value { font-size: 30px; font-weight: 700; color: var(--text); margin: 2px 0 6px; }
+  .balance-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .balance-label { font-size: 12px; color: var(--text-dim); }
+  .balance-value { font-size: 24px; font-weight: 700; }
+  .balance-note { font-size: 12px; color: var(--text-mute); margin-top: 8px; }
+  .topup-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+  .chip-btn { padding: 12px 6px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text); font-size: 14px; cursor: pointer; }
+  .chip-btn.active { border-color: var(--blue); background: var(--blue-dim); border-width: 2px; }
+  .op-list { display: flex; flex-direction: column; gap: 6px; }
+  .op-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 13px; color: var(--text); }
+  .op-row .op-date { font-size: 11.5px; color: var(--text-mute); margin-top: 2px; }
+  .seg { display: flex; gap: 6px; margin: 0 0 12px; }
+  .ad.premium { border-color: color-mix(in srgb,#f5c542 45%, var(--border)); box-shadow: 0 0 0 1px rgba(245,197,66,.14), 0 6px 14px rgba(0,0,0,.28); }
+  .ad-badge { position: absolute; right: 8px; border-radius: 10px; padding: 2px 8px; font-size: 10px; font-weight: 700; backdrop-filter: blur(6px); background: rgba(10,10,10,.6); }
+  .badge-pin { top: 42px; color: #ffd54a; }
+  .badge-boost { top: 72px; color: #7ee0ff; }
+  .ad-badges { position: absolute; left: 8px; bottom: 8px; display: flex; gap: 4px; flex-wrap: wrap; max-width: 74%; pointer-events: none; }
+  .ad-pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; color: #fff; backdrop-filter: blur(4px); margin-right: 4px; }
+  .b-new { background: rgba(46,160,67,.88); }
+  .b-trade { background: rgba(42,171,238,.9); }
+  .b-urgent { background: rgba(239,68,68,.88); }
+  .b-premium { background: rgba(212,175,55,.92); color: #1c1400; }
+  .badge-row { display: flex; gap: 10px; }
+  .badge-check { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text); background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; }
+  .badge-check input { width: 18px; height: 18px; accent-color: var(--blue); }
+  .pro-label { font-size: 9px; font-weight: 700; color: #d4af37; border: 1px solid rgba(212,175,55,.5); padding: 0 4px; border-radius: 6px; margin-left: 5px; vertical-align: 1px; }
+  .plan-pro { color: #d4af37; font-weight: 600; margin: 4px 0 10px !important; }
+  .seg { display: flex; gap: 4px; margin: 0 0 12px; padding: 4px; border-radius: 14px; background: color-mix(in srgb, var(--bg) 55%, var(--bg-card)); border: 1px solid var(--border); }
+  .seg-btn { flex: 1; padding: 9px; border-radius: 11px; background: transparent; border: none; color: var(--text-dim); font-size: 14px; font-weight: 500; cursor: pointer; transition: color .18s, background .18s; }
+  .seg-btn:active { background: color-mix(in srgb, var(--blue) 16%, transparent); }
+  .seg-btn.active { color: var(--blue); background: color-mix(in srgb, var(--blue) 16%, transparent); font-weight: 600; }
+  .home-tabs { justify-content: flex-start; gap: 4px; padding: 0; border: none; border-radius: 0; background: none; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+  .home-tabs .seg-btn { flex: 0 0 auto; padding: 9px 2px; margin-right: 16px; background: none; border: none; border-radius: 0; color: var(--text-mute); font-size: 13.5px; font-weight: 500; position: relative; }
+  .home-tabs .seg-btn:active { background: none; }
+  .home-tabs .seg-btn.active { background: none; color: var(--blue); font-weight: 600; }
+  .home-tabs .seg-btn.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; border-radius: 2px; background: var(--blue); }
+  .shop-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 8px; }
+  .shop-item .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .shop-item .nm { font-size: 14px; font-weight: 600; }
+  .shop-item .ds { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .shop-price { font-size: 14px; font-weight: 700; color: var(--blue); white-space: nowrap; }
+  .btn-sm { padding: 8px 14px; font-size: 13px; }
+  .badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px; background: var(--blue); color: #fff; font-size: 11px; font-weight: 600; border-radius: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg); }
+  .city-row { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 13px; color: var(--text-dim); cursor: pointer; }
+  .city-row b { color: var(--text); font-weight: 600; }
+  .city-row svg { opacity: .7; }
+  main { flex: 1; overflow-y: auto; padding: 16px 16px calc(84px + var(--safe-b)); -webkit-overflow-scrolling: touch; }
+  .section-title { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 10px; font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--text-dim); }
+  .section-title .more { font-size: 12.5px; text-transform: none; letter-spacing: 0; color: var(--blue); font-weight: 500; cursor: pointer; }
+  .section-title.big { text-transform: none; letter-spacing: 0; font-size: 21px; font-weight: 700; color: var(--text); margin: 4px 0 14px; }
+  .categories { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px 10px; margin-bottom: 26px; }
+  .search-list { display: flex; flex-direction: column; gap: 8px; }
+  .search-cat, .search-sub { display: flex; align-items: center; gap: 10px; padding: 12px 13px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; }
+  .search-cat:active, .search-sub:active { background: var(--bg-elev); }
+  .sc-ico { font-size: 18px; }
+  .sc-name { flex: 1; font-size: 15px; font-weight: 500; }
+  .search-cat .sc-name, .search-sub.all .sc-name { font-weight: 600; }
+  .sc-sub { font-size: 11.5px; color: var(--text-dim); }
+  .sc-count { font-size: 12px; color: var(--text-dim); background: var(--bg); border-radius: 10px; padding: 2px 8px; }
+  .search-sub.sel { border-color: var(--blue); background: var(--blue-dim); }
+  .sc-arrow { color: var(--text-dim); font-size: 18px; }
+  .crumbs { display: flex; align-items: center; gap: 6px; margin: 2px 0 12px; font-size: 13px; flex-wrap: wrap; }
+  .crumb { cursor: pointer; color: var(--blue); }
+  .crumb-sep { color: var(--text-dim); }
+  .filters { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .f-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .f-city { font-size: 14px; font-weight: 600; }
+  .ff-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .ff-head .back-btn { margin-right: auto; }
+  .ff-title { font-size: 18px; font-weight: 700; margin-right: auto; }
+  .filters-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; }
+  .reg-list { margin-top: 8px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-card); }
+  .reg-row { display: flex; align-items: center; gap: 8px; padding: 11px 12px; cursor: pointer; font-size: 13.5px; font-weight: 500; background: var(--bg-card); border-bottom: 1px solid var(--border); }
+  .reg-row:last-child { border-bottom: none; }
+  .reg-togg { transition: transform .15s; color: var(--text-mute); font-size: 11px; }
+  .reg-row.open .reg-togg { transform: rotate(90deg); }
+  .reg-name { flex: 1; }
+  .reg-meta { font-size: 11.5px; color: var(--text-mute); background: var(--bg); padding: 2px 8px; border-radius: 10px; }
+  .reg-body { display: none; }
+  .reg-body.open { display: block; }
+  .reg-body .c-item { display: flex; align-items: center; gap: 9px; padding: 9px 12px 9px 16px; font-size: 13px; color: var(--text-dim); cursor: pointer; background: var(--bg); border-bottom: 1px solid var(--border); }
+  .reg-body .c-item:last-child { border-bottom: none; }
+  .c-item .c-check { accent-color: var(--blue); width: 16px; height: 16px; flex-shrink: 0; }
+  .csel-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .csel-chips .c-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-dim); border-radius: 12px; padding: 5px 9px; cursor: pointer; user-select: none; }
+  .mini-tag { font-size: 11px; color: var(--text-mute); background: var(--bg); padding: 2px 8px; border-radius: 10px; }
+  .ff-sep { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--text-dim); margin: 14px 0 8px; }
+  .ff-note { font-size: 13px; color: var(--text-dim); background: var(--bg); border: 1px dashed var(--border); border-radius: 12px; padding: 12px; margin-top: 8px; }
+  .f-input { flex: 1; min-width: 0; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; color: var(--text); font-size: 13.5px; outline: none; }
+  .f-select { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; color: var(--text); font-size: 13.5px; outline: none; }
+  .f-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 7px 10px; cursor: pointer; user-select: none; }
+  .f-chip input { accent-color: var(--blue); }
+  .btn.mini { padding: 7px 12px; font-size: 12.5px; border-radius: 10px; }
+  .cat { display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; }
+  .cat .ico { width: 58px; height: 58px; border-radius: 19px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; isolation: isolate; transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, filter .18s ease; background: color-mix(in srgb, var(--bg) 84%, #fff 16%); border: 1px solid rgba(255,255,255,.045); box-shadow: 0 2px 5px rgba(0,0,0,.22), 0 9px 20px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.075); }
+  .cat .ico::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(circle at 22% 16%, rgba(255,255,255,.105), transparent 34%), linear-gradient(145deg, rgba(255,255,255,.035), transparent 48%, rgba(0,0,0,.08)); }
+  .cat .ico::after { content: ''; position: absolute; left: 9px; right: 9px; top: 7px; height: 1px; z-index: 3; background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent); pointer-events: none; }
+  .cat .ico svg { position: relative; z-index: 2; width: 48px; height: 48px; overflow: visible; filter: drop-shadow(0 4px 4px rgba(0,0,0,.28)); }
+  .cat:active .ico { transform: scale(.92) translateY(1px); filter: brightness(.96); }
+  .cat span { font-size: 11px; font-weight: 500; color: var(--text-dim); text-align: center; line-height: 1.2; max-width: 82px; }
+  .ads { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .ad { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; cursor: pointer; transition: .18s; box-shadow: 0 1px 2px rgba(0,0,0,.18); }
+  .ad:active { transform: scale(.985); border-color: var(--border); }
+  .ad-img { width: 100%; aspect-ratio: 16 / 11; background: linear-gradient(135deg, #1b2a38, #24313f); position: relative; display: flex; align-items: center; justify-content: center; color: #3a4a58; }
+  .fav { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border-radius: 50%; background: rgba(10,10,10,.55); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; border: none; }
+  .fav.active { color: var(--blue); }
+  .ad-timer { position: absolute; top: 8px; left: 8px; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 8px; backdrop-filter: blur(6px); background: rgba(10,10,10,.6); color: #7fd88e; max-width: calc(100% - 50px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ad-timer.timer-tight { background: rgba(180,40,40,.75); color: #fff; }
+  .ad-body { padding: 10px 11px 11px; }
+  .ad-price { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ad-title { font-size: 13px; color: var(--text); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px; }
+  .ad-meta { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-mute); white-space: nowrap; overflow: hidden; }
+  .ad-meta > span { overflow: hidden; text-overflow: ellipsis; }
+  .ad-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-mute); flex-shrink: 0; }
+  .ad-seller { display: flex; align-items: center; gap: 5px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .ad-seller .ava { width: 20px; height: 20px; border-radius: 50%; background: var(--blue-dim); color: #fff; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ad-seller .name { font-size: 11px; color: var(--text-dim); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ad-seller .contact { font-size: 11px; color: var(--blue); font-weight: 500; flex-shrink: 0; }
+  nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--nav-bg); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid var(--border); border-bottom: none; border-radius: 22px 22px 0 0; display: flex; padding: 8px 6px calc(8px + var(--safe-b)); z-index: 30; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10.5px; color: var(--text-mute); cursor: pointer; position: relative; padding: 4px 0; transition: color .2s; }
+  .tab svg { stroke: var(--text-mute); transition: stroke .2s, transform .2s; }
+  .tab:active { transform: scale(.92); }
+  .tab.active { color: var(--blue); }
+  .tab.active svg { stroke: var(--blue); transform: translateY(-1px); }
+  .tab .plus { width: 44px; height: 44px; margin-top: -14px; border-radius: 16px; background: var(--blue); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(42,171,238,.35); transition: transform .2s; }
+  .tab .plus:active { transform: scale(.92); }
+  .tab .plus svg { stroke: #fff; }
+  main > section { animation: viewIn .24s ease; }
+  @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .placebar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(92px + var(--safe-b)); width: 100%; max-width: 480px; padding: 10px 16px 4px; z-index: 29; background: linear-gradient(to top, var(--placebar-bg) 55%, transparent); }
+  .placebar .btn { box-shadow: 0 8px 24px rgba(42,171,238,.4); margin: 0; }
+  main.has-placebar { padding-bottom: calc(150px + var(--safe-b)); }
+  .sheet-mask { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 50; opacity: 0; pointer-events: none; transition: .25s; }
+  .sheet-mask.show { opacity: 1; pointer-events: auto; }
+  .sheet { position: absolute; left: 50%; bottom: 0; transform: translate(-50%, 100%); width: 100%; max-width: 480px; background: var(--bg-elev); border-top-left-radius: 28px; border-top-right-radius: 28px; border: 1px solid var(--border); border-bottom: none; padding: 8px 18px calc(24px + var(--safe-b)); transition: transform .28s cubic-bezier(.2,.9,.3,1); max-height: 88vh; overflow-y: auto; box-shadow: 0 -8px 40px rgba(0,0,0,.5); }
+  .sheet-mask.show .sheet { transform: translate(-50%, 0); }
+  .grab { width: 48px; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--text-mute) 45%, transparent); margin: 8px auto 18px; }
+  .sheet h2 { font-size: 19px; margin-bottom: 4px; }
+  .sheet .sub { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 7px; }
+  .field input, .field textarea, .field select { width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; color: var(--text); font-size: 15px; outline: none; font-family: inherit; }
+  .field input:focus, .field textarea:focus { border-color: var(--blue-dim); }
+  .field textarea { resize: none; height: 90px; }
+  .btn { width: 100%; background: var(--blue); color: #fff; border: none; border-radius: 14px; padding: 15px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 6px; transition: background .18s; }
+  .btn:active { background: var(--blue-dim); }
+  .btn.ghost { background: var(--bg-card); border: 1px solid var(--border); color: var(--text); }
+  .city-list { display: flex; flex-direction: column; gap: 4px; }
+  .city-opt { padding: 14px 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border); font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+  .city-opt:active { border-color: var(--blue-dim); }
+  .city-opt.sel { border-color: var(--blue); color: var(--blue); }
+  .city-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .city-head h2 { margin: 0; font-size: 18px; }
+  .back-mini { width: 34px; height: 34px; flex-shrink: 0; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text); font-size: 20px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .city-search { width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 11px 14px; color: var(--text); font-size: 15px; outline: none; margin-bottom: 14px; }
+  .city-search::placeholder { color: var(--text-mute); }
+  .detail-img { width: 100%; aspect-ratio: 1/1; background: linear-gradient(135deg, #1b2a38, #24313f); display: flex; align-items: center; justify-content: center; color: #3a4a58; position: relative; }
+  .back { position: absolute; top: calc(var(--safe-t) + 12px); left: 12px; width: 40px; height: 40px; border-radius: 50%; background: rgba(14,22,33,.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; color: #fff; border: none; cursor: pointer; }
+  .detail-body { padding: 18px 16px; }
+  .detail-price { font-size: 26px; font-weight: 650; margin-bottom: 10px; }
+  .detail-title { font-size: 18px; line-height: 1.35; margin-bottom: 14px; }
+  .detail-meta { display: flex; gap: 10px; font-size: 13px; color: var(--text-dim); margin-bottom: 18px; flex-wrap: wrap; }
+  .chip { background: var(--bg-card); border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; }
+  .detail-extra { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .detail-extra .chip { font-size: 12.5px; color: var(--text); background: var(--bg-elev); }
+  .detail-extra .k { color: var(--text-mute); margin-right: 5px; }
+  .detail-desc { font-size: 14.5px; line-height: 1.6; color: var(--text); margin-bottom: 22px; white-space: pre-wrap; }
+  .seller-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 20px; }
+  .seller-card .top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .seller-card .ava { width: 46px; height: 46px; border-radius: 50%; background: var(--blue-dim); color: #fff; font-weight: 600; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .seller-card .nm { font-size: 15px; font-weight: 600; }
+  .seller-card .rt { font-size: 12.5px; color: var(--text-mute); }
+  .contact-btns { display: flex; gap: 10px; }
+  .contact-btns .btn { margin: 0; }
+  .contact-btns .btn.tg { background: var(--bg-card); border: 1px solid var(--blue-dim); color: var(--blue); }
+  .contact-btns .btn.ph { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-dim); }
+  .empty { text-align: center; color: var(--text-mute); padding: 60px 20px; font-size: 14px; grid-column: 1 / -1; }
+  .empty svg { margin-bottom: 14px; opacity: .5; }
+  .loading { grid-column: 1 / -1; text-align: center; color: var(--text-mute); padding: 48px 20px; font-size: 14px; }
+  .ad-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .gallery { position: absolute; inset: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #111; }
+  .gallery img { height: 100%; width: 100%; object-fit: cover; flex-shrink: 0; scroll-snap-align: start; }
+  .img-pick { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 6px; align-items: stretch; }
+  .img-thumb { position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--bg-card); }
+  .img-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .img-thumb .rm { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,.6); color: #fff; border: none; font-size: 16px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .img-add { width: 100%; aspect-ratio: 4 / 3; border-radius: 14px; border: 1.5px dashed var(--border); background: var(--bg-card); color: var(--blue); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-size: 30px; }
+  .img-add:only-child { grid-column: 1 / -1; }
+  .img-add .lbl { font-size: 13px; color: var(--text-dim); }
+  .img-add input { display: none; }
+  .hidden { display: none !important; }
+  .toast { position: fixed; top: calc(var(--safe-t) + 14px); left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--bg-elev); border: 1px solid var(--border); color: var(--text); padding: 12px 18px; border-radius: 12px; font-size: 14px; z-index: 100; transition: .3s; box-shadow: 0 8px 30px rgba(0,0,0,.5); max-width: 90%; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .g-count { position: absolute; top: 12px; right: 12px; z-index: 3; background: rgba(0,0,0,.6); color: #fff; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 10px; backdrop-filter: blur(6px); }
+  .sk { position: relative; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; height: 210px; }
+  .sk::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent); animation: shimmer 1.2s infinite; }
+  @keyframes shimmer { 100% { transform: translateX(100%); } }
+  .sk.img { height: 120px; border-radius: 14px 14px 0 0; border: none; background: var(--bg-elev); }
+  .sk.line { height: 12px; border-radius: 6px; border: none; background: var(--bg-elev); margin: 10px 10px 0; }
+  .sk.line.short { width: 55%; }
+  .sk-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; height: 205px; }
+  .rev-list { display: flex; flex-direction: column; gap: 8px; }
+  .rev-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 13px; }
+  .rev-row .rev-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .rev-row .rev-stars { color: #f5b301; letter-spacing: 1px; }
+  .rev-row .rev-txt { color: var(--text-dim); margin-top: 6px; }
+  .rev-row .rev-date { font-size: 11px; color: var(--text-mute); }
+  .stars { display: flex; justify-content: center; gap: 10px; font-size: 38px; color: #4a4a4a; margin: 6px 0; cursor: pointer; user-select: none; }
+  .stars span { transition: .15s; }
+  .stars span.on { color: #f5b301; transform: scale(1.05); }
+  .rate-link { color: var(--blue); font-size: 12.5px; cursor: pointer; }
+  .rt .r-avg { color: #f5b301; font-weight: 600; }
+  html.light {
+    --bg: #eef1f5; --bg-elev: #ffffff; --bg-card: #ffffff; --border: #e0e7ee;
+    --text: #14181f; --text-dim: #6a7585; --text-mute: #98a2b0;
+    --blue: #168acd; --blue-dim: #0e74b0; --blue-soft: rgba(22,138,205,.11); --danger: #dc2626;
+    --nav-bg: rgba(255,255,255,.95);
+    --placebar-bg: rgba(255,255,255,.97);
+    --cat-ico-fg: #223143;
+    --cat-ico-to: #eef2f6;
+  }
+  html.light .cat .ico { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border) 80%, transparent), 0 1px 2px rgba(16,40,64,.05); }
+  html.light .ad-img, html.light .detail-img { background: linear-gradient(135deg, #e3e9f0, #eef2f6); }
+  html.light .sk::after { background: linear-gradient(90deg, transparent, rgba(0,0,0,.05), transparent); }
+  html.light .toast { box-shadow: 0 8px 30px rgba(0,0,0,.18); }
+  html.light .sheet { box-shadow: 0 -8px 30px rgba(0,0,0,.12); }
+  .prof-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .prof-stat { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 9px 4px; text-align: center; }
+  .prof-stat .v { font-size: 15px; font-weight: 600; color: var(--text); }
+  .prof-stat .l { font-size: 10.5px; color: var(--text-mute); margin-top: 2px; }
+  .onboard { position: fixed; inset: 0; z-index: 70; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
+  .onboard.hidden { display: none; }
+  .ob-track { display: flex; width: 300%; height: 100%; transition: transform .32s ease; }
+  .ob-slide { width: 33.3334%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 28px; text-align: center; }
+  .ob-ico { width: 118px; height: 118px; border-radius: 26px; display: flex; align-items: center; justify-content: center; font-size: 46px; margin-bottom: 24px; box-shadow: 0 10px 24px rgba(0,0,0,.2), inset 0 0 0 1px rgba(255,255,255,.06); }
+  .ob-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+  .ob-text { font-size: 14px; color: var(--text-dim); line-height: 1.5; max-width: 300px; }
+  .ob-foot { margin-top: auto; padding: 0 24px calc(28px + env(safe-area-inset-bottom, 0px)); width: 100%; box-sizing: border-box; }
+  .ob-dots { display: flex; justify-content: center; gap: 7px; margin-bottom: 18px; }
+  .ob-dot { width: 8px; height: 8px; border-radius: 99px; background: var(--border); transition: .25s; }
+  .ob-dot.on { width: 22px; background: var(--blue); }
+  .ob-foot .btn { margin: 0; }
+  .ob-skip { display: block; margin: 14px auto 0; background: none; border: none; color: var(--text-mute); font-size: 13px; cursor: pointer; }
+  .dnf-box { padding: 16px 4px 8px; text-align: center; }
+  .dnf-t { font-size: 16px; font-weight: 700; }
+  .dnf-s { font-size: 13px; color: var(--text-dim); margin: 10px 0 16px; }
+  .dnf-box #dnfOk:disabled { opacity: .5; }
+  mark { background: color-mix(in srgb, var(--blue) 24%, transparent); color: inherit; border-radius: 3px; padding: 0 2px; }
+  .ad.expired { opacity: .55; filter: grayscale(.6); }
+  .ad.sold { opacity: .7; }
+  .search { position: relative; }
+  #searchDropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 40; overflow: hidden; display: none; }
+  #searchDropdown.show { display: block; }
+  .sh-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; font-size: 13.5px; cursor: pointer; border-bottom: 1px solid var(--border); }
+  .sh-item:last-child { border-bottom: none; }
+  .sh-item:active { background: var(--blue-soft); }
+  .sh-item .sh-clock { color: var(--text-mute); }
+  .sh-item .sh-txt { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sh-item .sh-del { background: none; border: none; color: var(--text-mute); font-size: 13px; cursor: pointer; padding: 2px 6px; }
+  .sh-clear { padding: 9px; text-align: center; font-size: 12.5px; color: var(--blue); cursor: pointer; border-top: 1px solid var(--border); }
+  .search-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 40; overflow: hidden; max-height: 220px; overflow-y: auto; }
+  .search-suggestions .sg-item { padding: 10px 14px; font-size: 13.5px; cursor: pointer; border-bottom: 1px solid var(--border); }
+  .search-suggestions .sg-item:last-child { border-bottom: none; }
+  .search-suggestions .sg-item:active { background: var(--blue-soft); }
+  .empty .empty-ico { font-size: 22px; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--bg-elev); border: 1px solid var(--border); margin: 0 auto 14px; }
+  .tpl-section { margin-bottom: 10px; }
+  .tpl-row { display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 6px; font-size: 13.5px; }
+  .tpl-row .sh-del { background: none; border: none; color: var(--text-mute); font-size: 13px; cursor: pointer; padding: 2px 6px; }
+  .tpl-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+  .ptr-indicator { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; border: 3px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: translateX(-50%) rotate(360deg); } }
+  .city-toggle { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 11px 12px; cursor: pointer; font-size: 13.5px; font-weight: 500; margin-bottom: 8px; }
+  .city-toggle .city-toggle-arrow { transition: transform .2s; color: var(--text-mute); font-size: 12px; }
+  .ic { width: 16px; height: 16px; flex-shrink: 0; }
+  .ic-sm { width: 14px; height: 14px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="header">
+    <div class="top-row">
+      <button class="icon-btn back-btn hidden" id="catBack" onclick="exitCategory()" aria-label="Назад">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <div class="search" onclick="goTab('search')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="searchInput" placeholder="Поиск товаров..." oninput="onSearch(this.value);renderSearchSuggestions(this.value)" onfocus="renderSearchHistory()" onblur="scheduleHideSearchPopovers()" />
+        <div id="searchDropdown"></div>
+        <div id="searchSuggestions" class="search-suggestions hidden"></div>
+      </div>
+      <button class="icon-btn" onclick="goTab('filter', true)" aria-label="Фильтры">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg>
+        <span class="badge" id="filtBadge" style="display:none">0</span>
+      </button>
+      <button class="icon-btn" onclick="openNotifs()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span class="badge" id="notifBadge" style="display:none">0</span>
+      </button>
+    </div>
+    <div class="city-row" onclick="openCity()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span>Город: <b id="cityLabel">—</b></span>
+    </div>
+  </header>
+
+  <main id="main">
+    <section id="view-home">
+      <div class="section-title">Категории</div>
+      <div class="categories" id="catGrid"></div>
+      <div class="home-tabs seg">
+        <button class="seg-btn active" id="homeTabRec" onclick="pickHomeTab('rec')">Рекомендуем</button>
+        <button class="seg-btn" id="homeTabRecent" onclick="pickHomeTab('recent')">Недавно</button>
+      </div>
+      <div id="homeRecWrap">
+        <div class="section-title"><span>Рекомендуем в <span id="cityInTitle">…</span></span><span class="more" onclick="goTab('search')">Все</span></div>
+        <div class="ads" id="adListHome"></div>
+      </div>
+      <div id="homeRecentWrap" class="hidden">
+        <div class="section-title">Недавно просмотренные</div>
+        <div class="ads" id="recentHome"></div>
+      </div>
+    </section>
+
+    <section id="view-search" class="hidden">
+      <div class="section-title big">Поиск</div>
+      <div id="searchCrumbs" class="crumbs hidden"></div>
+      <div id="searchCatList" class="search-list"></div>
+      <div id="searchSubWrap" class="hidden">
+        <div id="searchSubList" class="search-list"></div>
+      </div>
+      <div class="section-title" style="margin-top:12px">Объявления</div>
+      <div class="ads" id="adListSearch"></div>
+      <div id="moreWrap" style="display:none;margin-top:12px">
+        <button class="btn ghost" style="width:100%" onclick="showMore()">Показать ещё</button>
+      </div>
+    </section>
+
+    <section id="view-filter" class="hidden">
+      <div class="ff-head">
+        <button class="icon-btn back-btn" onclick="goTab('search', true)" aria-label="Назад">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <span class="ff-title">Фильтры</span>
+        <button class="btn ghost mini" onclick="resetFilters()">Сбросить</button>
+      </div>
+      <div class="filters-card">
+        <div class="field">
+          <label>Города поиска <span class="mini-tag" id="citySelCount"></span></label>
+          <div class="city-toggle" id="cityToggle" onclick="toggleCityAcc()">
+            <span><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Выбрать регионы</span>
+            <span class="city-toggle-arrow" id="cityArrow">▾</span>
+          </div>
+          <div id="cityAccBody" class="hidden">
+            <label class="f-chip" style="display:inline-flex;width:auto;margin-left:auto;margin-bottom:8px;justify-content:center;gap:8px">
+              <input type="checkbox" id="ffAllRegions" onchange="setAllRegions(this.checked)" style="accent-color:var(--blue)">
+              <span>Все регионы</span>
+            </label>
+            <div id="citySelRegions" class="reg-list"></div>
+            <div id="citySelChips" class="csel-chips"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Категория</label>
+          <select class="f-select" style="width:100%" id="ffCat" onchange="setFiltCat(this.value)"></select>
+        </div>
+        <div id="ffCatBlock"></div>
+        <div class="ff-sep">Общие</div>
+        <div class="field">
+          <label>Цена, ₽</label>
+          <div class="f-row">
+            <input class="f-input" id="fMin" type="number" inputmode="numeric" placeholder="от" oninput="setGlobal('min',this.value)" />
+            <input class="f-input" id="fMax" type="number" inputmode="numeric" placeholder="до" oninput="setGlobal('max',this.value)" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Сортировка</label>
+          <select class="f-select" style="width:100%" id="fSort" onchange="setGlobal('sort',this.value)">
+            <option value="new">Сначала новые</option>
+            <option value="cheap">Сначала дешевле</option>
+            <option value="exp">Сначала дороже</option>
+            <option value="rating">По рейтингу продавца</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Дата размещения</label>
+          <select class="f-select" style="width:100%" id="fDate" onchange="setGlobal('dateRange',this.value)">
+            <option value="">Все</option>
+            <option value="today">Сегодня</option>
+            <option value="week">За неделю</option>
+            <option value="month">За месяц</option>
+          </select>
+        </div>
+        <div class="f-row">
+          <label class="f-chip"><input type="checkbox" id="fPhoto" onchange="setGlobal('photo',this.checked)"><span><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:4px"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>Только с фото</span></label>
+          <label class="f-chip"><input type="checkbox" id="fPromo" onchange="setGlobal('promo',this.checked)"><span>⭐ С продвижением</span></label>
+        </div>
+        <button class="btn" style="width:100%;margin-top:4px" onclick="goTab('search', true)">Показать объявления</button>
+      </div>
+    </section>
+
+    <section id="view-place" class="hidden">
+      <div style="padding:24px 16px">
+        <div class="section-title big">Разместить объявление</div>
+        <div class="field">
+          <label>Фотографии <span id="imgCount" style="color:var(--text-dim);font-size:12px;font-weight:400"></span></label>
+          <div class="img-pick" id="imgPick"></div>
+        </div>
+        <div class="field"><label>Заголовок</label><input id="f-title" placeholder="Например: iPhone 13, как новый" /></div>
+        <div class="field"><label>Категория</label><select id="f-cat" onchange="renderExtraFields()"></select></div>
+        <div id="extraFields"></div>
+        <div class="field"><label>Цена, ₽</label><input id="f-price" type="number" placeholder="0" /></div>
+        <div class="field"><label>Бейджи</label>
+          <div class="badge-row">
+            <label class="badge-check"><input type="checkbox" id="f-trade" /> Торг</label>
+            <label class="badge-check"><input type="checkbox" id="f-urgent" /> Срочно</label>
+          </div>
+        </div>
+        <div class="field"><label>Описание</label><textarea id="f-desc" placeholder="Опишите товар, состояние, причину продажи..."></textarea></div>
+        <div class="field"><label>Город</label><input id="f-city" readonly /></div>
+        <div class="field"><label>Связь: @username Telegram</label><input id="f-tg" placeholder="@username" /></div>
+        <div class="field"><label>Связь: телефон (необязательно)</label><input id="f-phone" placeholder="+7..." /></div>
+        <div id="tplSection" class="tpl-section hidden"></div>
+        <button class="btn" id="publishBtn" onclick="publishAd()">Опубликовать</button>
+        <button class="btn ghost hidden" id="cancelEditBtn" onclick="cancelEdit()" style="margin-top:10px">Отмена</button>
+      </div>
+    </section>
+
+    <section id="view-fav" class="hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div class="section-title big" style="margin:0">Избранное</div>
+        <button class="btn ghost mini hidden" id="exportFavBtn" onclick="exportFav()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>Экспорт</button>
+      </div>
+      <div class="ads" id="adListFav"></div>
+    </section>
+
+    <section id="view-profile" class="hidden">
+      <div style="padding:0 4px 4px">
+        <div class="seg" id="profSeg">
+        <button class="seg-btn active" id="profSegMain" onclick="setProfTab('main')">Профиль</button>
+        <button class="seg-btn" id="profSegOps" onclick="setProfTab('ops')">История операций</button>
+      </div>
+      <div id="profTab">
+        <div class="seller-card">
+          <div class="top">
+            <div class="ava" id="profAva">У</div>
+            <div><div class="nm" id="profName">Пользователь</div><div class="rt" id="profTg">@user</div></div>
+          </div>
+          <div style="display:flex; gap:10px; font-size:13px; color:var(--text-dim)">
+            <span>Объявлений: <b style="color:var(--text)" id="profAds">0</b></span>
+            <span>В избранном: <b style="color:var(--text)" id="profFav">0</b></span>
+          </div>
+          <div class="prof-stats">
+            <div class="prof-stat"><div class="v" id="profViews">0</div><div class="l">Просмотры</div></div>
+            <div class="prof-stat"><div class="v" id="profSold">0</div><div class="l">Продано</div></div>
+            <div class="prof-stat"><div class="v" id="profRate">—</div><div class="l" id="profRateLbl">Рейтинг</div></div>
+          </div>
+        </div>
+        <div class="balance-card">
+          <div class="balance-label">Баланс</div>
+          <div class="balance-value" id="profBalance">0 ₽</div>
+          <div class="balance-note">Баланс не выводится и не возвращается — тратится на услуги внутри приложения</div>
+          <button class="btn" onclick="openTopUp()">Пополнить баланс</button>
+        </div>
+        <button class="btn ghost" style="margin-bottom:10px" onclick="openShop(false)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="m3 9 1.5-5H19.5L21 9M3 9v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9M3 9h18M4 9h16M7 20v-7h10v7"/></svg>Магазин услуг</button>
+        <button class="btn ghost" style="margin-bottom:10px" onclick="myAds()">Мои объявления</button>
+        <button class="btn ghost" style="margin-bottom:10px" onclick="openCity()">Сменить город</button>
+        <button class="btn ghost" style="margin-bottom:10px" onclick="toggleTheme()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> <span id="themeLbl">Светлая тема</span></button>
+        <button class="btn ghost hidden" id="adminBtn" style="margin-bottom:10px;color:var(--blue);border-color:var(--blue-dim)" onclick="openAdmin()">Админ-панель</button>
+        <button class="btn ghost" onclick="showLegal()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Правовая информация</button>
+        <button class="btn ghost" onclick="showAbout()">О приложении</button>
+      </div>
+      <div id="opsTab" class="hidden">
+        <div class="section-title big" style="margin-top:6px">История операций</div>
+        <div class="op-list" id="profOps"></div>
+      </div>
+    </section>
+
+    <section id="view-mine" class="hidden">
+      <div class="section-title big" style="margin-top:6px">Мои объявления</div>
+      <div class="ads" id="adListMine"></div>
+    </section>
+  </main>
+
+  <div class="placebar hidden" id="placeBar">
+    <button class="btn" onclick="openPlaceFromMine()">+ Разместить объявление</button>
+  </div>
+
+  <nav id="nav">
+    <div class="tab active" data-tab="home" onclick="goTab('home')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Главная
+    </div>
+    <div class="tab" data-tab="search" onclick="goTab('search')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Поиск
+    </div>
+    <div class="tab" data-tab="mine" onclick="goTab('mine')">
+      <div class="plus">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 13h8M8 18h5"/></svg>
+      </div>Мои
+    </div>
+    <div class="tab" data-tab="fav" onclick="goTab('fav')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>Избранное
+    </div>
+    <div class="tab" data-tab="profile" onclick="goTab('profile')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Профиль
+    </div>
+  </nav>
+
+  <div class="sheet-mask" id="citySheet" onclick="if(event.target===this)closeSheet('citySheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="city-head">
+        <button class="back-mini hidden" id="cityBack" onclick="cityBack()">‹</button>
+        <h2 id="cityTitle">Выберите регион</h2>
+      </div>
+      <input id="citySearch" class="city-search" placeholder="Поиск по России…" oninput="cityFilter(this.value)" />
+      <div class="city-list" id="cityOptions"></div>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="detailSheet" onclick="if(event.target===this)closeSheet('detailSheet')">
+    <div class="sheet" style="padding:0">
+      <div class="detail-img" id="dImg">
+        <button class="back" onclick="closeSheet('detailSheet')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="gallery" id="dGallery"></div>
+      </div>
+      <div class="detail-body">
+        <div class="detail-price" id="dPrice"></div>
+        <div class="detail-title" id="dTitle"></div>
+        <div class="detail-meta" id="dMeta"></div>
+        <div class="detail-extra" id="dExtra"></div>
+        <div class="detail-desc" id="dDesc"></div>
+        <div class="seller-card">
+          <div class="top"><div class="ava" id="dAva"></div><div><div class="nm" id="dSeller"></div><div class="rt" id="dRating"></div></div></div>
+          <div class="contact-btns">
+            <button class="btn tg" id="dTg" onclick="contactTg()">Написать в Telegram</button>
+            <button class="btn ph" id="dPhone" onclick="contactPhone()">Позвонить</button>
+          </div>
+          <button class="btn ghost" style="margin-top:12px" onclick="shareAd()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:6px"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+            Поделиться объявлением
+          </button>
+          <div id="ownerActions" class="hidden" style="display:flex;gap:10px;margin-top:12px">
+            <button class="btn ghost" style="flex:1" onclick="editAd()">Редактировать</button>
+            <button class="btn ghost" style="flex:1;color:#ff5a5a;border-color:#5a2222" onclick="deleteAd()">Удалить</button>
+          </div>
+          <div id="promoActions" class="hidden" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+            <button class="btn ghost btn-sm" onclick="buyPromo('boost')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px"><path d="M13 2 3 14h6l-1 8 10-12h-6l1-8z"/></svg>Поднять в топ</button>
+            <button class="btn ghost btn-sm" onclick="buyPromo('highlight')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 21v-3M3 12h3M21 12h-3"/></svg>Выделить</button>
+            <button class="btn ghost btn-sm" onclick="buyPromo('pin')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px"><path d="M4 21V4l16 5-16 5"/></svg>Закрепить</button>
+            <button class="btn ghost btn-sm" onclick="openShop(false)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px"><path d="m3 9 1.5-5H19.5L21 9M3 9v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9M3 9h18M4 9h16M7 20v-7h10v7"/></svg>Все услуги</button>
+          </div>
+          <button id="statusBtn" class="btn ghost hidden" style="margin-top:10px" onclick="toggleStatus()"></button>
+          <button id="renewBtn" class="btn ghost hidden" style="margin-top:10px;color:var(--blue);border-color:var(--blue-dim)" onclick="renewAd()">Продлить на 30 дней</button>
+          <button id="reportBtn" class="btn ghost hidden" style="margin-top:10px;color:var(--text-dim)" onclick="openReport()">Пожаловаться</button>
+        </div>
+        <div id="dReviewsSec" class="hidden">
+          <div class="section-title" style="margin-top:14px">Отзывы</div>
+          <div id="dReviews" class="rev-list"></div>
+        </div>
+        <div id="dSimilarSec" class="hidden">
+          <div class="section-title" style="margin-top:14px">Похожие объявления</div>
+          <div class="ads" id="dSimilar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="notifSheet" onclick="if(event.target===this)closeSheet('notifSheet')">
+    <div class="sheet"><div class="grab"></div><h2>Уведомления</h2><p class="sub">Ответы, новые объявления в вашем городе</p><div id="notifList"></div></div>
+  </div>
+
+  <div class="sheet-mask" id="reportSheet" onclick="if(event.target===this)closeSheet('reportSheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <h2>Пожаловаться</h2>
+      <p class="sub">Выберите причину — мы проверим объявление</p>
+      <div class="city-list" id="reportOptions"></div>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="reviewSheet" onclick="if(event.target===this)closeSheet('reviewSheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <h2>Оценить объявление</h2>
+      <p class="sub">Насколько продавец оправдал ожидания?</p>
+      <div class="stars" id="revStars">
+        <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+      </div>
+      <textarea class="f-input" id="revText" rows="3" maxlength="500" placeholder="Комментарий (необязательно)" style="width:100%;margin:12px 0;resize:none"></textarea>
+      <button class="btn" style="width:100%" onclick="submitReview()">Отправить оценку</button>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="adminSheet" onclick="if(event.target===this)closeSheet('adminSheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <h2>Админ-панель</h2>
+      <p class="sub">Жалобы пользователей</p>
+      <div class="ads" id="adminList"></div>
+      <p class="sub" style="margin-top:18px">Журнал модерации</p>
+      <div class="ads" id="modList"></div>
+      <p class="sub" style="margin-top:18px">Пользователи</p>
+      <div class="ads" id="userList"></div>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="topUpSheet" onclick="if(event.target===this)closeSheet('topUpSheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <h2>Пополнить баланс</h2>
+      <p class="sub">Баланс не выводится и не возвращается</p>
+      <div class="topup-presets" id="topUpPresets"></div>
+      <button class="btn" id="topUpPayBtn" onclick="payTopUp()">Оплатить картой или СБП</button>
+      <p class="sub" id="topUpInfo" style="text-align:center"></p>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="shopSheet" onclick="if(event.target===this)closeSheet('shopSheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <h2>Магазин услуг</h2>
+      <p class="sub" id="shopSub">Услуги по продвижению объявлений</p>
+      <div id="shopServices"></div>
+      <div class="section-title big" style="margin-top:14px">Тарифы</div>
+      <div id="shopPlans"></div>
+    </div>
+  </div>
+
+  <div class="sheet-mask" id="confirmSheet" onclick="if(event.target===this)closeSheet('confirmSheet')">
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="dnf-box">
+        <div class="dnf-t">Удалить объявление?</div>
+        <div class="dnf-s">Действие необратимо. Кнопка активируется через <b id="dnfLeft">10</b> сек</div>
+        <button class="btn" id="dnfOk" style="background:#e53935" onclick="doDeleteAd()" disabled>Удалить навсегда</button>
+        <button class="btn ghost" style="margin-top:8px" onclick="closeSheet('confirmSheet')">Отменить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="onboard hidden" id="onboard">
+    <div class="ob-track" id="obTrack">
+      <div class="ob-slide"><div class="ob-ico" style="background:linear-gradient(150deg,#4a90d9,#141414)"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="ob-title">Объявления рядом</div><div class="ob-text">Выберите свой город и регионы — в поиске можно смотреть объявления сразу из нескольких городов.</div></div>
+      <div class="ob-slide"><div class="ob-ico" style="background:linear-gradient(150deg,#4ad98c,#141414)"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div><div class="ob-title">Умный поиск и фильтры</div><div class="ob-text">Ищите по категориям, цене и характеристикам, сравнивайте варианты и сохраняйте в избранное.</div></div>
+      <div class="ob-slide"><div class="ob-ico" style="background:linear-gradient(150deg,#d94a4a,#141414)"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/></svg></div><div class="ob-title">Размещайте легко</div><div class="ob-text">Добавляйте фото, указывайте цену и контакты — объявление опубликуется за минуту.</div></div>
+    </div>
+    <div class="ob-foot">
+      <div class="ob-dots" id="obDots"></div>
+      <button class="btn" id="obNext" onclick="nextOnb()">Далее</button>
+      <button class="ob-skip" onclick="finishOnb()">Пропустить</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ===== Telegram ===== */
+const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+if (tg) { tg.expand(); tg.ready(); }
+
+/* ===== Config ===== */
+const API = '';
+const CATEGORIES = [
+  { id:'tech', name:'Электроника', color:'#1a2a4a', accent:'#4a90d9', icon:'<rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>' },
+  { id:'auto', name:'Авто', color:'#33220f', accent:'#d98c4a', icon:'<path d="M18.7 17.2H20c.6 0 1-.4 1-1v-3.4c0-.9-.7-1.7-1.5-1.9C17.8 10.4 15 10 15 10s-1.3-1.5-2.2-2.4c-.5-.4-1.1-.6-1.8-.6H5.5c-.6 0-1.1.4-1.4.9L2.5 11a2.7 2.7 0 0 0-.5 1.2V16c0 .6.4 1 1 1h1.3"/><circle cx="7" cy="17.2" r="2"/><path d="M9 17.2h6"/><circle cx="17" cy="17.2" r="2"/>' },
+  { id:'home', name:'Недвижимость', color:'#12291c', accent:'#4ad98c', icon:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M16 18h.01"/>' },
+  { id:'cloth', name:'Одежда', color:'#2a1130', accent:'#d94aaa', icon:'<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>' },
+  { id:'sport', name:'Спорт', color:'#2e1212', accent:'#d94a4a', icon:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>' },
+  { id:'job', name:'Работа', color:'#1e1030', accent:'#9a4ad9', icon:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' },
+  { id:'kids', name:'Детям', color:'#2c2c10', accent:'#d9d44a', icon:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18"/><path d="M3 12h18"/>' },
+  { id:'other', name:'Другое', color:'#1c1c1c', accent:'#939393', icon:'<path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>' },
+];
+/* Доп. поля по категориям (универсальная система). type: text|number|select */
+/* Справочник: марка -> список моделей (для категории «Авто») */
+const CAR_MODELS = {
+  'LADA (ВАЗ)': ['1111 Ока','2101','2102','2103','2104','2105','2106','2107','2108','2109','21099','2110','2111','2112','2113','2114','2115','2120','2121','2123','2131','2329','4x4','21213','21214','Granta','Granta Cross','Kalina','Largus','Largus Cross','Niva','Priora','Revolution','Vesta','Vesta Cross','Vesta Sport','XRAY','XRAY Cross','Ока','Нива','Нива Легенда','Нива Travel','Спектр','СеАЗ Ока'],
+  'ГАЗ': ['21','22','24','69','3102','31029','3110','31105','3302','3307','3308','3309','2217','2206','2310','2330','2705','2752','3221','3910','Волга','Волга 21','Волга 24','Газель','Газель Next','Газель Бизнес','Соболь','Садко','Тигр','Валдай','Некст','Юнкер'],
+  'УАЗ': ['3151','31512','3153','3159','3160','3162','3741','3909','3962','452','469','2206','2217','Хантер','Hunter','Patriot','Патриот','Пикап','Pickup','Профи','Profi','Симбир','Симба','Буханка','74','Классик'],
+  'Москвич': ['400','401','402','403','407','408','410','411','412','2138','2140','2141','2142','426','427','433','434','АЗЛК','3','3e','6','Князь Волконский','Купе','Святогор','Престиж','Юрий Долгорукий'],
+  'ЗАЗ': ['965','966','968','968-М','1102 Таврия','1103 Славута','1105 Дана','11055','Chance','Шанс','Sens','Vida','Forza','Lanos','Таврия','Славута','Дана'],
+  'ИЖ': ['2125','21251','2126','2126 Ода','2715','2717','27175','ОДА','Ода','Москвич-412','Планета'],
+  'СеАЗ': ['Ока','1111','11113','11116'],
+  'ТагАЗ': ['C10','C30','Aquila','Aquilla','Road Partner','Tager','Vega','Vortex','ГАЗ-3302'],
+  'ВИС': ['2345','2347','2349','23452','ВИС-2346'],
+  'Аурус': ['Senat','Сенат','Komendant','Комендант'],
+  'Alfa Romeo': ['33','75','90','145','146','147','155','156','159','164','166','1750','2000','Alfasud','Alfetta','Brera','Giulia','Giulietta','GT','GTV','MiTo','Spider','Stelvio','Tonale','Zagato','SZ','RZ'],
+  'Alpina': ['B3','B4','B5','B6','B7','B8','D3','D4','D5','XB7','XD3','XD4','B10','B11','B12'],
+  'Alpine': ['A110','A290','A310','A442','A610','V6'],
+  'AMC': ['Ambassador','Concord','Eagle','Gremlin','Hornet','Javelin','Matador','Pacer','Rebel','Wagoneer','Marlin'],
+  'Aston Martin': ['Cygnet','DB7','DB9','DB11','DBS','DBX','One-77','Rapide','Valhalla','Valkyrie','Vanquish','Vantage','Virage','DB4','DB5','DB6','Lagonda','Victor'],
+  'Audi': ['100','200','80','90','A1','A2','A3','A3 Sportback','A4','A4 Allroad','A5','A5 Sportback','A6','A6 Allroad','A7','A8','Cabriolet','Coupé','Q2','Q3','Q4 e-tron','Q5','Q5 Sportback','Q6','Q7','Q8','R8','RS3','RS4','RS5','RS6','RS7','S3','S4','S5','S6','S7','S8','TT','Quattro','V8','e-tron','e-tron GT','SQ5','SQ7','RS Q3','TT RS','A5 Cabriolet','A3 Cabriolet','A8 L'],
+  'BAIC': ['BJ30','BJ40','BJ60','BJ80','D20','D50','EU5','EU260','M50F','U5','U5 Plus','X5','X7','X55','X3','U7','BJ20'],
+  'Baltijas Dzips': ['BDD 3310','3310'],
+  'Baojun': ['E100','E300','E500','E530','RC-5','RC-6','RM-5','RS-3','RS-5','RS-7','510','730'],
+  'Bentley': ['Arnage','Azure','Bentayga','Brooklands','Continental','Continental GT','Continental Flying Spur','Corniche','Mulsanne','Turbo R','Turbo RT','Turbo S'],
+  'Bestune': ['B50','B70','E01','Nata','T55','T77','T99','X40','X80','B90'],
+  'BMW': ['1 серия','2 серия','3 серия','4 серия','5 серия','6 серия','7 серия','8 серия','M2','M3','M4','M5','M6','M8','X1','X2','X3','X4','X5','X6','X7','XM','Z1','Z3','Z4','Z8','i3','i4','i5','i7','i8','iX','iX1','iX2','iX3','318','320','323','325','328','330','335','520','523','525','528','530','535','540','550','620','623','630','635','640','645','650','728','730','735','740','745','750','760','M3 GTR','M5 CS','e36','e39','e46','e60','e90','f10','f30','g30','2002','E21','E28','E30','E34','E38','E46','E60','E65','F01','F02','G11','G12','iX3','M8 GTS'],
+  'Bogdan': ['2110','2111','2112','А091','А092','А093'],
+  'Brilliance': ['BS2','BS4','BS6','H230','H320','H330','H530','M2','M3','V3','V5','V6','V7','Frv','M2 (H230)'],
+  'Buick': ['Century','Electra','Enclave','Encore','Envision','GL8','Lacrosse','LeSabre','Lucerne','Park Avenue','Regal','Rendezvous','Riviera','Roadmaster','Skyhawk','Skylark','Verano','Wildcat','Encore GX','LaCrosse'],
+  'BYD': ['Atto 3','Dolphin','E2','E5','E6','F3','Flyer','Han','Han EV','Qin','Seagull','Seal','Seal U','Song','Song Plus','Song Max','Suri','Tang','Tang EV','T3','Yuan Plus','Yuan Up','Tang DM','Song L'],
+  'Cadillac': ['ATS','BLS','Brougham','CT4','CT5','CT6','CTS','Coupe','DTS','DeVille','Eldorado','Escalade','Fleetwood','Seville','SRX','STS','XT4','XT5','XT6','XLR','XTS','Calais','Cimarron'],
+  'Changan': ['Alsvin','CS15','CS35','CS35 Plus','CS55','CS75','CS85','CS95','Eado','E-Rock','Hunter','Lamore','Lumin','Raeton','Uni-K','Uni-T','Uni-V','Benben','CX20','Eado Plus'],
+  'Changhe': ['Freedom','Ideal','A6','Старт'],
+  'Chery': ['Arrizo 5','Arrizo 6','Arrizo 7','Arrizo 8','Bonus','Fora','Fulwin','Fulwin A8','Kimo','M11','QQ','Sweet','Tiggo','Tiggo 2','Tiggo 3','Tiggo 4','Tiggo 5','Tiggo 7','Tiggo 8','Tiggo 9','Tiggo Cross','Very','Zhu Lin','eQ1'],
+  'Chevrolet': ['Astro','Aveo','Beretta','Blazer','Bolt','C1500','Camaro','Caprice','Captiva','Cavalier','Celebrity','Celta','Citation','Cobalt','Colorado','Corsica','Corvette','Cruze','Epica','Equinox','Evanda','Express','HHR','Impala','Kalos','Lacetti','Lanos','Lumina','Malibu','Maverick','Metro','Monte Carlo','Niva','Orlando','Rezzo','S-10','Silverado','Sonic','Spark','Suburban','Tacuma','Tahoe','Tracker','TrailBlazer','Traverse','Uplander','Van','Venture','Viva','Volt'],
+  'Chrysler': ['300','300C','200','Concorde','Crossfire','Grand Voyager','Intrepid','LeBaron','Neon','New Yorker','Pacifica','PT Cruiser','Sebring','Stratus','Town & Country','Voyager','Vision','Aspen','Fifth Avenue'],
+  'Citroen': ['Berlingo','C1','C2','C3','C3 Aircross','C3 Picasso','C4','C4 Cactus','C4 Picasso','C4 SpaceTourer','C5','C5 Aircross','C6','C8','C-Crosser','C-Elysee','DS3','DS4','DS5','Evasion','Grand C4 Picasso','Jumpy','Nemo','Picasso','Saxo','Xantia','XM','Xsara','Xsara Picasso','C15'],
+  'Dacia': ['1310','1410','Dokker','Duster','Logan','Lodgy','Nova','Sandero','Solenza','Spring','SuperNova','MCV'],
+  'Daewoo': ['Espero','Gentra','Kalos','Lacetti','Lanos','Leganza','Magnus','Matiz','Nexia','Nubira','Prince','Racer','Tico','Winstorm','International','Alpheon'],
+  'Daihatsu': ['Applause','Charade','Copen','Cuore','Esse','Hijet','Gran Max','Materia','Mira','Move','Rocky','Sirion','Sonica','Terios','YRV','Max','Naked','Opti'],
+  'Datsun': ['GO','go+','mi-DO','on-DO','on-DO FA','on-DO MA','on-DO MI','GO'],
+  'Denza': ['D9','Z9'],
+  'Derways': ['Antelope','Aurora','Cowboy','Land Crown','Pluto','Saladin','Shuttle'],
+  'Dodge': ['Avenger','Caliber','Caravan','Challenger','Charger','Dakota','Dart','Durango','Grand Caravan','Intrepid','Journey','Magnum','Monaco','Neon','Nitro','Omni','Ram','Shadow','Spirit','Stealth','Stratus','Viper','Aries','Diplomat'],
+  'Dongfeng': ['580','A30','AX7','DX3','DX5','E70','H30','S30','S50','Aeolus','A9','Fengon','Mini'],
+  'DS': ['3','4','5','7','9','3 Crossback','7 Crossback'],
+  'Eagle': ['Summit','Talon','Vision','Premier'],
+  'Exeed': ['LX','RX','Sterra ES','Sterra ET','TX','VX','Exlantix ES','Exlantix ET'],
+  'FAW': ['B50','B70','Besturn','Besturn T55','C40','E-HS9','HS5','HS7','Oley','T77','V2','V5','X40','X80'],
+  'Ferrari': ['308','328','348','360','400','412','456','458','488','512','550','575','599','612','812','California','Enzo','F355','F40','F430','F50','F8','F12berlinetta','GTC4Lusso','LaFerrari','Mondial','Portofino','Roma','SF90','Testarossa','Dino','Maranello','512 TR'],
+  'Fiat': ['124','126','127','128','131','500','500L','500X','Albea','Barchetta','Brava','Bravo','Coupe','Croma','Doblò','Ducato','Fiorino','Freemont','Grande Punto','Idea','Linea','Marea','Multipla','Palio','Panda','Punto','Scudo','Siena','Stilo','Tipo','Ulysse','Viaggio'],
+  'Fisker': ['Karma','Ocean'],
+  'Ford': ['Bronco','Bronco Sport','C-Max','Capri','Edge','Escape','Escort','Expedition','Explorer','F-150','Festiva','Fiesta','Figo','Focus','Fusion','Galaxy','Granada','Ka','Kuga','Maverick','Mondeo','Mustang','Mustang Mach-E','Orion','Probe','Puma','Ranger','S-Max','Scorpio','Sierra','Taurus','Tempo','Thunderbird','Tourneo','Transit','Transit Connect','Crown Victoria','Focus RS','Focus ST'],
+  'Foton': ['Auman','Midam','Sauvana','Tunland','View','WOW'],
+  'GAC': ['Emkoo','GN8','GS3','GS4','GS5','GS8','M6','M8','Trumpchi','Aion S','Aion V','Aion Y'],
+  'Geely': ['Atlas','Atlas Pro','Coolray','Emgrand','Emgrand 7','Emgrand GT','Geometry','GS','Icon','Jiaji','LC','MK','Monjaro','Okavango','Otaka','Panda','Preface','Tugella','Vision','Xingyue'],
+  'Genesis': ['G70','G80','G90','GV60','GV70','GV80','GV90','EQ900'],
+  'GMC': ['Acadia','Canyon','Envoy','Jimmy','Safari','Savana','Sierra','Sonoma','Suburban','Terrain','Typhoon','Vandura','Yukon','Yukon XL'],
+  'Gonow': ['GX6','Phoenix','Star','Troy'],
+  'Great Wall': ['Coolbear','Deer','Florid','Hover','Hover H3','Hover H5','Hover H6','Hover M2','Hover M4','Pegasus','Peri','Sailor','Sing','Voleex','Wingle','Safe'],
+  'Hafei': ['Brio','Lobo','Saibao','Simbo','Zhongyi'],
+  'Haval': ['Dargo','F7','F7x','H2','H3','H4','H5','H6','H6 Coupe','H9','Jolion','M6','Raptor','Shenyue','Xiaolong','H2S'],
+  'Honda': ['Accord','Acty','Civic','CR-V','CR-X','Crosstour','Edix','Element','Elysion','Fit','FR-V','HR-V','Insight','Integra','Jazz','Legend','Life','Mobilio','Odyssey','Passport','Pilot','Prelude','Ridgeline','S2000','Stepwgn','Stream','Vezel','Zest','City','Capa','Saber','Torneo','Vigor'],
+  'Hongqi': ['E-HS9','E-QM5','H5','H6','H7','H9','HS3','HS5','HS7','LS7','S9'],
+  'Hozon': ['Neta Aya','Neta S','Neta U','Neta V','Neta X','Neta L'],
+  'Hummer': ['EV','H1','H2','H2 SUT','H3','H3T'],
+  'Hyundai': ['Accent','Atos','Creta','Elantra','Eon','Equus','Excel','Galloper','Genesis','Getz','Grandeur','Grand Starex','H-1','HB20','i10','i20','i30','i40','Ioniq','Ioniq 5','Ioniq 6','ix35','Kona','Lantra','Matrix','Nexo','Palisade','Pony','Porter','Santa Fe','Solaris','Sonata','Starex','Staria','Terracan','Tiburon','Trajet','Tucson','Tuscani','Veloster','Veracruz','Verna','XG','H100','Coupe'],
+  'Infiniti': ['EX','FX','G20','G25','G35','G37','I30','I35','J30','JX','M25','M30','M35','M37','M45','Q30','Q40','Q50','Q60','Q70','QX30','QX4','QX50','QX55','QX56','QX60','QX70','QX80'],
+  'Iran Khodro': ['Dena','Runna','Samand','Sarir','Soren'],
+  'Isuzu': ['Ascender','Axiom','Bighorn','D-Max','Elf','Fargo','Gemini','Hombre','Midi','Mu','Rodeo','Trooper','VehiCross'],
+  'Iveco': ['Daily','EuroCargo','Massif','New Daily','TurboDaily','Stralis'],
+  'Jaecoo': ['J5','J6','J7','J8','J9'],
+  'Jaguar': ['E-Pace','E-Type','F-Pace','F-Type','I-Pace','Mark II','S-Type','XF','XJ','XJ40','XJS','XK','XKR','XE','X-Type','X200','F-Type Coupe'],
+  'Jeep': ['Cherokee','CJ','Commander','Compass','Gladiator','Grand Cherokee','Liberty','Patriot','Renegade','Wagoneer','Wrangler','Grand Wagoneer','Comanche'],
+  'Jetour': ['Dashing','Ice Cream','T2','T3','T5','X70','X70 Plus','X90','X90 Plus','Kigoa X95'],
+  'JMC': ['Baodian','Basas','Vigus'],
+  'Jonway': ['A380','UFO','A430','A150'],
+  'Kaiyi': ['E5','FX','FS','X3 Pro','X7'],
+  'Kia': ['Avella','Borrego','Carens','Carnival','Capital','Ceed','Cerato','Clarus','e-Niro','EV3','EV6','EV9','K3','K5','K7','K9','K900','Magentis','Mohave','Niro','Optima','Pegas','Picanto','Pride','Retona','Rio','Rio X','Ray','Seltos','Shuma','Sorento','Soul','Spectra','Sportage','Stinger','Venga','XCeed','Amanti','Sephia'],
+  'Lamborghini': ['Aventador','Countach','Diablo','Espada','Gallardo','Huracán','Jalpa','LM002','Miura','Murciélago','Reventón','Revuelto','Urus','350 GT','400 GT','Urus S','Aventador SV'],
+  'Lancia': ['2000','Arna','Aurelia','Beta','Dedra','Delta','Flavia','Fulvia','Gamma','Kappa','Lybra','Musa','Prisma','Thema','Thesis','Trevi','Y10','Ypsilon','Zagato'],
+  'Land Rover': ['Defender','Defender 90','Defender 110','Discovery','Discovery Sport','Evoque','Freelander','LR2','LR3','LR4','Range Rover','Range Rover Evoque','Range Rover Sport','Range Rover Velar','Series','Discovery 3','Discovery 4','Series II','Series III'],
+  'Leapmotor': ['C10','C11','C16','T03'],
+  'Lexus': ['CT','ES','GS','GX','HS','IS','LC','LF-A','LM','LS','LX','NX','RC','RX','RZ','SC','TX','UX','LBX','NX Hybrid','RX Hybrid','IS F','GS F'],
+  'Lifan': ['620','650','820','Breez','Cebrium','Murman','Smily','Solano','X50','X60','520','720'],
+  'LiXiang': ['L7','L8','L9','MEGA','ONE'],
+  'Lincoln': ['Aviator','Blackwood','Continental','Corsair','LS','Mark LT','MKS','MKT','MKX','MKZ','Navigator','Nautilus','Town Car','Zephyr'],
+  'Lotus': ['Eclat','Elise','Elite','Elan','Emira','Esprit','Evora','Excel','Exige','Europa'],
+  'Lucid': ['Air','Gravity'],
+  'Luxgen': ['M7','S5','U5','U6','U7','V7'],
+  'Lynk&Co': ['01','02','03','05','07','08','09','Z10'],
+  'Maruti': ['Alto','Esteem','Gypsy','Swift','Wagon R','Zen','Omni'],
+  'Maserati': ['3200GT','Biturbo','Coupé','Ghibli','GranCabrio','GranTurismo','Grecale','Karif','Levante','MC20','Merak','Quattroporte','Shamal','Spyder'],
+  'Maybach': ['57','62','S 580','S 680','Zeppelin','Exelero'],
+  'Mazda': ['2','3','5','6','8','323','626','929','Astina','Atenza','Axela','BT-50','Bongo','Carol','CX-3','CX-30','CX-4','CX-5','CX-50','CX-7','CX-8','CX-9','Demio','Familia','Lantis','Laputa','Millenia','MPV','MX-3','MX-5','MX-6','Premacy','Protege','Roadster','RX-7','RX-8','Sentia','Tribute','Verisa'],
+  'McLaren': ['12C','540C','570GT','570S','600LT','620R','650S','675LT','720S','750S','765LT','Artura','GTS','MP4-12C','P1','Senna','Speedtail','Elva'],
+  'Mercedes-Benz': ['A-класс','B-класс','C-класс','CL-класс','CLA','CLS','Citan','CLK','E-класс','G-класс','GLA','GLB','GLC','GLE','GLK','GLS','GT','M-класс','ML','R-класс','S-класс','SL','SLC','SLK','SLS','Sprinter','V-класс','Vaneo','Viano','Vito','Metris','AMG GT','190','EQC','EQA','EQB','EQE','EQS','EQS SUV','A45 AMG','G 63','G 500','W123','W124','W126','W140','W201','W210','W211','W212','W220','W221','W222','CLS 63'],
+  'Mercury': ['Cougar','Grand Marquis','Mariner','Marquis','Milan','Montego','Mountaineer','Mystique','Sable','Topaz','Tracer','Villager','Capri'],
+  'MG': ['3','5','6','Cyberster','EZS','GT','HS','Marvel R','MG4','MG5','RX5','ZS','ZS EV','350','750'],
+  'Mini': ['Cabrio','Clubman','Cooper','Cooper S','Countryman','Countryman S','Coupé','JCW','Paceman','Roadster','Mini One','Mini 3-door','Mini 5-door'],
+  'Mitsubishi': ['3000GT','ASX','Attrage','Carisma','Colt','Delica','Diamante','Eclipse','Endeavor','Eterna','Galant','Grandis','i-MiEV','L200','Lancer','Lancer Evolution','Lancer X','Magna','Mirage','Montero','Nativa','Outlander','Pajero','Pajero Junior','Pajero Mini','Pajero Pinin','Pajero Sport','RVR','Space Gear','Space Runner','Space Star','Starion','Tredia','Triton','Lancer Cedia'],
+  'Mitsuoka': ['Galue','Le-Seyde','Nue','Orochi','Rock Star','Ryoga','Viewt','Yuga','Zero1'],
+  'Nissan': ['100NX','200SX','240SX','300ZX','350Z','370Z','Almera','Almera Classic','Armada','Avenir','Bluebird','Cedric','Cefiro','Cube','Expert','Fairlady','Figaro','Gloria','Grand Livina','GT-R','Juke','Largo','Laurel','Leaf','Liberty','Livina','March','Maxima','Micra','Murano','Navara','Note','Pathfinder','Patrol','President','Primera','Qashqai','R\'nessa','Rasheen','Rogue','Safari','Sentra','Serena','Skyline','Stagea','Sunny','Teana','Terrano','Terrano II','Tiida','Titan','Vanette','Versa','Wingroad','X-Trail','Z','Aria','Bassara','Clipper','Moco','Otti','Piño','Prairie','Pulsar'],
+  'Oldsmobile': ['88','98','Achieva','Alero','Aurora','Bravada','Cutlass','Intrigue','Omega','Silhouette','Starfire','Toronado'],
+  'Omoda': ['C5','C6','C7','E5','S5','Omoda 5'],
+  'Opel': ['Adam','Agila','Antara','Ascona','Astra','Calibra','Cascada','Combo','Corsa','Frontera','GT','Insignia','Kadett','Manta','Meriva','Mokka','Monza','Movano','Olympia','Omega','Rekord','Senator','Signum','Tigra','Vectra','Vivaro','Zafira'],
+  'Panoz': ['Esperante','AIV Roadster'],
+  'Peugeot': ['106','107','108','1007','2008','205','206','207','208','3008','301','306','307','308','309','4007','4008','404','405','406','407','408','5008','504','505','508','605','607','806','807','Bipper','Boxer','Expert','Partner','Traveller'],
+  'Plymouth': ['Barracuda','Breeze','Duster','Fury','Neon','Prowler','Reliant','Road Runner','Sundance','Volare','Voyager','Acclaim','Cranbrook'],
+  'Pontiac': ['Aztek','Bonneville','Catalina','Firebird','G6','G8','Grand Am','Grand Prix','GTO','LeMans','Montana','Solstice','Sunbird','Sunfire','Tempest','Trans Am','Trans Sport','Vibe'],
+  'Porsche': ['356','718','911','911 Carrera','911 GT3','911 GT3 RS','911 GT2','911 Turbo','912','914','918','924','928','944','968','Boxster','Cayenne','Cayenne Coupe','Cayman','Macan','Panamera','Taycan','996','997','991','992'],
+  'Premier': ['Padmini','Premier 118NE'],
+  'Proton': ['Arena','Inspira','Persona','Perdana','Saga','Satria','Waja','Wira'],
+  'Qoros': ['3','5'],
+  'Ravon': ['Gentra','Matiz','Nexia R3','R2','R4','R5','R6'],
+  'Renault': ['12','14','19','21','25','4','5','9','Arkana','Captur','Clio','Duster','Espace','Fluence','Kadjar','Kangoo','Kaptur','Koleos','Laguna','Latitude','Logan','Logan Stepway','Master','Megane','Modus','Premium','Safrane','Sandero','Sandero Stepway','Scala','Scenic','Symbol','Talisman','Thalia','Trafic','Twingo','Vel Satis','Express'],
+  'Roewe': ['550','750','i5','i6','RX5','RX8','Marvel R','eRX5'],
+  'Rolls-Royce': ['Cloud','Cullinan','Dawn','Ghost','Phantom','Silver Cloud','Silver Shadow','Silver Spirit','Silver Spur','Spectre','Wraith','Park Ward'],
+  'Rover': ['200','25','400','45','600','75','800','Metro','Mini','Streetwise','Vitesse','P6','SD1'],
+  'Saab': ['9-2X','9-3','9-4X','9-5','9-7X','90','900','9000','Sonett'],
+  'Saturn': ['Astra','Aura','Ion','L200','LS','LW','Outlook','Relay','Sky','SL','SW','Vue'],
+  'Scion': ['FR-S','iA','iM','tC','xA','xB','xD'],
+  'Seat': ['Alhambra','Altea','Arosa','Ateca','Cordoba','Exeo','Ibiza','Inca','Leon','Malaga','Marbella','Mii','Terra','Toledo'],
+  'Seres': ['3','5','SF5','M5'],
+  'Shuanghuan': ['A6','Noble','SCEO','MPV'],
+  'Skoda': ['105','120','130','135','136','Citigo','Enyaq','Fabia','Felicia','Favorit','Forman','Kamiq','Karoq','Kodiaq','Octavia','Octavia A5','Octavia A7','Rapid','Roomster','Scout','Scala','Superb','Yeti','Elroq'],
+  'Skywell': ['ET5','HT5'],
+  'Smart': ['#1','#3','City Coupe','Crossblade','Forfour','Fortwo','Roadster','EQ fortwo'],
+  'Soueast': ['DX3','DX5','Lioncel','Soveran','Zinger'],
+  'SsangYong': ['Actyon','Actyon Sports','Chairman','Family','Kallus','Korando','Kyron','Musso','Nomad','Rexton','Rodius','Stavic','Tivoli','Torres','XLV'],
+  'Subaru': ['Ascent','Baja','BRZ','Crosstrek','Exiga','Forester','Impreza','Justy','Legacy','Levorg','Libero','Outback','Solterra','SVX','Tribeca','WRX','XV','Dias','R2'],
+  'Suzuki': ['Aerio','Alto','Baleno','Cappuccino','Celerio','Cultus','Escudo','Every','Grand Vitara','Ignis','Jimny','Kizashi','Liana','MR Wagon','Samurai','Splash','Swift','SX-4','Vitara','Wagon R','XL-7','SJ-410'],
+  'SWM': ['G01','G03','G05','X7'],
+  'Tank': ['300','400','500','700','800'],
+  'Tatra': ['603','613','700','Tatraphan','Beta'],
+  'Tesla': ['Cybertruck','Model 3','Model S','Model X','Model Y','Roadster','Semi'],
+  'Togg': ['T10F','T10X'],
+  'Toyota': ['4Runner','Agya','Allion','Alphard','Altezza','Aqua','Auris','Avalon','Avensis','Aygo','bB','Belta','C-HR','Caldina','Camry','Camry Solara','Celica','Celsior','Chaser','Corolla','Corolla Cross','Corolla Fielder','Corolla Rumion','Cressida','Crown','Dyna','Estima','FJ Cruiser','Fortuner','Fun Cargo','GT86','Harrier','HiAce','Highlander','Hilux','Ipsum','Ist','Land Cruiser','Land Cruiser Prado','Mark II','Mark X','Matrix','Mirai','Noah','Passo','Picnic','Premio','Prius','Probox','RAV4','Regius','Rush','Sai','Sequoia','Sienna','Sienta','Starlet','Succeed','Supra','Tacoma','Tercel','Tundra','Venza','Verso','Vios','Vista','Vitz','Voxy','WiLL','Windom','Yaris','Yaris Cross'],
+  'Triumph': ['1500','2000','2500','Acclaim','Dolomite','Herald','Spitfire','Stag','TR6','TR7','TR8'],
+  'Volvo': ['240','244','245','340','343','440','460','480','66','740','745','760','780','850','940','960','Amazon','C30','C40','C70','P1800','PV544','S40','S60','S70','S80','S90','V40','V50','V60','V70','V90','XC40','XC60','XC70','XC90','S60 Cross Country','V60 Cross Country','V90 Cross Country'],
+  'Volkswagen': ['Amarok','Arteon','Beetle','Bora','Caddy','California','CC','Corrado','Crafter','Eos','Fox','Golf','Golf Plus','Golf R','Golf Sportsvan','ID.3','ID.4','ID.5','ID.6','ID.7','Jetta','Lupo','Multivan','New Beetle','Passat','Passat CC','Phaeton','Polo','Polo Sedan','Scirocco','Sharan','Taigo','T-Cross','T-Roc','Tiguan','Tiguan Allspace','Touareg','Touran','Transporter','Up!','Vento'],
+  'Vortex': ['Corda','Estina','Tingo','Tino'],
+  'Voyah': ['Dream','Free','Passion','Courage'],
+  'Wartburg': ['1.3','311','312','313','353'],
+  'Wey': ['Blue Mountain','Coffee 01','Coffee 02','Latte','Mocha'],
+  'Wuling': ['Air EV','Cloud EV','Hongguang','Mini EV','Sunshine'],
+  'Xiali': ['7100','7180','New Central'],
+  'Xpeng': ['G6','G9','Mona M03','P5','P7','P8','X9'],
+  'Zeekr': ['001','007','009','7X','Mix','X'],
+  'Zotye': ['2008','300','5008','Coupa','E200','SR7','SR9','T300','T500','T600','Z100','Z300','Z7','T600 Coupe'],
+  'ВАЗ': ['2101','2102','2103','2104','2105','2106','2107','2108','2109','21099','2110','2111','2112','2113','2114','2115','2121','2123','2131','2329','4x4','Калина','Приора','Гранта','Нива','Vesta','XRAY','Ларгус','Ока'],
+  'Другая': [],
+};
+const MODELS_TECH = {
+  'Apple': ['iPhone 16 Pro Max','iPhone 16 Pro','iPhone 16','iPhone 16 Plus','iPhone 15 Pro Max','iPhone 15 Pro','iPhone 15','iPhone 15 Plus','iPhone 14 Pro Max','iPhone 14 Pro','iPhone 14','iPhone 14 Plus','iPhone 13','iPhone 13 mini','iPhone SE 3','MacBook Pro 14','MacBook Pro 16','MacBook Air 13','MacBook Air 15','iMac 24','Mac mini','Mac Studio','iPad Pro 11','iPad Pro 12.9','iPad Air','iPad 10','iPad mini 6','Apple Watch Ultra 2','Apple Watch Series 9','Apple Watch SE','AirPods Pro 2','AirPods 3','AirPods Max','HomePod mini','Apple TV 4K','Apple Vision Pro'],
+  'Samsung': ['Galaxy S25 Ultra','Galaxy S25','Galaxy S25+','Galaxy S24 Ultra','Galaxy S24','Galaxy S24+','Galaxy S23 FE','Galaxy Z Fold 6','Galaxy Z Flip 6','Galaxy Z Fold 5','Galaxy Z Flip 5','Galaxy A56','Galaxy A55','Galaxy A35','Galaxy A16','Galaxy Tab S10 Ultra','Galaxy Tab S9','Galaxy Tab A9+','Galaxy Book 4 Pro','Galaxy Book 4 Edge','Galaxy Watch Ultra','Galaxy Watch 7','Galaxy Buds 3 Pro','Smart Monitor M8','Odyssey G9','BESPOKE Jet'],
+  'Xiaomi': ['Xiaomi 15 Pro','Xiaomi 15','Xiaomi 15 Ultra','Xiaomi 14 Ultra','Xiaomi 14','Xiaomi 14T','Xiaomi 13T','Redmi Note 14 Pro','Redmi Note 14','Redmi Note 13 Pro+','Redmi Note 13','Redmi 13C','Redmi 12','Poco F6 Pro','Poco X6 Pro','Poco M6 Pro','Poco C65','Xiaomi Pad 6S Pro','Xiaomi Pad 6','Redmi Pad SE','Xiaomi Smart Band 9','Redmi Buds 6','Xiaomi TV A 55'],
+  'Huawei': ['Mate 60 Pro','Mate 60','Mate X5','P60 Pro','P60','Nova 12 Ultra','Nova 12','MatePad Pro 13.2','MatePad 11','MateBook 14s','MateBook D16','Watch GT 5 Pro','Watch GT 4','FreeBuds Pro 3','Vision Smart TV'],
+  'Honor': ['Magic 6 Pro','Magic 6','Honor 200 Pro','Honor 200','Honor 90','Honor X9b','Honor X8b','Honor Pad 9','MagicPad 2','Honor Watch 5'],
+  'Oppo': ['Find X8 Pro','Find X8','Reno 13 Pro','Reno 13','A80'],
+  'Google': ['Pixel 9 Pro XL','Pixel 9 Pro','Pixel 9','Pixel 9 Pro Fold','Pixel 8a','Pixel 8 Pro','Pixel Watch 3','Pixel Buds Pro 2','Pixel Tablet'],
+  'Sony': ['Xperia 1 VI','Xperia 5 VI','Xperia 10 VI','PlayStation 5 Pro','PlayStation 5 Slim','PlayStation 5','PlayStation 4 Pro','PlayStation 4','WH-1000XM5','WH-CH720N','LinkBuds S','WF-1000XM5','A7C II','A7 IV','A6400','ZV-E10','BRAVIA XR A95L','Bravia 4K'],
+  'LG': ['OLED G4','OLED C4','OLED B4','QNED 90T','UltraGear 27','Gram 17','Gram 16','Gram Pro 16','LG Soundbar','LG Q60 4K'],
+  'Lenovo': ['ThinkPad X1 Carbon G12','ThinkPad T14s','ThinkPad E16','IdeaPad 5 2-in-1','IdeaPad Slim 3','IdeaPad Pro 5','Legion Pro 7i','Legion 5 Pro','LOQ 15IRX','Yoga Slim 7x','Tab P12','Tab M11'],
+  'Asus': ['ROG Strix G16','ROG Zephyrus G14','ROG Strix Scar 18','TUF Gaming A15','TUF Gaming F15','Vivobook 15','Vivobook S15 OLED','Zenbook 14 OLED','Zenbook Duo','ROG Ally','ProArt','ROG Phone 9'],
+  'HP': ['Pavilion 15','Pavilion x360 14','Envy x360 15','Spectre x360 14','Omen 16','Victus 16','EliteBook 840 G11','ProBook 450','LaserJet M111','OMEN Transcend 14'],
+  'Dell': ['XPS 13','XPS 15','XPS 14','Inspiron 15','Inspiron 14 Plus','Alienware M16 R2','Alienware x16','Latitude 7450','Precision 5680','UltraSharp 27'],
+  'MSI': ['Katana 15','Katana 17','Sword 16 HX','Raider GE68','Stealth 14','Modern 15','Titan 18 HZ','Vector 16'],
+  'Canon': ['EOS R5 Mark II','EOS R6 Mark II','EOS R50','EOS R10','EOS 90D','EOS M50 Mark II','PowerShot G7 X Mark III','EOS RP'],
+  'Nikon': ['Z9','Z8','Z6 III','Z50 II','D850','Z 50','Z 5'],
+  'GoPro': ['HERO12 Black','HERO11 Black','HERO10 Black','HERO9 Black','Fusion'],
+  'JBL': ['Charge 5','Flip 6','Xtreme 3','Boombox 3','PartyBox 310','Tune 510','Live 770NC','Quantum 360P'],
+  'Bose': ['QuietComfort Ultra','QuietComfort','QuietComfort 45','SoundLink Flex','SoundLink Revolve+ II','Soundbar 600','QC Earbuds'],
+  'Garmin': ['Fenix 7 Pro','Forerunner 265','Forerunner 965','Venu 3','Instinct 2','Edge 1040'],
+  'Logitech': ['MX Master 3S','MX Mechanical','MX Keys S','G502 X Plus','G213','G Pro X','C920','Brio','G915','Blue Yeti'],
+  'Razer': ['Viper V3 Pro','DeathAdder V3 Pro','BlackWidow V4','Huntsman V2','Kraken V3','Blade 16','Naga'],
+  'OnePlus': ['OnePlus 13','OnePlus 12','OnePlus Nord 4','OnePlus Pad 2'],
+  'Realme': ['Realme 14 Pro+','Realme 13 Pro','Realme 12','Realme C75','Realme Note 50'],
+  'Motorola': ['Edge 50 Ultra','Edge 50 Pro','Moto Razr 50 Ultra','Moto G84','Moto G54'],
+};
+/* Доп. поля по категориям (универсальная система). type: text|number|select */
+const CATEGORY_FIELDS = {
+  auto: [
+    { key:'brand', label:'Марка', type:'select', required:true, onchange:'renderCarModel()', options:Object.keys(CAR_MODELS) },
+    { key:'model', label:'Модель', type:'select', required:true, dynamic:true },
+    { key:'year', label:'Год выпуска', type:'number', required:true, placeholder:'Например: 2018' },
+    { key:'mileage', label:'Пробег, км', type:'number', required:true, placeholder:'0' },
+    { key:'owners', label:'Владельцев', type:'number', required:false, placeholder:'1' },
+    { key:'transmission', label:'Коробка передач', type:'select', required:true, options:['Механика','Автомат','Робот','Вариатор'] },
+    { key:'drive', label:'Привод', type:'select', required:false, options:['Передний','Задний','Полный'] },
+    { key:'condition', label:'Состояние', type:'select', required:false, options:['Отличное','Хорошее','Среднее','Требуется ремонт'] },
+    { key:'vin', label:'VIN (необязательно)', type:'text', required:false, placeholder:'XXXXXX' },
+  ],
+  tech: [
+    { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Смартфоны','Планшеты','Ноутбуки и ПК','Мониторы','Телевизоры и аудио','Наушники и аксессуары','Фото и видеотехника','Игровые приставки','Умные часы и гаджеты','Бытовая техника','Умный дом','Другая электроника'] },
+    { key:'brand', label:'Производитель', type:'select', required:false, onchange:"renderElaModel()", options:['Apple','Samsung','Xiaomi','Huawei','Honor','Oppo','Realme','Google','Sony','LG','Lenovo','Asus','Acer','HP','Dell','MSI','Toshiba','Philips','Panasonic','Bosch','Siemens','Dyson','Canon','Nikon','GoPro','Logitech','Razer','Nokia','Motorola','OnePlus','Nothing','Tecno','Infinix','Poco','Garmin','JBL','Bose','Другой'] },
+    { key:'model', label:'Модель', type:'text', required:false, placeholder:'Модель' },
+    { key:'condition', label:'Состояние', type:'select', required:false, options:['Новое','Как новое','Отличное','Хорошее','Среднее','Требуется ремонт'] },
+  ],
+  home: [
+    { key:'subcategory', label:'Тип недвижимости', type:'select', required:true, options:['Гараж','Дом','Дача','Коттедж','Квартира','Земельный участок','Коммерческая недвижимость'] },
+    { key:'rooms', label:'Комнат', type:'number', required:false, placeholder:'1' },
+    { key:'area', label:'Площадь, м²', type:'number', required:false, placeholder:'0' },
+    { key:'floor', label:'Этаж', type:'number', required:false, placeholder:'1' },
+  ],
+  cloth: [
+    { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Женская одежда','Мужская одежда','Верхняя одежда','Платья и костюмы','Обувь','Сумки и рюкзаки','Часы и украшения','Аксессуары','Бельё и домашняя одежда','Другое'] },
+    { key:'size', label:'Размер', type:'text', required:false, placeholder:'Например: S, M, 42, 45' },
+    { key:'condition', label:'Состояние', type:'select', required:false, options:['Новое с биркой','Новое','Как новое','Отличное','Хорошее','Среднее'] },
+  ],
+  sport: [
+    { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Велосипеды','Самокаты и гироскутеры','Ролики и скейтборды','Лыжи и сноуборды','Тренажёры и фитнес','Командные виды спорта','Туризм и кемпинг','Охота и рыбалка','Другое'] },
+    { key:'condition', label:'Состояние', type:'select', required:false, options:['Новое','Как новое','Отличное','Хорошее','Среднее','Требуется ремонт'] },
+  ],
+  job: [
+    { key:'subcategory', label:'Сфера', type:'select', required:true, options:['Офис и администрация','IT и разработка','Торговля сфера услуг','Производство и строительство','Водители и логистика','Медицина и образование','Красота и здоровье','Общепит','Работа с частичной занятостью','Удалённая работа','Другое'] },
+    { key:'schedule', label:'График', type:'select', required:false, options:['Полный день','Сменный график','Гибкий график','Работа по выходным','Вахта'] },
+  ],
+  kids: [
+    { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Коляски и кресла','Автокресла','Игрушки','Одежда для малышей','Детская мебель','Питание и уход','Книги и развитие','Школьные принадлежности','Игровые площадки и бассейны','Другое'] },
+    { key:'age', label:'Возраст', type:'text', required:false, placeholder:'Например: 0-3, 3-7, 7+' },
+  ],
+  other: [
+    { key:'subcategory', label:'Подкатегория', type:'select', required:true, options:['Дом и сад','Инструменты','Товары для животных','Хобби и рукоделие','Коллекционирование','Книги и журналы','Музыкальные инструменты','Подарки и сувениры','Разное'] },
+  ],
+};
+const RANGE_KEYS = { year:1, mileage:1, area:1, rooms:1, floor:1 };
+const TEXT_KEYS = { size:1, age:1 };
+const CATEGORY_FILTERS = {
+  auto: ['brand', 'year', 'mileage', 'transmission', 'drive', 'condition'],
+  tech: ['subcategory', 'brand', 'condition'],
+  home: ['subcategory', 'rooms', 'area', 'floor'],
+  cloth: ['subcategory', 'size', 'condition'],
+  sport: ['subcategory', 'condition'],
+  job: ['subcategory', 'schedule'],
+  kids: ['subcategory', 'age'],
+  other: ['subcategory'],
+};
+function fieldBy(cat, key) { return (CATEGORY_FIELDS[cat] || []).find(x => x.key === key) || {}; }
+const REGIONS = [
+  { name: 'Москва', cities: ['Москва'] },
+  { name: 'Санкт-Петербург', cities: ['Санкт-Петербург'] },
+  { name: 'Севастополь', cities: ['Севастополь'] },
+  { name: 'Республика Адыгея', cities: ['Майкоп', 'Адыгейск'] },
+  { name: 'Республика Алтай', cities: ['Горно-Алтайск'] },
+  { name: 'Республика Башкортостан', cities: ['Агидель', 'Баймак', 'Белебей', 'Белорецк', 'Бирск', 'Благовещенск', 'Давлеканово', 'Дюртюли', 'Ишимбай', 'Кумертау', 'Межгорье', 'Мелеуз', 'Нефтекамск', 'Октябрьский', 'Салават', 'Сибай', 'Стерлитамак', 'Туймазы', 'Уфа', 'Учалы', 'Янаул'] },
+  { name: 'Республика Бурятия', cities: ['Бабушкин', 'Гусиноозёрск', 'Закаменск', 'Кяхта', 'Северобайкальск', 'Улан-Удэ'] },
+  { name: 'Республика Дагестан', cities: ['Буйнакск', 'Дагестанские Огни', 'Дербент', 'Избербаш', 'Каспийск', 'Кизилюрт', 'Кизляр', 'Махачкала', 'Хасавюрт', 'Южно-Сухокумск'] },
+  { name: 'Республика Ингушетия', cities: ['Карабулак', 'Магас', 'Малгобек', 'Назрань', 'Сунжа'] },
+  { name: 'Кабардино-Балкарская Республика', cities: ['Баксан', 'Майский', 'Нальчик', 'Нарткала', 'Прохладный', 'Терек', 'Тырныауз', 'Чегем'] },
+  { name: 'Республика Калмыкия', cities: ['Городовиковск', 'Лагань', 'Элиста'] },
+  { name: 'Карачаево-Черкесская Республика', cities: ['Карачаевск', 'Теберда', 'Усть-Джегута', 'Черкесск'] },
+  { name: 'Республика Карелия', cities: ['Беломорск', 'Кемь', 'Кондопога', 'Костомукша', 'Лахденпохья', 'Медвежьегорск', 'Олонец', 'Петрозаводск', 'Питкяранта', 'Пудож', 'Сегежа', 'Сортавала', 'Суоярви'] },
+  { name: 'Республика Коми', cities: ['Воркута', 'Вуктыл', 'Емва', 'Инта', 'Микунь', 'Печора', 'Сосногорск', 'Сыктывкар', 'Усинск', 'Ухта'] },
+  { name: 'Республика Марий Эл', cities: ['Волжск', 'Звенигово', 'Йошкар-Ола', 'Козьмодемьянск'] },
+  { name: 'Республика Мордовия', cities: ['Ардатов', 'Инсар', 'Ковылкино', 'Краснослободск', 'Рузаевка', 'Саранск', 'Темников'] },
+  { name: 'Республика Саха (Якутия)', cities: ['Алдан', 'Верхоянск', 'Вилюйск', 'Ленск', 'Мирный', 'Нерюнгри', 'Нюрба', 'Олёкминск', 'Покровск', 'Среднеколымск', 'Томмот', 'Удачный', 'Якутск'] },
+  { name: 'Республика Северная Осетия — Алания', cities: ['Алагир', 'Ардон', 'Беслан', 'Владикавказ', 'Дигора', 'Моздок'] },
+  { name: 'Республика Татарстан', cities: ['Агрыз', 'Азнакаево', 'Альметьевск', 'Арск', 'Бавлы', 'Болгар', 'Бугульма', 'Буинск', 'Елабуга', 'Заинск', 'Зеленодольск', 'Иннополис', 'Казань', 'Кукмор', 'Лаишево', 'Лениногорск', 'Мамадыш', 'Менделеевск', 'Мензелинск', 'Набережные Челны', 'Нижнекамск', 'Нурлат', 'Тетюши', 'Чистополь'] },
+  { name: 'Республика Тыва', cities: ['Ак-Довурак', 'Кызыл', 'Туран', 'Чадан', 'Шагонар'] },
+  { name: 'Удмуртская Республика', cities: ['Воткинск', 'Глазов', 'Ижевск', 'Камбарка', 'Можга', 'Сарапул'] },
+  { name: 'Республика Хакасия', cities: ['Абаза', 'Абакан', 'Саяногорск', 'Сорск', 'Черногорск'] },
+  { name: 'Чеченская Республика', cities: ['Аргун', 'Грозный', 'Гудермес', 'Урус-Мартан', 'Шали'] },
+  { name: 'Чувашская Республика', cities: ['Алатырь', 'Канаш', 'Козловка', 'Мариинский Посад', 'Новочебоксарск', 'Цивильск', 'Чебоксары', 'Шумерля', 'Ядрин'] },
+  { name: 'Алтайский край', cities: ['Алейск', 'Барнаул', 'Белокуриха', 'Бийск', 'Горняк', 'Заринск', 'Змеиногорск', 'Камень-на-Оби', 'Новоалтайск', 'Рубцовск', 'Славгород', 'Яровое'] },
+  { name: 'Забайкальский край', cities: ['Балей', 'Борзя', 'Краснокаменск', 'Могоча', 'Нерчинск', 'Петровск-Забайкальский', 'Сретенск', 'Хилок', 'Чита', 'Шилка'] },
+  { name: 'Камчатский край', cities: ['Вилючинск', 'Елизово', 'Петропавловск-Камчатский'] },
+  { name: 'Краснодарский край', cities: ['Абинск', 'Анапа', 'Апшеронск', 'Армавир', 'Белореченск', 'Геленджик', 'Горячий Ключ', 'Гулькевичи', 'Ейск', 'Кореновск', 'Краснодар', 'Кропоткин', 'Крымск', 'Курганинск', 'Лабинск', 'Новокубанск', 'Новороссийск', 'Приморско-Ахтарск', 'Славянск-на-Кубани', 'Сочи', 'Темрюк', 'Тимашёвск', 'Тихорецк', 'Туапсе', 'Усть-Лабинск', 'Хадыженск'] },
+  { name: 'Красноярский край', cities: ['Артёмовск', 'Ачинск', 'Боготол', 'Бородино', 'Дивногорск', 'Дудинка', 'Енисейск', 'Железногорск', 'Заозёрный', 'Зеленогорск', 'Игарка', 'Иланский', 'Канск', 'Кедровый', 'Кодинск', 'Красноярск', 'Лесосибирск', 'Минусинск', 'Назарово', 'Норильск', 'Сосновоборск', 'Ужур', 'Уяр', 'Шарыпово'] },
+  { name: 'Пермский край', cities: ['Александровск', 'Березники', 'Верещагино', 'Горнозаводск', 'Гремячинск', 'Губаха', 'Добрянка', 'Кизел', 'Красновишерск', 'Краснокамск', 'Кудымкар', 'Кунгур', 'Лысьва', 'Нытва', 'Оса', 'Оханск', 'Очёр', 'Пермь', 'Соликамск', 'Усолье', 'Чайковский', 'Чердынь', 'Чермоз', 'Чернушка', 'Чусовой'] },
+  { name: 'Приморский край', cities: ['Арсеньев', 'Артём', 'Большой Камень', 'Владивосток', 'Дальнегорск', 'Дальнереченск', 'Лесозаводск', 'Находка', 'Партизанск', 'Спасск-Дальний', 'Уссурийск', 'Фокино'] },
+  { name: 'Ставропольский край', cities: ['Благодарный', 'Будённовск', 'Георгиевск', 'Ессентуки', 'Железноводск', 'Зеленокумск', 'Изобильный', 'Ипатово', 'Кисловодск', 'Лермонтов', 'Минеральные Воды', 'Михайловск', 'Невинномысск', 'Нефтекумск', 'Новоалександровск', 'Новопавловск', 'Пятигорск', 'Светлоград', 'Ставрополь'] },
+  { name: 'Хабаровский край', cities: ['Амурск', 'Бикин', 'Вяземский', 'Комсомольск-на-Амуре', 'Николаевск-на-Амуре', 'Советская Гавань', 'Хабаровск'] },
+  { name: 'Амурская область', cities: ['Белогорск', 'Благовещенск', 'Завитинск', 'Зея', 'Райчихинск', 'Свободный', 'Сковородино', 'Тында', 'Циолковский', 'Шимановск'] },
+  { name: 'Архангельская область', cities: ['Архангельск', 'Вельск', 'Каргополь', 'Коряжма', 'Котлас', 'Мезень', 'Мирный', 'Новодвинск', 'Няндома', 'Онега', 'Северодвинск', 'Сольвычегодск', 'Шенкурск'] },
+  { name: 'Астраханская область', cities: ['Астрахань', 'Ахтубинск', 'Знаменск', 'Камызяк', 'Нариманов', 'Харабали'] },
+  { name: 'Белгородская область', cities: ['Алексеевка', 'Белгород', 'Бирюч', 'Валуйки', 'Грайворон', 'Губкин', 'Короча', 'Новый Оскол', 'Старый Оскол', 'Строитель', 'Шебекино'] },
+  { name: 'Брянская область', cities: ['Брянск', 'Дятьково', 'Жуковка', 'Злынка', 'Карачев', 'Клинцы', 'Мглин', 'Новозыбков', 'Почеп', 'Севск', 'Сельцо', 'Стародуб', 'Сураж', 'Трубчевск', 'Унеча', 'Фокино'] },
+  { name: 'Владимирская область', cities: ['Александров', 'Владимир', 'Вязники', 'Гороховец', 'Гусь-Хрустальный', 'Камешково', 'Карабаново', 'Киржач', 'Ковров', 'Кольчугино', 'Костерёво', 'Курлово', 'Лакинск', 'Меленки', 'Муром', 'Петушки', 'Покров', 'Радужный', 'Собинка', 'Струнино', 'Судогда', 'Суздаль', 'Юрьев-Польский'] },
+  { name: 'Волгоградская область', cities: ['Волгоград', 'Волжский', 'Дубовка', 'Жирновск', 'Калач-на-Дону', 'Камышин', 'Котельниково', 'Котово', 'Краснослободск', 'Ленинск', 'Михайловка', 'Николаевск', 'Новоаннинский', 'Палласовка', 'Петров Вал', 'Серафимович', 'Суровикино', 'Урюпинск', 'Фролово'] },
+  { name: 'Вологодская область', cities: ['Бабаево', 'Белозерск', 'Великий Устюг', 'Вологда', 'Вытегра', 'Грязовец', 'Кадников', 'Кириллов', 'Красавино', 'Никольск', 'Сокол', 'Тотьма', 'Устюжна', 'Харовск', 'Череповец'] },
+  { name: 'Воронежская область', cities: ['Бобров', 'Богучар', 'Борисоглебск', 'Бутурлиновка', 'Воронеж', 'Калач', 'Лиски', 'Нововоронеж', 'Новохопёрск', 'Острогожск', 'Павловск', 'Поворино', 'Россошь', 'Семилуки', 'Эртиль'] },
+  { name: 'Ивановская область', cities: ['Вичуга', 'Гаврилов Посад', 'Заволжск', 'Иваново', 'Кинешма', 'Комсомольск', 'Кохма', 'Наволоки', 'Плёс', 'Приволжск', 'Пучеж', 'Родники', 'Тейково', 'Фурманов', 'Шуя', 'Южа', 'Юрьевец'] },
+  { name: 'Иркутская область', cities: ['Алзамай', 'Ангарск', 'Байкальск', 'Бирюсинск', 'Бодайбо', 'Братск', 'Вихоревка', 'Железногорск-Илимский', 'Зима', 'Иркутск', 'Киренск', 'Нижнеудинск', 'Саянск', 'Свирск', 'Слюдянка', 'Тайшет', 'Тулун', 'Усолье-Сибирское', 'Усть-Илимск', 'Усть-Кут', 'Черемхово', 'Шелехов'] },
+  { name: 'Калининградская область', cities: ['Багратионовск', 'Балтийск', 'Гвардейск', 'Гурьевск', 'Гусев', 'Зеленоградск', 'Калининград', 'Краснознаменск', 'Ладушкин', 'Мамоново', 'Неман', 'Нестеров', 'Озёрск', 'Пионерский', 'Полесск', 'Правдинск', 'Приморск', 'Светлогорск', 'Светлый', 'Славск', 'Советск', 'Черняховск'] },
+  { name: 'Калужская область', cities: ['Балабаново', 'Белоусово', 'Боровск', 'Ермолино', 'Жиздра', 'Жуков', 'Калуга', 'Киров', 'Козельск', 'Кондрово', 'Кремёнки', 'Людиново', 'Малоярославец', 'Медынь', 'Мещовск', 'Мосальск', 'Обнинск', 'Сосенский', 'Спас-Деменск', 'Сухиничи', 'Таруса', 'Юхнов'] },
+  { name: 'Кемеровская область', cities: ['Анжеро-Судженск', 'Белово', 'Берёзовский', 'Гурьевск', 'Калтан', 'Кемерово', 'Киселёвск', 'Ленинск-Кузнецкий', 'Мариинск', 'Междуреченск', 'Мыски', 'Новокузнецк', 'Осинники', 'Полысаево', 'Прокопьевск', 'Салаир', 'Тайга', 'Таштагол', 'Топки', 'Юрга'] },
+  { name: 'Кировская область', cities: ['Белая Холуница', 'Вятские Поляны', 'Зуевка', 'Киров', 'Кирово-Чепецк', 'Кирс', 'Котельнич', 'Луза', 'Малмыж', 'Мураши', 'Нолинск', 'Омутнинск', 'Орлов', 'Слободской', 'Советск', 'Сосновка', 'Уржум', 'Яранск'] },
+  { name: 'Костромская область', cities: ['Буй', 'Волгореченск', 'Галич', 'Кологрив', 'Кострома', 'Макарьев', 'Мантурово', 'Нерехта', 'Нея', 'Солигалич', 'Чухлома', 'Шарья'] },
+  { name: 'Курганская область', cities: ['Далматово', 'Катайск', 'Курган', 'Куртамыш', 'Макушино', 'Петухово', 'Шадринск', 'Шумиха', 'Щучье'] },
+  { name: 'Курская область', cities: ['Дмитриев', 'Железногорск', 'Курск', 'Курчатов', 'Льгов', 'Обоянь', 'Рыльск', 'Суджа', 'Фатеж', 'Щигры'] },
+  { name: 'Ленинградская область', cities: ['Бокситогорск', 'Волосово', 'Волхов', 'Всеволожск', 'Выборг', 'Высоцк', 'Гатчина', 'Ивангород', 'Каменногорск', 'Кингисепп', 'Кириши', 'Кировск', 'Коммунар', 'Кудрово', 'Лодейное Поле', 'Луга', 'Любань', 'Мурино', 'Никольское', 'Новая Ладога', 'Отрадное', 'Пикалёво', 'Подпорожье', 'Приморск', 'Приозерск', 'Светогорск', 'Сертолово', 'Сланцы', 'Сосновый Бор', 'Сясьстрой', 'Тихвин', 'Тосно', 'Шлиссельбург'] },
+  { name: 'Липецкая область', cities: ['Грязи', 'Данков', 'Елец', 'Задонск', 'Лебедянь', 'Липецк', 'Усмань', 'Чаплыгин'] },
+  { name: 'Магаданская область', cities: ['Магадан', 'Сусуман'] },
+  { name: 'Московская область', cities: ['Апрелевка', 'Балашиха', 'Бронницы', 'Верея', 'Видное', 'Волоколамск', 'Воскресенск', 'Высоковск', 'Голицыно', 'Дедовск', 'Дзержинский', 'Дмитров', 'Долгопрудный', 'Домодедово', 'Дрезна', 'Дубна', 'Егорьевск', 'Жуковский', 'Зарайск', 'Звенигород', 'Ивантеевка', 'Истра', 'Кашира', 'Клин', 'Коломна', 'Королёв', 'Котельники', 'Красноармейск', 'Красногорск', 'Краснознаменск', 'Кубинка', 'Куровское', 'Ликино-Дулёво', 'Лобня', 'Лосино-Петровский', 'Луховицы', 'Лыткарино', 'Люберцы', 'Можайск', 'Мытищи', 'Наро-Фоминск', 'Ногинск', 'Одинцово', 'Озёры', 'Орехово-Зуево', 'Павловский Посад', 'Пересвет', 'Подольск', 'Протвино', 'Пушкино', 'Пущино', 'Раменское', 'Реутов', 'Рошаль', 'Руза', 'Сергиев Посад', 'Серебряные Пруды', 'Серпухов', 'Солнечногорск', 'Старая Купавна', 'Ступино', 'Талдом', 'Фрязино', 'Химки', 'Хотьково', 'Черноголовка', 'Чехов', 'Шатура', 'Щёлково', 'Электрогорск', 'Электросталь', 'Электроугли', 'Яхрома'] },
+  { name: 'Мурманская область', cities: ['Апатиты', 'Гаджиево', 'Заозёрск', 'Заполярный', 'Кандалакша', 'Кировск', 'Ковдор', 'Кола', 'Мончегорск', 'Мурманск', 'Оленегорск', 'Островной', 'Полярные Зори', 'Полярный', 'Североморск', 'Снежногорск'] },
+  { name: 'Нижегородская область', cities: ['Арзамас', 'Балахна', 'Богородск', 'Бор', 'Ветлуга', 'Володарск', 'Ворсма', 'Выкса', 'Горбатов', 'Городец', 'Дзержинск', 'Заволжье', 'Княгинино', 'Кстово', 'Кулебаки', 'Лукоянов', 'Лысково', 'Навашино', 'Нижний Новгород', 'Павлово', 'Первомайск', 'Перевоз', 'Саров', 'Семёнов', 'Сергач', 'Урень', 'Чкаловск', 'Шахунья'] },
+  { name: 'Новгородская область', cities: ['Боровичи', 'Валдай', 'Великий Новгород', 'Малая Вишера', 'Окуловка', 'Пестово', 'Сольцы', 'Старая Русса', 'Холм', 'Чудово'] },
+  { name: 'Новосибирская область', cities: ['Барабинск', 'Бердск', 'Болотное', 'Искитим', 'Карасук', 'Каргат', 'Куйбышев', 'Купино', 'Новосибирск', 'Обь', 'Татарск', 'Тогучин', 'Черепаново', 'Чулым'] },
+  { name: 'Омская область', cities: ['Исилькуль', 'Калачинск', 'Называевск', 'Омск', 'Тара', 'Тюкалинск'] },
+  { name: 'Оренбургская область', cities: ['Абдулино', 'Бугуруслан', 'Бузулук', 'Гай', 'Кувандык', 'Медногорск', 'Новотроицк', 'Оренбург', 'Орск', 'Соль-Илецк', 'Сорочинск', 'Ясный'] },
+  { name: 'Орловская область', cities: ['Болхов', 'Дмитровск', 'Ливны', 'Малоархангельск', 'Мценск', 'Новосиль', 'Орёл'] },
+  { name: 'Пензенская область', cities: ['Белинский', 'Городище', 'Заречный', 'Каменка', 'Кузнецк', 'Нижний Ломов', 'Никольск', 'Пенза', 'Сердобск', 'Спасск', 'Сурск'] },
+  { name: 'Псковская область', cities: ['Великие Луки', 'Гдов', 'Дно', 'Невель', 'Новоржев', 'Новосокольники', 'Опочка', 'Остров', 'Печоры', 'Порхов', 'Псков', 'Пустошка', 'Пыталово', 'Себеж'] },
+  { name: 'Ростовская область', cities: ['Азов', 'Аксай', 'Батайск', 'Белая Калитва', 'Волгодонск', 'Гуково', 'Донецк', 'Зверево', 'Зерноград', 'Каменск-Шахтинский', 'Константиновск', 'Красный Сулин', 'Миллерово', 'Морозовск', 'Новочеркасск', 'Новошахтинск', 'Пролетарск', 'Ростов-на-Дону', 'Сальск', 'Семикаракорск', 'Таганрог', 'Цимлянск', 'Шахты'] },
+  { name: 'Рязанская область', cities: ['Касимов', 'Кораблино', 'Михайлов', 'Новомичуринск', 'Рыбное', 'Ряжск', 'Рязань', 'Сасово', 'Скопин', 'Спас-Клепики', 'Спасск-Рязанский', 'Шацк'] },
+  { name: 'Самарская область', cities: ['Жигулёвск', 'Кинель', 'Нефтегорск', 'Новокуйбышевск', 'Октябрьск', 'Отрадный', 'Похвистнево', 'Самара', 'Сызрань', 'Тольятти', 'Чапаевск'] },
+  { name: 'Саратовская область', cities: ['Аркадак', 'Аткарск', 'Балаково', 'Балашов', 'Вольск', 'Ершов', 'Калининск', 'Красноармейск', 'Красный Кут', 'Маркс', 'Новоузенск', 'Петровск', 'Пугачёв', 'Ртищево', 'Саратов', 'Хвалынск', 'Шиханы', 'Энгельс'] },
+  { name: 'Сахалинская область', cities: ['Александровск-Сахалинский', 'Анива', 'Долинск', 'Корсаков', 'Курильск', 'Макаров', 'Невельск', 'Оха', 'Поронайск', 'Северо-Курильск', 'Томари', 'Углегорск', 'Холмск', 'Шахтёрск', 'Южно-Сахалинск'] },
+  { name: 'Свердловская область', cities: ['Алапаевск', 'Арамиль', 'Артёмовский', 'Асбест', 'Берёзовский', 'Богданович', 'Верхний Тагил', 'Верхняя Пышма', 'Верхняя Салда', 'Верхняя Тура', 'Верхотурье', 'Волчанск', 'Дегтярск', 'Екатеринбург', 'Заречный', 'Ивдель', 'Ирбит', 'Каменск-Уральский', 'Камышлов', 'Карпинск', 'Качканар', 'Кировград', 'Краснотурьинск', 'Красноуральск', 'Красноуфимск', 'Кушва', 'Лесной', 'Михайловск', 'Невьянск', 'Нижние Серги', 'Нижний Тагил', 'Нижняя Салда', 'Нижняя Тура', 'Новая Ляля', 'Новоуральск', 'Первоуральск', 'Полевской', 'Ревда', 'Реж', 'Североуральск', 'Серов', 'Среднеуральск', 'Сухой Лог', 'Сысерть', 'Тавда', 'Талица', 'Туринск'] },
+  { name: 'Смоленская область', cities: ['Велиж', 'Вязьма', 'Гагарин', 'Демидов', 'Десногорск', 'Дорогобуж', 'Духовщина', 'Ельня', 'Починок', 'Рославль', 'Рудня', 'Сафоново', 'Смоленск', 'Сычёвка', 'Ярцево'] },
+  { name: 'Тамбовская область', cities: ['Жердевка', 'Кирсанов', 'Котовск', 'Мичуринск', 'Моршанск', 'Рассказово', 'Тамбов', 'Уварово'] },
+  { name: 'Тверская область', cities: ['Андреаполь', 'Бежецк', 'Белый', 'Бологое', 'Весьегонск', 'Вышний Волочёк', 'Западная Двина', 'Зубцов', 'Калязин', 'Кашин', 'Кимры', 'Конаково', 'Красный Холм', 'Кувшиново', 'Лихославль', 'Нелидово', 'Осташков', 'Ржев', 'Старица', 'Тверь', 'Торжок', 'Торопец', 'Удомля'] },
+  { name: 'Томская область', cities: ['Асино', 'Кедровый', 'Колпашево', 'Северск', 'Стрежевой', 'Томск'] },
+  { name: 'Тульская область', cities: ['Алексин', 'Белёв', 'Богородицк', 'Болохово', 'Венёв', 'Донской', 'Ефремов', 'Кимовск', 'Киреевск', 'Липки', 'Новомосковск', 'Плавск', 'Советск', 'Суворов', 'Тула', 'Узловая', 'Чекалин', 'Щёкино', 'Ясногорск'] },
+  { name: 'Тюменская область', cities: ['Заводоуковск', 'Ишим', 'Тобольск', 'Тюмень', 'Ялуторовск'] },
+  { name: 'Ульяновская область', cities: ['Барыш', 'Димитровград', 'Инза', 'Новоульяновск', 'Сенгилей', 'Ульяновск'] },
+  { name: 'Челябинская область', cities: ['Аша', 'Бакал', 'Верхнеуральск', 'Верхний Уфалей', 'Еманжелинск', 'Златоуст', 'Карабаш', 'Карталы', 'Касли', 'Катав-Ивановск', 'Копейск', 'Коркино', 'Куса', 'Кыштым', 'Магнитогорск', 'Миасс', 'Миньяр', 'Нязепетровск', 'Озёрск', 'Пласт', 'Сатка', 'Сим', 'Снежинск', 'Трёхгорный', 'Троицк', 'Усть-Катав', 'Чебаркуль', 'Челябинск', 'Южноуральск', 'Юрюзань'] },
+  { name: 'Ярославская область', cities: ['Гаврилов-Ям', 'Данилов', 'Любим', 'Мышкин', 'Переславль-Залесский', 'Пошехонье', 'Ростов', 'Рыбинск', 'Тутаев', 'Углич', 'Ярославль'] },
+  { name: 'Еврейская автономная область', cities: ['Биробиджан', 'Облучье'] },
+  { name: 'Ненецкий автономный округ', cities: ['Нарьян-Мар'] },
+  { name: 'Ханты-Мансийский автономный округ — Югра', cities: ['Белоярский', 'Когалым', 'Лангепас', 'Лянтор', 'Мегион', 'Нефтеюганск', 'Нижневартовск', 'Нягань', 'Покачи', 'Пыть-Ях', 'Радужный', 'Сургут', 'Урай', 'Ханты-Мансийск', 'Югорск'] },
+  { name: 'Чукотский автономный округ', cities: ['Анадырь', 'Билибино', 'Певек'] },
+  { name: 'Ямало-Ненецкий автономный округ', cities: ['Губкинский', 'Лабытнанги', 'Муравленко', 'Надым', 'Новый Уренгой', 'Ноябрьск', 'Салехард', 'Тарко-Сале'] },
+{ name: 'Республика Крым', cities: ['Алупка', 'Алушта', 'Армянск', 'Бахчисарай', 'Белогорск', 'Джанкой', 'Евпатория', 'Керчь', 'Красноперекопск', 'Саки', 'Симферополь', 'Старый Крым', 'Судак', 'Феодосия', 'Щёлкино', 'Ялта'] },
+  { name: 'Донецкая Народная Республика', cities: ['Амвросиевка', 'Горловка', 'Дебальцево', 'Доброполье', 'Докучаевск', 'Донецк', 'Дружковка', 'Енакиево', 'Ждановка', 'Зугрэс', 'Иловайск', 'Краматорск', 'Макеевка', 'Мариуполь', 'Моспино', 'Новогродовка', 'Селидово', 'Славянск', 'Снежное', 'Торез', 'Харцызск', 'Шахтёрск', 'Ясиноватая'] },
+  { name: 'Луганская Народная Республика', cities: ['Александровск', 'Алмазная', 'Алчевск', 'Антрацит', 'Брянка', 'Вахрушево', 'Голубовка', 'Зимогорье', 'Золотое', 'Кадиевка', 'Кировск', 'Краснодон', 'Красный Луч', 'Лисичанск', 'Луганск', 'Лутугино', 'Миусинск', 'Молодогвардейск', 'Новодружеск', 'Первомайск', 'Перевальск', 'Петровское', 'Попасная', 'Ровеньки', 'Рубежное', 'Сватово', 'Северодонецк', 'Сорокино', 'Старобельск', 'Суходольск', 'Счастье', 'Червонопартизанск'] },
+  { name: 'Запорожская область', cities: ['Бердянск', 'Васильевка', 'Вольнянск', 'Гуляйполе', 'Днепрорудное', 'Запорожье', 'Каменка-Днепровская', 'Мелитополь', 'Молочанск', 'Орехов', 'Пологи', 'Приморск', 'Токмак', 'Энергодар'] },
+  { name: 'Херсонская область', cities: ['Алёшки', 'Берислав', 'Геническ', 'Голая Пристань', 'Каховка', 'Новая Каховка', 'Скадовск', 'Таврийск', 'Херсон'] },
+];
+REGIONS.forEach(r => { r.cities.sort((a, b) => a.localeCompare(b, 'ru')); });
+REGIONS.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+
+/* ===== State ===== */
+let state = {
+  city: localStorage.getItem('m_city') || '',
+  ads: [],
+  me: null,
+  current: null,
+  loading: false,
+  newImages: [],
+  backToMine: false,
+  activeCat: null,
+  activeSub: null,
+  searchRes: null,
+  filters: { min: '', max: '', photo: false, promo: false, sort: 'new', dateRange: '', extra: {} },
+  recent: (() => { try { return JSON.parse(localStorage.getItem('m_recent') || '[]'); } catch (e) { return []; } })(),
+  searchLimit: 20,
+  filterCities: (() => { try { const s = JSON.parse(localStorage.getItem('m_cityfilters') || '{"all":false,"cities":[]}'); return { all: !!s.all, cities: Array.isArray(s.cities) ? s.cities.filter(Boolean) : [] }; } catch (e) { return { all: false, cities: [] }; } })(),
+  scopeAds: null,
+  scopeKey: '',
+  homeTab: 'rec',
+  cityAcc: false,
+};
+function mineViewActive() { return !document.getElementById('view-mine').classList.contains('hidden'); }
+
+/* ===== API helper ===== */
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (tg && tg.initData) headers['X-Init-Data'] = tg.initData;
+  const res = await fetch(API + path, {
+    method: opts.method || 'GET',
+    headers,
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
+  return data;
+}
+
+const $ = s => document.querySelector(s);
+const catName = id => (CATEGORIES.find(c => c.id === id) || {}).name || 'Другое';
+function extraChipsHTML(ad) {
+  const fields = CATEGORY_FIELDS[ad.category] || [];
+  if (!fields.length || !ad.extra) return '';
+  const chips = [];
+  fields.forEach(f => {
+    const v = ad.extra[f.key];
+    if (v == null || v === '') return;
+    const shown = f.options && !f.options.includes(v) ? v : v;
+    chips.push(`<span class="chip"><span class="k">${escapeHtml(f.label)}:</span> ${escapeHtml(shown)}</span>`);
+  });
+  return chips.join('');
+}
+function cardExtra(a) {
+  const brand = a.extra && a.extra.brand;
+  const mileage = a.extra && a.extra.mileage;
+  const parts = [];
+  if (brand) parts.push(brand);
+  if (mileage) parts.push(Number(mileage).toLocaleString('ru-RU') + ' км');
+  return parts.length ? `<span class="dot"></span><span>${parts.map(escapeHtml).join(' · ')}</span>` : '';
+}
+function daysLeftText(ad) {
+  if (ad.status === 'expired') return `<span class="ad-timer timer-tight">⏳ Срок истёк</span>`;
+  if (!ad.createdAt) return '';
+  const DAY = 86400000;
+  const end = ad.createdAt * 1000 + 30 * DAY;
+  const left = Math.max(0, Math.ceil((end - Date.now()) / DAY));
+  const cls = left <= 3 ? 'timer-tight' : 'timer-ok';
+  return left === 0
+    ? `<span class="ad-timer ${cls}">⏳ Сегодня последний день</span>`
+    : `<span class="ad-timer ${cls}">⏳ Осталось ${left} ${pluralDays(left)}</span>`;
+}
+function pluralDays(n) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return 'день';
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'дня';
+  return 'дней';
+}
+const priceFmt = p => Number(p).toLocaleString('ru-RU') + ' ₽';
+
+function lightenColor(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.min(255, ((n >> 16) & 255) + amt);
+  const g = Math.min(255, ((n >> 8) & 255) + amt);
+  const b = Math.min(255, (n & 255) + amt);
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+let catIcoSeq = 0;
+const CAT_ART = {
+  tech: `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#72d9ff"/><stop offset=".55" stop-color="#6d7cff"/><stop offset="1" stop-color="#b44cff"/></linearGradient><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#eefbff"/><stop offset="1" stop-color="#76b9ff"/></linearGradient></defs><rect x="4" y="5" width="16" height="14" rx="3.2" fill="url(#g)"/><rect x="6" y="7" width="12" height="9" rx="1.5" fill="#18253b" opacity=".72"/><rect x="8" y="8.5" width="8" height="1.6" rx=".8" fill="url(#s)" opacity=".9"/><circle cx="9" cy="13" r="1.1" fill="#6fe7ff"/><path d="M9 21h6M12 19v2" stroke="#b8e9ff" stroke-width="1.7" stroke-linecap="round"/>`,
+  auto: `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffcf67"/><stop offset=".5" stop-color="#ff875b"/><stop offset="1" stop-color="#ff4f83"/></linearGradient><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f7fbff"/><stop offset="1" stop-color="#a9bfd5"/></linearGradient></defs><path d="M3.2 16.4 5.2 10.7c.4-1.2 1.5-2 2.8-2h6.3c1.1 0 2.2.6 2.7 1.6l1.6 3h1.2c.7 0 1.2.5 1.2 1.2v2.4c0 .8-.6 1.4-1.4 1.4H4.2c-.7 0-1.2-.5-1.2-1.2v-.7c0-.1.1-.1.2 0Z" fill="url(#g)"/><path d="m6.2 11.1 1.3-1.8h5.7l1.4 2.5H6.2Z" fill="#ffdca0" opacity=".85"/><circle cx="7.2" cy="17.1" r="2.1" fill="#26354a"/><circle cx="17.2" cy="17.1" r="2.1" fill="#26354a"/><circle cx="7.2" cy="17.1" r=".9" fill="url(#w)"/><circle cx="17.2" cy="17.1" r=".9" fill="url(#w)"/><path d="M18.7 12.5h1.8" stroke="#fff0d0" stroke-width="1.2" stroke-linecap="round"/>`,
+  home: `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a7f58c"/><stop offset=".5" stop-color="#47d99a"/><stop offset="1" stop-color="#3aa6ff"/></linearGradient><linearGradient id="r" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f8ffff"/><stop offset="1" stop-color="#b9eaff"/></linearGradient></defs><path d="M3 10.5 12 3l9 7.5v9.7c0 .8-.6 1.4-1.4 1.4H4.4c-.8 0-1.4-.6-1.4-1.4Z" fill="url(#g)"/><path d="M6 10.5h12v9H6z" fill="#1c3850" opacity=".72"/><path d="M9 19.5v-5.2c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v5.2" fill="url(#r)" opacity=".92"/><rect x="7.5" y="12" width="2" height="2" rx=".5" fill="#eaffff"/><rect x="14.5" y="12" width="2" height="2" rx=".5" fill="#eaffff"/><path d="m2.6 10.7 9.4-8 9.4 8" fill="none" stroke="#d5ffbd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  cloth: `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff9bd7"/><stop offset=".48" stop-color="#d55cff"/><stop offset="1" stop-color="#735cff"/></linearGradient><linearGradient id="h" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#ffc8ed"/></linearGradient></defs><path d="M8 5.1 5 6.6 2.8 11l3.7 2.1L8 10.8v8.8c0 .8.6 1.4 1.4 1.4h5.2c.8 0 1.4-.6 1.4-1.4v-8.8l1.5 2.3 3.7-2.1L19 6.6l-3-1.5-2 2.1h-4Z" fill="url(#g)"/><path d="M9.1 4.1c.3 2 1.2 3 2.9 3s2.6-1 2.9-3" fill="none" stroke="url(#h)" stroke-width="1.5" stroke-linecap="round"/><path d="M12 8v10.7" stroke="#fff" stroke-width="1" opacity=".45"/><circle cx="12" cy="4.7" r=".9" fill="#fff" opacity=".85"/>`,
+  sport: `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7be9ff"/><stop offset=".48" stop-color="#3d8dff"/><stop offset="1" stop-color="#6e4dff"/></linearGradient></defs><path d="M6 8.5h2.7v7H6zM15.3 8.5H18v7h-2.7z" fill="url(#g)"/><rect x="8.7" y="10.2" width="6.6" height="3.6" rx="1.4" fill="#d7f8ff"/><rect x="2.8" y="6.3" width="3" height="11.4" rx="1.3" fill="url(#g)"/><rect x="18.2" y="6.3" width="3" height="11.4" rx="1.3" fill="url(#g)"/><path d="M4.3 4.4c3 1.7 5.1 2.2 7.7 2.2s4.7-.5 7.7-2.2" fill="none" stroke="#8deeff" stroke-width="1.2" opacity=".65" stroke-linecap="round"/>`,
+  job: `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe27a"/><stop offset=".5" stop-color="#ff9a52"/><stop offset="1" stop-color="#ff5f75"/></linearGradient><linearGradient id="h" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff3bd"/><stop offset="1" stop-color="#ffc05e"/></linearGradient></defs><rect x="3" y="7" width="18" height="13" rx="3" fill="url(#g)"/><path d="M8 7V5.2C8 4.5 8.6 4 9.3 4h5.4c.7 0 1.3.5 1.3 1.2V7" fill="none" stroke="url(#h)" stroke-width="2" stroke-linecap="round"/><path d="M3.5 12h17" stroke="#fff0b0" stroke-width="1.2" opacity=".7"/><rect x="9.5" y="10.6" width="5" height="3" rx="1.5" fill="#fff3c4" opacity=".95"/><circle cx="18" cy="9.5" r="1" fill="#fff" opacity=".7"/>`,
+  kids: `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffef74"/><stop offset=".45" stop-color="#ff9bd9"/><stop offset="1" stop-color="#7b8cff"/></linearGradient><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7cecff"/><stop offset="1" stop-color="#4f9bff"/></linearGradient></defs><circle cx="12" cy="12" r="8.7" fill="url(#g)"/><path d="M12 3.3c2.5 2.1 3.9 4.9 3.9 8.7s-1.4 6.6-3.9 8.7" fill="none" stroke="#fff" stroke-width="1.2" opacity=".5"/><path d="M3.5 12h17" stroke="#fff" stroke-width="1.2" opacity=".55"/><circle cx="17.8" cy="6.4" r="2.4" fill="url(#b)"/><path d="m17.8 5.2.4.8.9.1-.7.6.2.9-.8-.4-.8.4.2-.9-.7-.6.9-.1Z" fill="#fff" opacity=".9"/>`,
+  other: `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8ff1ff"/><stop offset=".5" stop-color="#6d82ff"/><stop offset="1" stop-color="#c052ff"/></linearGradient><linearGradient id="h" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#b4c9ff"/></linearGradient></defs><path d="m4 8.2 8-4.4 8 4.4v7.6l-8 4.4-8-4.4Z" fill="url(#g)"/><path d="m4.2 8.2 7.8 4.5 7.8-4.5M12 12.7v7.2" fill="none" stroke="url(#h)" stroke-width="1.2" stroke-linejoin="round" opacity=".85"/><circle cx="17.7" cy="16.9" r="2.6" fill="#fff" opacity=".18"/><path d="M17.7 15.5v2.8M16.3 16.9h2.8" stroke="#fff" stroke-width="1.1" stroke-linecap="round" opacity=".9"/>`
+};
+function catIco(c, size = 28) {
+  const id = 'ci' + String(catIcoSeq++);
+  const art = (CAT_ART[c.id] || CATEGORIES.find(x => x.id === c.id)?.icon || '');
+  const svg = art.replaceAll('id="g"', `id="${id}g"`).replaceAll('url(#g)', `url(#${id}g)`).replaceAll('id="s"', `id="${id}s"`).replaceAll('url(#s)', `url(#${id}s)`).replaceAll('id="w"', `id="${id}w"`).replaceAll('url(#w)', `url(#${id}w)`).replaceAll('id="r"', `id="${id}r"`).replaceAll('url(#r)', `url(#${id}r)`).replaceAll('id="h"', `id="${id}h"`).replaceAll('url(#h)', `url(#${id}h)`);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${svg}</svg>`;
+}
+function renderCategories(elId) {
+  document.getElementById(elId).innerHTML = CATEGORIES.map(c => `
+    <div class="cat" onclick="filterCat('${c.id}')">
+      <div class="ico" style="background:color-mix(in srgb, var(--bg) 84%, #fff 16%);box-shadow:inset 0 0 0 1px color-mix(in srgb, ${c.accent} 12%, rgba(255,255,255,.02)),inset 0 1px 0 rgba(255,255,255,.075),0 9px 20px -14px color-mix(in srgb, ${c.accent} 42%, transparent)">${catIco(c, 48)}</div><span>${c.name}</span>
+    </div>`).join('');
+}
+function accentAlpha(hex) {
+  return hex + '40';
+}
+
+const BADGE_MAP = {
+  new: { t: 'Новое', c: 'b-new' },
+  trade: { t: 'Торг', c: 'b-trade' },
+  urgent: { t: 'Срочно', c: 'b-urgent' },
+  premium: { t: 'Премиум', c: 'b-premium' },
+};
+function badgeIds(a) {
+  const ids = [];
+  const p = a.promo || {};
+  if (a.createdAt && a.createdAt * 1000 > Date.now() - 3 * 86400000) ids.push('new');
+  if ((a.badges || []).includes('trade')) ids.push('trade');
+  if ((a.badges || []).includes('urgent')) ids.push('urgent');
+  if (p.highlight) ids.push('premium');
+  return ids;
+}
+function badgePills(a) {
+  return badgeIds(a).map(b => `<span class="ad-pill ${BADGE_MAP[b].c}">${BADGE_MAP[b].t}</span>`).join('');
+}
+
+function adHTML(a, opts) {
+  const timer = (opts && opts.my && a.isMine) ? daysLeftText(a) : '';
+  const p = a.promo || {};
+  const badges = (p.pin ? '<span class="ad-badge badge-pin">📌 Закреплено</span>' : '') + (p.boost ? '<span class="ad-badge badge-boost">⚡ В топе</span>' : '');
+  const pills = badgePills(a);
+  return `
+  <div class="ad${p.highlight ? ' premium' : ''}${a.status === 'expired' ? ' expired' : ''}${a.status === 'sold' ? ' sold' : ''}" onclick="openAd(${a.id})">
+    <div class="ad-img">
+      ${timer}
+      ${badges}
+      ${pills ? `<div class="ad-badges">${pills}</div>` : ''}
+      ${a.images && a.images.length ? `<img class="ad-cover" src="${a.images[0]}" alt="" />` : `<svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>`}
+      <button class="fav ${a.fav ? 'active' : ''}" onclick="event.stopPropagation();toggleFav(${a.id})">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="${a.fav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+      </button>
+    </div>
+    <div class="ad-body">
+      <div class="ad-price">${priceFmt(a.price)}</div>
+      <div class="ad-title">${highlightMatch(escapeHtml(a.title), (opts && opts.highlight) || '')}</div>
+      <div class="ad-meta"><span>${escapeHtml(a.city)}</span><span class="dot"></span><span>${catName(a.category)}</span>${cardExtra(a)}${a.status === 'sold' ? '<span class="dot"></span><span style="color:var(--blue)">Продано</span>' : ''}${a.status === 'expired' ? '<span class="dot"></span><span style="color:#ff5a5a">Срок истёк</span>' : ''}</div>
+      <div class="ad-seller">
+        <div class="ava" style="${a.sellerPro ? 'border-color:#d4af37' : ''}">${(a.seller || '?')[0]}</div>
+        <div class="name">${escapeHtml(a.seller || 'Пользователь')}${a.sellerPro ? '<span class="pro-label">PRO</span>' : ''}</div>
+        <div class="contact">${a.tg ? 'Telegram' : 'Телефон'}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function highlightMatch(text, query) {
+  const q = (query || '').trim();
+  if (!q) return text;
+  const words = q.split(/\s+/).filter(Boolean);
+  let out = text;
+  words.forEach(w => {
+    if (!w) return;
+    const re = new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+    out = out.replace(re, '<mark>$1</mark>');
+  });
+  return out;
+}
+function emptyHTML(t = 'Ничего не найдено', icon) {
+  const ico = icon
+    ? `<div class="empty-ico">${icon}</div>`
+    : '<svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>';
+  return `<div class="empty">${ico}<div>${t}</div></div>`;
+}
+function skeletonHTML(n = 6) {
+  return Array(n).fill(`
+  <div class="sk-card">
+    <div class="sk img"></div>
+    <div class="sk line"></div>
+    <div class="sk line short"></div>
+    <div class="sk line short" style="width:40%"></div>
+  </div>`).join('');
+}
+function loadingHTML(){ return skeletonHTML(6); }
+
+/* ===== Data loading ===== */
+async function loadAds() {
+  if (!state.city) return;
+  try {
+    const p = new URLSearchParams({ city: state.city });
+    const { ads } = await api('/api/ads?' + p.toString());
+    state.ads = ads;
+  } catch (e) {
+    toast(e.message);
+    state.ads = state.ads || [];
+  } finally {
+    renderHome();
+    if (document.getElementById('view-search').classList.contains('hidden') === false) renderSearch($('#searchInput').value);
+  }
+}
+
+async function loadMe() {
+  try { state.me = await api('/api/me'); renderProfile(); renderBalance(); } catch (e) { /* ignore */ }
+}
+
+/* ===== Render ===== */
+function renderHome() {
+  $('#cityLabel').textContent = state.city || '—';
+  const titleCity = document.getElementById('cityInTitle');
+  if (titleCity) titleCity.textContent = state.city || '…';
+  const local = state.ads || [];
+  const recItems = (state.recent || []).map(id => local.find(a => a.id === id)).filter(Boolean);
+  const showRecent = recItems.length > 0;
+  document.getElementById('homeTabRecent').classList.toggle('hidden', !showRecent);
+  if (!showRecent && state.homeTab === 'recent') state.homeTab = 'rec';
+  document.getElementById('homeTabRec').classList.toggle('active', state.homeTab === 'rec');
+  document.getElementById('homeTabRecent').classList.toggle('active', state.homeTab === 'recent');
+  document.getElementById('homeRecWrap').classList.toggle('hidden', state.homeTab !== 'rec');
+  document.getElementById('homeRecentWrap').classList.toggle('hidden', state.homeTab !== 'recent');
+  $('#adListHome').innerHTML = local.length ? local.map(adHTML).join('') : emptyHTML('В вашем городе пока нет объявлений', '🏙');
+  $('#recentHome').innerHTML = recItems.slice(0, 6).map(a => adHTML(a)).join('');
+}
+function pickHomeTab(tab) {
+  tap();
+  state.homeTab = tab;
+  renderHome();
+}
+function recordViewed(id) {
+  state.recent = [id, ...state.recent.filter(x => x !== id)].slice(0, 12);
+  try { localStorage.setItem('m_recent', JSON.stringify(state.recent)); } catch (e) {}
+}
+function timeAgo(ts) {
+  const d = Math.max(0, Math.floor(Date.now() / 1000) - (Number(ts) || 0));
+  if (d < 60) return 'только что';
+  if (d < 3600) return Math.floor(d / 60) + ' мин назад';
+  if (d < 86400) return Math.floor(d / 3600) + ' ч назад';
+  return Math.floor(d / 86400) + ' дн назад';
+}
+function starsHTML(n) {
+  return '★'.repeat(n || 0) + '☆'.repeat(Math.max(0, 5 - (n || 0)));
+}
+function renderRating(ad) {
+  const el = $('#dRating'); if (!el) return;
+  const r = ad.rating;
+  let html = 'Продавец на площадке';
+  if (r && r.count) html = `★ <span class="r-avg">${r.avg}</span> &middot; ${r.count} ${r.count === 1 ? 'отзыв' : (r.count < 5 ? 'отзыва' : 'отзывов')}`;
+  if (!r) return void (el.textContent = 'Продавец на площадке');
+  if (r.already) html += ' <span style="color:var(--text-dim)">· вы оценили</span>';
+  else if (r.canRate) html += ' <span class="rate-link" onclick="openReview()">Оценить</span>';
+  el.innerHTML = html;
+}
+function renderReviews(ad) {
+  const sec = $('#dReviewsSec'); if (!sec) return;
+  const list = (ad.rating && ad.rating.list) || [];
+  if (!list.length) { sec.classList.add('hidden'); return; }
+  $('#dReviews').innerHTML = list.map(x => `
+    <div class="rev-row">
+      <div class="rev-head"><span class="rev-stars">${starsHTML(x.rating)}</span><span class="rev-date">${timeAgo(x.created_at)}</span></div>
+      ${x.text ? '<div class="rev-txt">' + escapeHtml(x.text) + '</div>' : ''}
+    </div>`).join('');
+  sec.classList.remove('hidden');
+}
+let revRate = 5;
+function paintStars() {
+  document.querySelectorAll('#revStars span').forEach(s => s.classList.toggle('on', Number(s.dataset.v) <= revRate));
+}
+function openReview() {
+  revRate = 5;
+  paintStars();
+  $('#revText').value = '';
+  openSheet('reviewSheet');
+}
+function pickRev(v) { revRate = v; paintStars(); tap('impact'); }
+async function submitReview() {
+  const a = state.current; if (!a) return;
+  try {
+    const r = await api('/api/ads/' + a.id + '/review', { method: 'POST', body: { rating: revRate, text: $('#revText').value.trim() } });
+    a.rating = r.rating;
+    closeSheet('reviewSheet');
+    renderRating(a); renderReviews(a);
+    toast('Спасибо за оценку!');
+    tap('success');
+  } catch (e) { toast(e.message); tap('error'); }
+}
+function renderSimilar(ad) {
+  const sec = $('#dSimilarSec'); if (!sec) return;
+  const sim = (state.ads || []).filter(x => x.category === ad.category && x.id !== ad.id && x.status !== 'sold' && x.status !== 'expired').slice(0, 6);
+  if (!sim.length) { sec.classList.add('hidden'); return; }
+  $('#dSimilar').innerHTML = sim.map(a => adHTML(a)).join('');
+  sec.classList.remove('hidden');
+}
+function renderGalleryCounter(gal, n) {
+  const old = $('#dCount'); if (old) old.remove();
+  if (n < 2) return;
+  const b = document.createElement('div');
+  b.className = 'g-count'; b.id = 'dCount'; b.textContent = '1 / ' + n;
+  (gal.parentElement || document.body).appendChild(b);
+  let ticking = false;
+  const upd = () => {
+    const w = gal.clientWidth || gal.parentElement.clientWidth;
+    if (w) b.textContent = (Math.min(n - 1, Math.max(0, Math.round(gal.scrollLeft / w))) + 1) + ' / ' + n;
+    ticking = false;
+  };
+  gal.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(upd); } }, { passive: true });
+  setTimeout(upd, 60);
+}
+function showMore() {
+  state.searchLimit += 20;
+  renderSearch($('#searchInput').value);
+}
+function tap(kind) {
+  try {
+    const hf = tg && tg.HapticFeedback;
+    if (!hf) return;
+    if (kind === 'success') hf.notificationOccurred('success');
+    else if (kind === 'error') hf.notificationOccurred('error');
+    else hf.impactOccurred(kind === 'heavy' ? 'heavy' : 'light');
+  } catch (e) {}
+}
+function applyTheme() {
+  const t = localStorage.getItem('m_theme') || 'dark';
+  document.documentElement.classList.toggle('light', t === 'light');
+  const lbl = $('#themeLbl'); if (lbl) lbl.textContent = t === 'light' ? 'Тёмная тема' : 'Светлая тема';
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.setAttribute('content', t === 'light' ? '#f2f3f5' : '#0a0a0a');
+}
+function toggleTheme() {
+  const t = localStorage.getItem('m_theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.classList.add('theme-switch');
+  localStorage.setItem('m_theme', t);
+  applyTheme();
+  tap('impact');
+  setTimeout(() => document.documentElement.classList.remove('theme-switch'), 420);
+}
+function subOf(a) {
+  if (!a.extra) return '';
+  return a.category === 'auto' ? (a.extra.brand || '') : (a.extra.subcategory || '');
+}
+function subList(cat) {
+  if (cat === 'auto') return Object.keys(CAR_MODELS);
+  const f = (CATEGORY_FIELDS[cat] || []).find(x => x.key === 'subcategory');
+  return f ? f.options : [];
+}
+const SYNONYMS = {
+  'телефон': ['смартфон', 'мобилка'],
+  'смартфон': ['телефон'],
+  'ноутбук': ['лэптоп', 'ноут'],
+  'велосипед': ['байк', 'bike'],
+  'самокат': ['кикшир', 'электросамокат'],
+  'наушники': ['earpods', 'airpods'],
+  'компьютер': ['пк', 'десктоп'],
+  'экран': ['монитор', 'дисплей'],
+  'диван': ['софа', 'диванчик'],
+  'стол': ['столик', 'комод'],
+};
+function expandQueryWords(q) {
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  return words.map(w => {
+    const set = new Set([w]);
+    if (SYNONYMS[w]) SYNONYMS[w].forEach(v => set.add(v.toLowerCase()));
+    Object.keys(SYNONYMS).forEach(k => {
+      if (k === w) return;
+      if (SYNONYMS[k].some(v => v.toLowerCase() === w)) {
+        set.add(k.toLowerCase());
+        SYNONYMS[k].forEach(v => set.add(v.toLowerCase()));
+      }
+    });
+    return [...set];
+  });
+}
+function matchesQuery(a, q) {
+  const t = (a.title + ' ' + (a.description || '')).toLowerCase();
+  const groups = expandQueryWords(q);
+  return groups.every(g => g.some(v => t.includes(v)));
+}
+function renderSearch(q = '') {
+  const cat = state.activeCat;
+  const sub = state.activeSub;
+  $('#searchCatList').classList.toggle('hidden', !!cat);
+  $('#searchSubWrap').classList.toggle('hidden', !cat || !!sub);
+  const crumbs = $('#searchCrumbs');
+  if (cat) {
+    crumbs.classList.remove('hidden');
+    crumbs.innerHTML = sub
+      ? `<span class="crumb" onclick="backToSubs()">${catName(cat)}</span><span class="crumb-sep">›</span><span class="crumb" onclick="pickSearchSub(-1)">${escapeHtml(sub)} ✕</span>`
+      : `<span class="crumb" onclick="backToSubs()">${catName(cat)}</span>`;
+    $('#searchSubList').innerHTML = renderSubList(cat);
+  } else {
+    crumbs.classList.add('hidden');
+    $('#searchCatList').innerHTML = renderCatList();
+  }
+  const base = state.searchRes == null ? (state.scopeAds || state.ads) : state.searchRes;
+  let list = cat ? base.filter(a => a.category === cat) : base;
+  if (sub) list = list.filter(a => subOf(a) === sub);
+  const Q = q ? q.toLowerCase().trim() : '';
+  if (Q) list = list.filter(a => matchesQuery(a, Q));
+  const f = state.filters;
+  const min = parseFloat(f.min) || 0, max = parseFloat(f.max) || Infinity;
+  list = list.filter(a => a.price >= min * 100 && a.price <= max * 100);
+  if (f.photo) list = list.filter(a => a.images && a.images.length > 0);
+  if (f.promo) list = list.filter(a => hasPromo(a));
+  if (f.dateRange) {
+    const nowSec = Date.now() / 1000;
+    const lim = f.dateRange === 'today' ? 86400 : f.dateRange === 'week' ? 604800 : 2592000;
+    list = list.filter(a => a.createdAt && (nowSec - a.createdAt) < lim);
+  }
+  const ef = (f.extra || {})[cat] || {};
+  for (const key of (CATEGORY_FILTERS[cat] || [])) {
+    const from = ef[key + 'From'], to = ef[key + 'To'];
+    if (from || to) {
+      list = list.filter(a => {
+        const v = Number((a.extra || {})[key]);
+        if (isNaN(v)) return false;
+        if (from && v < Number(from)) return false;
+        if (to && v > Number(to)) return false;
+        return true;
+      });
+    } else if (ef[key]) {
+      const want = String(ef[key]).toLowerCase();
+      const isText = !!(TEXT_KEYS[key] || !fieldBy(cat, key).options);
+      list = list.filter(a => {
+        const got = (a.extra || {})[key];
+        if (got == null) return false;
+        return isText ? String(got).toLowerCase().includes(want) : String(got).toLowerCase() === want;
+      });
+    }
+  }
+  if (f.sort === 'cheap') list = [...list].sort((a, b) => a.price - b.price);
+  else if (f.sort === 'exp') list = [...list].sort((a, b) => b.price - a.price);
+  else if (f.sort === 'rating') list = [...list].sort((a, b) => ((b.rating && b.rating.avg) || 0) - ((a.rating && a.rating.avg) || 0));
+  const shown = list.slice(0, state.searchLimit);
+  $('#adListSearch').innerHTML = shown.length ? shown.map(a => adHTML(a, { highlight: Q || '' })).join('') : emptyHTML('Объявлений не найдено', '🔍');
+  const moreWrap = $('#moreWrap');
+  if (moreWrap) moreWrap.style.display = list.length > shown.length ? 'block' : 'none';
+  syncFilterBadge();
+}
+function renderCatList() {
+  const base = state.scopeAds || state.ads;
+  return CATEGORIES.map(c => {
+    const n = base.filter(a => a.category === c.id).length;
+    return `<div class="search-cat" onclick="pickSearchCat('${c.id}')">
+      <span class="sc-ico" style="color:${c.accent}">${catIco(c, 20)}</span>
+      <span class="sc-name">${c.name}</span>
+      <span class="sc-count">${n}</span>
+      <span class="sc-arrow">›</span>
+    </div>`;
+  }).join('');
+}
+function renderSubList(cat) {
+  const opts = subList(cat);
+  const counts = {};
+  const scope = state.scopeAds || state.ads;
+  scope.forEach(a => { if (a.category === cat) { const s = subOf(a); if (s) counts[s] = (counts[s] || 0) + 1; } });
+  const total = scope.filter(a => a.category === cat).length;
+  let rows = `<div class="search-sub all${state.activeSub ? '' : ' sel'}" onclick="pickSearchSub(-1)">
+    <span class="sc-name">Все объявления</span><span class="sc-count">${total}</span><span class="sc-arrow">›</span>
+  </div>`;
+  rows += opts.map((o, i) => `
+    <div class="search-sub${state.activeSub === o ? ' sel' : ''}" onclick="pickSearchSub(${i})">
+      <span class="sc-name">${escapeHtml(o)}</span><span class="sc-count">${counts[o] || 0}</span>
+    </div>`).join('');
+  return rows;
+}
+function pickSearchCat(id) {
+  state.activeCat = id || null;
+  state.activeSub = null;
+  updateCatBack();
+  renderSearch($('#searchInput').value);
+}
+function pickSearchSub(i) {
+  if (i < 0) state.activeSub = null;
+  else {
+    const opts = subList(state.activeCat);
+    state.activeSub = opts[i] != null ? opts[i] : null;
+  }
+  renderSearch($('#searchInput').value);
+}
+function backToSubs() {
+  if (!state.activeCat) return;
+  state.activeSub = null;
+  updateCatBack();
+  renderSearch($('#searchInput').value);
+}
+function renderFav() {
+  const list = (state.me ? state.me.favAds : []);
+  $('#adListFav').innerHTML = list.length ? list.map(a => adHTML(a)).join('') : emptyHTML('Нет избранных объявлений', '❤️');
+  const exp = document.getElementById('exportFavBtn');
+  if (exp) exp.classList.toggle('hidden', !list.length);
+}
+function renderProfile() {
+  const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+  const me = state.me;
+  $('#profName').textContent = (u && u.first_name) || (me && me.user && me.user.first_name) || 'Пользователь';
+  $('#profTg').textContent = (u && u.username) ? '@' + u.username : (me && me.user && me.user.username ? '@' + me.user.username : '@user');
+  $('#profAva').textContent = ($('#profName').textContent || 'У')[0];
+  $('#profAds').textContent = me && Array.isArray(me.myAds) ? me.myAds.length : 0;
+  $('#profFav').textContent = me && me.favCount ? me.favCount : 0;
+  $('#adminBtn').classList.toggle('hidden', !(me && me.isAdmin));
+  const st = me && me.stats;
+  if (st) {
+    $('#profViews').textContent = st.totalViews || 0;
+    $('#profSold').textContent = st.soldCount || 0;
+    const rt = document.getElementById('profRate');
+    const lbl = document.getElementById('profRateLbl');
+    if (st.ratingCount) {
+      rt.textContent = String((st.ratingAvg || 0).toFixed(1));
+      lbl.textContent = '★ ' + st.ratingCount + ' ' + pluralWord(st.ratingCount, 'отзыв', 'отзыва', 'отзывов');
+    } else {
+      rt.textContent = '—';
+      lbl.textContent = 'Рейтинг';
+    }
+  }
+}
+function pluralWord(n, one, few, many) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+}
+
+function fmtRub(kopecks) { return ((kopecks || 0) / 100).toLocaleString('ru-RU') + ' ₽'; }
+function fmtDate(ts) { return ts ? new Date(ts * 1000).toLocaleDateString('ru-RU') : ''; }
+function fmtKop(kopecks) { return ((kopecks || 0) / 100).toLocaleString('ru-RU', { maximumFractionDigits: 0 }); }
+
+/* ===== Balance / Top-up ===== */
+let topUpAmount = 10000;
+const TOPUP_PRESETS = [10000, 30000, 50000, 100000, 300000, 1000000];
+let profTab = 'main';
+function setProfTab(tab) {
+  profTab = tab;
+  $('#profSegMain').classList.toggle('active', tab === 'main');
+  $('#profSegOps').classList.toggle('active', tab === 'ops');
+  $('#profTab').classList.toggle('hidden', tab !== 'main');
+  $('#opsTab').classList.toggle('hidden', tab !== 'ops');
+  if (tab === 'ops') renderBalance();
+}
+async function renderBalance() {
+  try {
+    const b = await api('/api/balance');
+    $('#profBalance').textContent = fmtRub(b.balance);
+    const ops = (b.ops || []).slice(0, 50);
+    $('#profOps').innerHTML = ops.length ? ops.map(op => {
+      const label = escapeHtml(op.note || (op.amount > 0 ? 'Пополнение' : 'Списание'));
+      const date = op.created_at ? `<div class="op-date">${fmtDate(op.created_at)}</div>` : '';
+      return `<div class="op-row"><span>${label}${date}</span><span style="color:${op.amount > 0 ? '#4ad98c' : '#ff5a5a'}">${op.amount > 0 ? '+' : '−'}${fmtRub(Math.abs(op.amount))}</span></div>`;
+    }).join('') : emptyHTML('Операций пока нет');
+  } catch (e) {}
+}
+async function openTopUp() {
+  const m = await api('/api/pay/methods').then(r => r).catch(() => ({}));
+  topUpAmount = TOPUP_PRESETS[0];
+  renderTopUpPresets();
+  $('#topUpInfo').textContent = m.yookassa ? '' : 'Приём платежей не настроен — пополнение пока недоступно';
+  openSheet('topUpSheet');
+}
+function renderTopUpPresets() {
+  $('#topUpPresets').innerHTML = TOPUP_PRESETS.map(s =>
+    `<button class="chip-btn${s === topUpAmount ? ' active' : ''}" onclick="pickTopUp(${s})" style="${s === topUpAmount ? 'font-size:16px;font-weight:700' : ''}">${fmtKop(s)} ₽</button>`
+  ).join('');
+}
+function pickTopUp(s) { topUpAmount = s; renderTopUpPresets(); }
+async function payTopUp() {
+  const btn = $('#topUpPayBtn');
+  btn.disabled = true;
+  try {
+    const r = await api('/api/checkout/create', { method: 'POST', body: { amount_kopecks: topUpAmount } });
+    if (r.confirmation_url) window.open(r.confirmation_url, '_blank');
+    closeSheet('topUpSheet');
+    $('#topUpInfo').textContent = '';
+    toast('Открываем оплату картой или СБП…');
+    await loadMe();
+  } catch (e) {
+    toast(e.message);
+  }
+  btn.disabled = false;
+}
+
+/* ===== Shop: promo & plans ===== */
+state.shop = null;
+let shopAdId = null;
+async function loadShop() {
+  if (!state.shop) state.shop = await api('/api/shop');
+  return state.shop;
+}
+async function openShop(fromAd) {
+  shopAdId = fromAd || shopAdId;
+  $('#shopServices').innerHTML = loadingHTML(3);
+  $('#shopPlans').innerHTML = '';
+  openSheet('shopSheet');
+  try {
+    const s = await loadShop();
+    const limits = s.limits || {};
+    $('#shopSub').textContent = 'Ваш тариф: ' + limits.planName + (limits.endsAt ? ' · до ' + fmtDate(limits.endsAt) : '');
+    $('#shopServices').innerHTML = s.services.length ? s.services.map(sv => `
+      <div class="shop-item"><div class="row">
+        <div><div class="nm">${escapeHtml(sv.name)}</div><div class="ds">${escapeHtml(sv.desc || '')}</div></div>
+        <div class="row" style="flex:0"><span class="shop-price">${fmtKop(sv.kopecks)} ₽</span><button class="btn btn-sm" onclick="buyService('${sv.id}')">Купить</button></div>
+      </div></div>`).join('') : emptyHTML('Пока нет услуг');
+    $('#shopPlans').innerHTML = s.plans.map(p => {
+      const perks = fmtPerks(p.perks);
+      return `<div class="shop-item"><div class="row">
+        <div><div class="nm">${escapeHtml(p.name)}${limits.planName === p.name ? ' <span class="pro-label">активен</span>' : ''}${p.price === 0 ? ' <span style="color:var(--text-dim);font-size:12px">бесплатно</span>' : ''}</div>
+        <div class="ds">${escapeHtml(perks)} · ${p.duration_days} дней</div></div>
+        <div class="row" style="flex:0"><span class="shop-price">${p.price === 0 ? '0 ₽' : fmtKop(p.price) + ' ₽'}</span><button class="btn btn-sm" onclick="buyPlan(${p.id})">${p.price === 0 ? 'Подключить' : 'Купить'}</button></div>
+      </div></div>`;
+    }).join('');
+  } catch (e) { $('#shopServices').innerHTML = emptyHTML('Ошибка загрузки'); }
+}
+function fmtPerks(perks) {
+  const arr = [];
+  if (perks.maxAds === 0) arr.push('∞ объявлений'); else if (perks.maxAds) arr.push('до ' + perks.maxAds + ' объявлений');
+  if (perks.maxPhotos) arr.push(perks.maxPhotos + ' фото');
+  if (perks.promos) arr.push(perks.promos + ' продвижений/мес.');
+  if (perks.highlight) arr.push('выделение');
+  if (perks.pin) arr.push('закрепление');
+  if (perks.analytics) arr.push('аналитика');
+  return arr.join(', ') || 'без лимитов';
+}
+async function buyService(serviceId) {
+  if (!shopAdId) { toast('Сначала откройте своё объявление'); return; }
+  const s = state.shop && state.shop.services.find(x => x.id === serviceId);
+  if (s && !confirm('Купить «' + s.name + '» за ' + fmtKop(s.kopecks) + ' ₽ с баланса?')) return;
+  try {
+    const r = await api('/api/ads/' + shopAdId + '/promo', { method: 'POST', body: { service: serviceId } });
+    await loadMe();
+    state.shop = null;
+    toast('Готово: ' + fmtKop(r.balance) + ' ₽ на балансе');
+    openShop(true);
+  } catch (e) { toast(e.message); }
+}
+async function buyPlan(planId) {
+  const p = state.shop && state.shop.plans.find(x => x.id === planId);
+  if (p && !confirm('Купить тариф «' + p.name + '» за ' + (p.price === 0 ? '0 ₽' : fmtKop(p.price) + ' ₽') + ' с баланса?')) return;
+  try {
+    const r = await api('/api/plans/' + planId + '/buy', { method: 'POST', body: { auto_renew: true } });
+    await loadMe();
+    state.shop = null;
+    toast('Тариф «' + (p ? p.name : '') + '» активен до ' + fmtDate(r.limits.endsAt));
+    openShop(false);
+  } catch (e) { toast(e.message); }
+}
+async function buyPromo(serviceId) {
+  if (!state.current || !state.current.isMine) return;
+  shopAdId = state.current.id;
+  await buyService(serviceId);
+}
+
+/* ===== Actions ===== */
+function goTab(tab, keep) {
+  tap();
+  document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+  document.getElementById('view-' + tab).classList.remove('hidden');
+  const pb = document.getElementById('placeBar');
+  if (pb) { pb.classList.toggle('hidden', tab !== 'mine'); document.getElementById('main').classList.toggle('has-placebar', tab === 'mine'); }
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const nt = document.querySelector(`.tab[data-tab="${tab}"]`);
+  if (nt) nt.classList.add('active');
+  if (tab === 'home') renderHome();
+  if (tab === 'search') {
+    ensureScope();
+    if (!keep) { state.activeCat = null; state.activeSub = null; state.searchLimit = 20; }
+    updateCatBack();
+    renderSearch($('#searchInput').value);
+  }
+  if (tab === 'filter') {
+    if (!keep) { state.activeCat = null; state.activeSub = null; }
+    renderFilterView();
+  }
+  if (tab === 'fav') renderFav();
+  if (tab === 'mine') openMine();
+  if (tab === 'profile') {
+    if (profTab !== 'main') setProfTab('main');
+    loadMe();
+  }
+  if (tab === 'place') { openPlace(); }
+  $('#main').scrollTop = 0;
+}
+function filterCat(id) {
+  state.activeCat = id;
+  state.activeSub = null;
+  goTab('search', true);
+}
+function exitCategory() {
+  if (state.activeSub) state.activeSub = null;
+  else if (state.activeCat) state.activeCat = null;
+  else { renderHome(); goTab('home'); return; }
+  updateCatBack();
+  renderSearch($('#searchInput').value);
+}
+function updateCatBack() {
+  const b = document.getElementById('catBack');
+  if (b) b.classList.toggle('hidden', !(state.activeCat || state.activeSub));
+}
+let searchTimer = null;
+async function searchAds(q) {
+  const Q = (q || '').trim();
+  if (!Q) { state.searchRes = null; state.searchLimit = 20; renderSearch(''); return; }
+  state.searchLimit = 20;
+  let server = [];
+  try {
+    const p = new URLSearchParams();
+    if (state.filterCities.all) { /* все регионы — без фильтра города */ }
+    else if (state.filterCities.cities.length) p.set('cities', state.filterCities.cities.join(','));
+    else p.set('city', state.city || '');
+    p.set('q', Q);
+    const d = await api('/api/ads?' + p.toString());
+    server = d.ads || [];
+  } catch (e) { server = []; }
+  const local = state.ads.filter(a => matchesQuery(a, Q));
+  const byId = new Map();
+  [...server, ...local].forEach(a => { if (!byId.has(a.id)) byId.set(a.id, a); });
+  state.searchRes = [...byId.values()];
+  renderSearch($('#searchInput').value);
+}
+function filterHTML(cat) {
+  const ef = (state.filters.extra || {})[cat] || {};
+  return (CATEGORY_FILTERS[cat] || []).map(key => {
+    const fb = fieldBy(cat, key);
+    const val = ef[key] || '';
+    if (RANGE_KEYS[key]) {
+      return `<div class="field">
+        <label>${fb.label}</label>
+        <div class="f-row">
+          <input class="f-input" type="number" inputmode="numeric" placeholder="от" value="${ef[key + 'From'] || ''}" oninput="setF('${cat}','${key}','from',this.value)" />
+          <input class="f-input" type="number" inputmode="numeric" placeholder="до" value="${ef[key + 'To'] || ''}" oninput="setF('${cat}','${key}','to',this.value)" />
+        </div>
+      </div>`;
+    }
+    if (fb.type === 'select') {
+      const opts = fb.options || [];
+      return `<div class="field">
+        <label>${fb.label}</label>
+        <select class="f-select" style="width:100%" onchange="setF('${cat}','${key}','',this.value)">
+          <option value="">Любая</option>
+          ${opts.map(o => `<option ${val === o ? 'selected' : ''}>${o}</option>`).join('')}
+        </select>
+      </div>`;
+    }
+    return `<div class="field">
+      <label>${fb.label}</label>
+      <input class="f-input" type="text" style="width:100%" value="${val}" placeholder="Любое" oninput="setF('${cat}','${key}','',this.value)" />
+    </div>`;
+  }).join('');
+}
+function cityFilterHTML() {
+  return REGIONS.map((r, ri) => {
+    const selN = r.cities.filter(c => state.filterCities.cities.includes(c)).length;
+    return `<div class="reg-row" onclick="toggleRegion(${ri})">
+        <span class="reg-togg">▶</span><span class="reg-name">${escapeHtml(r.name)}</span>
+        <span class="reg-meta">${selN}/${r.cities.length}</span>
+      </div>
+      <div class="reg-body" id="regBody-${ri}">
+        ${r.cities.map((c, ci) => `
+          <label class="c-item"><input type="checkbox" class="c-check" ${state.filterCities.cities.includes(c) ? 'checked' : ''} onchange="setCitySel(${ri},${ci},this.checked)"><span>${escapeHtml(c)}</span></label>`).join('')}
+      </div>`;
+  }).join('');
+}
+function toggleRegion(ri) {
+  const row = document.querySelectorAll('.reg-row')[ri];
+  const body = document.getElementById('regBody-' + ri);
+  if (!row || !body) return;
+  row.classList.toggle('open');
+  body.classList.toggle('open');
+}
+function toggleCityAcc() {
+  state.cityAcc = !state.cityAcc;
+  const body = document.getElementById('cityAccBody');
+  if (body) body.classList.toggle('hidden', !state.cityAcc);
+  const arrow = document.getElementById('cityArrow');
+  if (arrow) arrow.style.transform = state.cityAcc ? 'rotate(180deg)' : '';
+}
+function saveCityFilters() {
+  try { localStorage.setItem('m_cityfilters', JSON.stringify({ all: state.filterCities.all, cities: state.filterCities.cities })); } catch (e) {}
+}
+function setCitySel(ri, ci, on) {
+  const c = (REGIONS[ri] && REGIONS[ri].cities[ci]) || '';
+  if (!c) return;
+  if (on && !state.filterCities.cities.includes(c)) state.filterCities.cities.push(c);
+  if (!on && state.filterCities.cities.includes(c)) state.filterCities.cities = state.filterCities.cities.filter(x => x !== c);
+  saveCityFilters();
+  state.filterCities.all = false;
+  const allOn = document.getElementById('ffAllRegions');
+  if (allOn) allOn.checked = false;
+  applyCityScope();
+}
+function setAllRegions(on) {
+  state.filterCities.all = !!on;
+  if (on) state.filterCities.cities = [];
+  saveCityFilters();
+  applyCityScope();
+}
+function chipRemoveCity(city) {
+  state.filterCities.cities = state.filterCities.cities.filter(x => x !== city);
+  saveCityFilters();
+  applyCityScope();
+}
+function updateCitySelUI() {
+  const count = document.getElementById('citySelCount');
+  if (count) count.textContent = state.filterCities.all ? 'все' : (state.filterCities.cities.length ? state.filterCities.cities.length : 'не выбраны');
+  const chips = document.getElementById('citySelChips');
+  if (!chips) return;
+  if (state.filterCities.all || !state.filterCities.cities.length) {
+    chips.innerHTML = '';
+    return;
+  }
+  chips.innerHTML = state.filterCities.cities.map(c => `<span class="c-chip" onclick="chipRemoveCity('${c.replace(/'/g, "\\'")}')">${escapeHtml(c)} ✕</span>`).join('');
+}
+function scopeParams() {
+  if (state.filterCities.all) return '';
+  if (state.filterCities.cities.length) return 'cities=' + encodeURIComponent(state.filterCities.cities.join(','));
+  return 'city=' + encodeURIComponent(state.city || '');
+}
+function ensureScope() {
+  const key = scopeParams();
+  if (key === state.scopeKey && state.scopeAds != null) return;
+  state.scopeKey = key;
+  state.scopeAds = null;
+  api('/api/ads' + (key ? '?' + key : '')).then(d => {
+    state.scopeAds = d.ads || [];
+    const inp = document.getElementById('searchInput');
+    renderSearch(inp ? inp.value : '');
+  }).catch(() => {});
+}
+function applyCityScope() {
+  updateCitySelUI();
+  syncFilterBadge();
+  ensureScope();
+  renderSearch($('#searchInput').value);
+}
+function renderFilterView() {
+  const allOn = document.getElementById('ffAllRegions');
+  if (allOn) allOn.checked = !!state.filterCities.all;
+  const regions = document.getElementById('citySelRegions');
+  if (regions) regions.innerHTML = cityFilterHTML();
+  updateCitySelUI();
+  const sel = document.getElementById('ffCat');
+  sel.innerHTML = '<option value="">Все категории</option>' + CATEGORIES.map(c =>
+    `<option value="${c.id}"${state.activeCat === c.id ? ' selected' : ''}>${c.name}</option>`).join('');
+  const block = document.getElementById('ffCatBlock');
+  block.innerHTML = state.activeCat
+    ? `<div class="ff-sep">${catName(state.activeCat)}</div>` + filterHTML(state.activeCat)
+    : `<div class="ff-note">Выберите категорию в поиске или выше — появятся её фильтры (например, для «Авто»: год, пробег, КПП, привод).</div>`;
+  $('#fMin').value = state.filters.min || '';
+  $('#fMax').value = state.filters.max || '';
+  $('#fSort').value = state.filters.sort || 'new';
+  $('#fDate').value = state.filters.dateRange || '';
+  $('#fPhoto').checked = !!state.filters.photo;
+  $('#fPromo').checked = !!state.filters.promo;
+  const cityBody = document.getElementById('cityAccBody');
+  if (cityBody) cityBody.classList.toggle('hidden', !state.cityAcc);
+  const cityArrow = document.getElementById('cityArrow');
+  if (cityArrow) cityArrow.style.transform = state.cityAcc ? 'rotate(180deg)' : '';
+  syncFilterBadge();
+}
+function setGlobal(k, v) {
+  state.filters[k] = v;
+  renderSearch($('#searchInput').value);
+}
+function setF(cat, key, part, val) {
+  state.filters.extra[cat] = state.filters.extra[cat] || {};
+  state.filters.extra[cat][key + (part === 'from' ? 'From' : part === 'to' ? 'To' : '')] = val;
+  renderSearch($('#searchInput').value);
+}
+function setFiltCat(v) {
+  state.activeCat = v || null;
+  state.activeSub = null;
+  goTab('filter', true);
+  renderFilterView();
+}
+function countActiveFilters() {
+  const f = state.filters;
+  let n = 0;
+  if (f.min || f.max) n++;
+  if (f.photo) n++;
+  if (f.promo) n++;
+  if (f.dateRange) n++;
+  if (f.sort && f.sort !== 'new') n++;
+  Object.values(f.extra || {}).forEach(e => { if (e && Object.values(e).some(Boolean)) n++; });
+  if (state.filterCities.all || state.filterCities.cities.length) n++;
+  return n;
+}
+function syncFilterBadge() {
+  const b = document.getElementById('filtBadge');
+  if (!b) return;
+  const n = countActiveFilters();
+  b.style.display = n ? 'flex' : 'none';
+  b.textContent = n;
+}
+function resetFilters() {
+  state.filters = { min: '', max: '', photo: false, promo: false, sort: 'new', dateRange: '', extra: {} };
+  state.filterCities.all = false;
+  state.filterCities.cities = [];
+  saveCityFilters();
+  state.scopeAds = null; state.scopeKey = '';
+  renderFilterView();
+  renderSearch($('#searchInput').value);
+  toast('Фильтры сброшены');
+}
+function hasPromo(a) {
+  const p = a.promo || {};
+  return !!(p.pin || p.boost || p.highlight);
+}
+function onSearch(v) {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => { addHistory(v); searchAds(v); }, 260);
+}
+
+/* ===== Search history ===== */
+function getHistory() {
+  try {
+    const h = JSON.parse(localStorage.getItem('m_searchHistory') || '[]');
+    return Array.isArray(h) ? h.filter(x => typeof x === 'string') : [];
+  } catch (e) { return []; }
+}
+function setHistory(h) {
+  try { localStorage.setItem('m_searchHistory', JSON.stringify(h.slice(0, 10))); } catch (e) {}
+}
+function addHistory(q) {
+  q = (q || '').trim();
+  if (q.length < 2) return;
+  const h = getHistory().filter(x => x !== q);
+  h.unshift(q);
+  setHistory(h);
+}
+function renderSearchHistory() {
+  const el = document.getElementById('searchDropdown');
+  if (!el) return;
+  const h = getHistory();
+  if (!h.length) { el.classList.remove('show'); return; }
+  el.innerHTML = h.map((q, i) => `
+    <div class="sh-item" onclick="pickHistory(${i})">
+      <span class="sh-clock"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+      <span class="sh-txt">${escapeHtml(q)}</span>
+      <button class="sh-del" onclick="event.stopPropagation();removeHistory(${i})">✕</button>
+    </div>`).join('') + '<div class="sh-clear" onclick="clearHistory()">Очистить историю</div>';
+  el.classList.add('show');
+}
+function pickHistory(i) {
+  const h = getHistory();
+  const q = h[i];
+  if (q == null) return;
+  const inp = document.getElementById('searchInput');
+  if (inp) inp.value = q;
+  hideSearchHistory();
+  searchAds(q);
+  addHistory(q);
+}
+function removeHistory(i) {
+  const h = getHistory();
+  if (h[i] == null) return;
+  h.splice(i, 1);
+  setHistory(h);
+  renderSearchHistory();
+}
+function clearHistory() { setHistory([]); renderSearchHistory(); }
+function hideSearchHistory() {
+  const el = document.getElementById('searchDropdown');
+  if (el) el.classList.remove('show');
+}
+let searchPtrGuard = false;
+function scheduleHideSearchPopovers() {
+  setTimeout(() => {
+    if (!searchPtrGuard) { hideSearchHistory(); hideSearchSuggestions(); }
+  }, 200);
+}
+
+/* ===== Brand autocomplete ===== */
+const ALL_BRANDS = [...new Set([...Object.keys(CAR_MODELS), ...Object.keys(MODELS_TECH)])].sort((a, b) => a.localeCompare(b, 'ru'));
+let lastSuggestions = [];
+function renderSearchSuggestions(q) {
+  const el = document.getElementById('searchSuggestions');
+  if (!el) return;
+  q = (q || '').trim().toLowerCase();
+  if (q.length < 2) { el.classList.add('hidden'); el.innerHTML = ''; return; }
+  lastSuggestions = ALL_BRANDS.filter(b => b.toLowerCase().startsWith(q)).slice(0, 5);
+  if (!lastSuggestions.length) { el.classList.add('hidden'); el.innerHTML = ''; return; }
+  el.innerHTML = lastSuggestions.map((b, i) => `<div class="sg-item" onclick="pickSuggestion(${i})">${escapeHtml(b)}</div>`).join('');
+  el.classList.remove('hidden');
+}
+function pickSuggestion(i) {
+  const b = lastSuggestions[i];
+  if (!b) return;
+  const inp = document.getElementById('searchInput');
+  if (inp) inp.value = b;
+  hideSearchSuggestions();
+  searchAds(b);
+}
+function hideSearchSuggestions() {
+  const el = document.getElementById('searchSuggestions');
+  if (el) el.classList.add('hidden');
+}
+const searchDropdownEl = document.getElementById('searchDropdown');
+if (searchDropdownEl) {
+  ['touchstart', 'mousedown'].forEach(ev => searchDropdownEl.addEventListener(ev, () => {
+    searchPtrGuard = true;
+    setTimeout(() => { searchPtrGuard = false; }, 400);
+  }, { passive: true }));
+}
+const searchSuggestionsEl = document.getElementById('searchSuggestions');
+if (searchSuggestionsEl) {
+  ['touchstart', 'mousedown'].forEach(ev => searchSuggestionsEl.addEventListener(ev, () => {
+    searchPtrGuard = true;
+    setTimeout(() => { searchPtrGuard = false; }, 400);
+  }, { passive: true }));
+}
+
+/* ===== Ad templates ===== */
+let lastPostedTpl = null;
+function getTemplates() {
+  try {
+    const t = JSON.parse(localStorage.getItem('m_templates') || '[]');
+    return Array.isArray(t) ? t.slice(0, 3) : [];
+  } catch (e) { return []; }
+}
+function setTemplates(t) {
+  try { localStorage.setItem('m_templates', JSON.stringify(t.slice(0, 3))); } catch (e) {}
+}
+function renderTemplates() {
+  const el = document.getElementById('tplSection');
+  if (!el) return;
+  const t = getTemplates();
+  if (!t.length) { el.innerHTML = ''; el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+  el.innerHTML = '<div class="ff-sep">Шаблоны</div>' + t.map((tmpl, i) => `
+    <div class="tpl-row">
+      <span class="tpl-name" onclick="loadTemplate(${i})">${escapeHtml(tmpl.title || 'Без названия')}</span>
+      <button class="sh-del" onclick="event.stopPropagation();removeTemplate(${i})">✕</button>
+    </div>`).join('');
+}
+function saveAsTemplate() {
+  if (!lastPostedTpl) { toast('Нет данных для шаблона'); return; }
+  const t = getTemplates();
+  if (t.length >= 3) { toast('Максимум 3 шаблона'); return; }
+  t.unshift(lastPostedTpl);
+  setTemplates(t);
+  renderTemplates();
+  toast('Шаблон сохранён');
+}
+function loadTemplate(i) {
+  const t = getTemplates();
+  const tmpl = t[i];
+  if (!tmpl) return;
+  fillCatSelect();
+  $('#f-title').value = tmpl.title || '';
+  $('#f-cat').value = tmpl.category || 'auto';
+  renderExtraFields(tmpl.extra || {});
+  $('#f-price').value = tmpl.price || '';
+  $('#f-desc').value = tmpl.description || '';
+  $('#f-tg').value = tmpl.tg || '';
+  $('#f-phone').value = tmpl.phone || '';
+  toast('Шаблон загружен');
+}
+function removeTemplate(i) {
+  const t = getTemplates();
+  if (t[i] == null) return;
+  t.splice(i, 1);
+  setTemplates(t);
+  renderTemplates();
+}
+
+/* ===== Export favorites ===== */
+function exportFav() {
+  const list = (state.me && state.me.favAds) || [];
+  if (!list.length) { toast('Нет избранных'); return; }
+  const lines = list.map(a => '— ' + a.title + '\nЦена: ' + priceFmt(a.price) + '\nГород: ' + a.city + '\nКатегория: ' + catName(a.category) + '\n');
+  const text = 'Избранные объявления\n====================\n\n' + lines.join('\n');
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const aEl = document.createElement('a');
+  aEl.href = url;
+  aEl.download = 'favorites.txt';
+  document.body.appendChild(aEl);
+  aEl.click();
+  document.body.removeChild(aEl);
+  URL.revokeObjectURL(url);
+  toast('Файл экспортирован');
+}
+
+/* ===== Sanitize invisible unicode ===== */
+function sanitizeInput(text) {
+  return String(text == null ? '' : text)
+    .replace(/[\u200B\u200C\u200D\uFEFF]/g, '')
+    .replace(/[\u00A0\u2007\u202F]/g, ' ')
+    .normalize('NFKC')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+function attachSanitizeHandlers() {
+  const t = document.getElementById('f-title');
+  if (t && !t.dataset.san) {
+    t.dataset.san = '1';
+    t.addEventListener('input', () => { t.value = sanitizeInput(t.value); });
+  }
+  const d = document.getElementById('f-desc');
+  if (d && !d.dataset.san) {
+    d.dataset.san = '1';
+    d.addEventListener('input', () => { d.value = sanitizeInput(d.value); });
+  }
+}
+
+/* ===== Pull-to-refresh ===== */
+let ptrStartY = 0, ptrActive = false, ptrIndicator = null;
+function initPullToRefresh() {
+  const main = document.getElementById('main');
+  if (!main) return;
+  main.addEventListener('touchstart', e => {
+    if (main.scrollTop === 0) { ptrStartY = (e.touches[0] || e).clientY; ptrActive = true; }
+    else ptrActive = false;
+  }, { passive: true });
+  main.addEventListener('touchmove', e => {
+    if (!ptrActive) return;
+    const dy = (e.touches[0] || e).clientY - ptrStartY;
+    if (main.scrollTop === 0 && dy > 30) {
+      if (!ptrIndicator) {
+        ptrIndicator = document.createElement('div');
+        ptrIndicator.className = 'ptr-indicator';
+        const app = document.getElementById('app');
+        (app || document.body).appendChild(ptrIndicator);
+      }
+      ptrIndicator.style.display = 'block';
+      ptrIndicator.style.top = Math.min(30, Math.round(Math.max(0, dy - 30) * 0.35)) + 'px';
+    }
+  }, { passive: true });
+  main.addEventListener('touchend', () => {
+    if (!ptrActive) return;
+    ptrActive = false;
+    if (ptrIndicator && ptrIndicator.style.display !== 'none') {
+      ptrIndicator.style.display = 'none';
+      ptrIndicator.style.top = '-40px';
+      setTimeout(() => loadAds(), 80);
+    }
+  }, { passive: true });
+}
+
+/* ===== Toast with HTML ===== */
+function toastTpl(msg) {
+  const t = $('#toast');
+  t.innerHTML = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+async function toggleFav(id) {
+  const a = state.ads.find(x => x.id === id);
+  tap('impact');
+  try {
+    const { fav } = await api('/api/fav', { method: 'POST', body: { adId: id } });
+    if (a) a.fav = fav;
+    if (state.me) { await loadMe(); }
+    renderHome(); renderSearch($('#searchInput').value); renderFav();
+    toast(fav ? 'Добавлено в избранное' : 'Убрано из избранного');
+    tap(fav ? 'success' : 'impact');
+  } catch (e) { toast(e.message); tap('error'); }
+}
+
+async function openAd(id) {
+  try {
+    const { ad } = await api('/api/ads/' + id);
+    state.backToMine = mineViewActive();
+    state.current = ad;
+    $('#dPrice').textContent = priceFmt(ad.price);
+    $('#dTitle').textContent = ad.title;
+    $('#dMeta').innerHTML = `<span class="chip">${escapeHtml(ad.city)}</span><span class="chip">${catName(ad.category)}</span><span class="chip"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:3px"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>${ad.views || 0}</span>${badgePills(ad)}`;
+    $('#dExtra').innerHTML = extraChipsHTML(ad);
+    $('#dDesc').textContent = ad.description || 'Описание не указано';
+    const gal = $('#dGallery');
+    gal.innerHTML = (ad.images && ad.images.length)
+      ? ad.images.map(s => `<img src="${s}" alt="" />`).join('')
+      : `<div style="margin:auto;color:#3a3a3a"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></div>`;
+    renderGalleryCounter(gal, (ad.images || []).length);
+    $('#dAva').textContent = (ad.seller || '?')[0];
+    $('#dSeller').textContent = ad.seller || 'Пользователь';
+    renderRating(ad);
+    renderReviews(ad);
+    renderSimilar(ad);
+    $('#dTg').style.display = ad.tg ? 'block' : 'none';
+    $('#dPhone').style.display = ad.phone ? 'block' : 'none';
+    if (!ad.tg && !ad.phone) $('#dTg').style.display = 'block';
+    $('#ownerActions').classList.toggle('hidden', !ad.isMine);
+    $('#promoActions').classList.toggle('hidden', !ad.isMine);
+    if (ad.isMine) shopAdId = ad.id;
+    $('#statusBtn').classList.toggle('hidden', !ad.isMine);
+    $('#reportBtn').classList.toggle('hidden', ad.isMine);
+    updateStatusBtn();
+    recordViewed(ad.id);
+    openSheet('detailSheet');
+  } catch (e) { toast(e.message); }
+}
+function contactTg() {
+  const a = state.current; if (!a || !a.tg) return;
+  const uname = a.tg.replace('@', '');
+  if (tg && tg.openTelegramLink) tg.openTelegramLink('https://t.me/' + uname);
+  else window.open('https://t.me/' + uname, '_blank');
+  toast('Открываем чат с продавцом…');
+}
+function contactPhone() {
+  const a = state.current; if (!a || !a.phone) return;
+  if (tg && tg.openLink) tg.openLink('tel:' + a.phone.replace(/\s/g, ''));
+  else window.location.href = 'tel:' + a.phone.replace(/\s/g, '');
+}
+function shareAd() {
+  const a = state.current; if (!a) return;
+  const link = location.origin + location.pathname + '?ad=' + a.id;
+  const text = `${a.title}\n${priceFmt(a.price)} · ${a.city}\n${link}`;
+  if (tg && tg.switchInlineQuery) {
+    try { tg.switchInlineQuery(text, ['users', 'groups', 'channels']); return; } catch (e) {}
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => toast('Ссылка скопирована')).catch(() => toast(link));
+  } else {
+    toast(link);
+  }
+}
+
+function fillCatSelect() {
+  $('#f-cat').innerHTML = CATEGORIES.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+}
+function renderExtraFields(prefill = {}) {
+  const cat = $('#f-cat').value;
+  const fields = CATEGORY_FIELDS[cat] || [];
+  const el = $('#extraFields');
+  if (!fields.length) { el.innerHTML = ''; return; }
+  el.innerHTML = fields.map(f => {
+    const v = prefill && (prefill[f.key] != null && prefill[f.key] !== '') ? prefill[f.key] : '';
+    const req = f.required ? ' (обязательно)' : '';
+    let input;
+    if (f.type === 'select') {
+      const oc = f.onchange ? ` onchange="${f.onchange}"` : '';
+      const opts = f.dynamic ? '' : f.options.map(o => `<option value="${escapeHtml(o)}" ${String(o) === String(v) ? 'selected' : ''}>${escapeHtml(o)}</option>`).join('');
+      input = `<select id="ef-${f.key}"${oc}>${opts}</select>`;
+    } else {
+      const ph = f.placeholder ? ` placeholder="${escapeHtml(f.placeholder)}"` : '';
+      const num = f.type === 'number' ? ' type="number" inputmode="numeric" min="0"' : ' type="text"';
+      input = `<input id="ef-${f.key}"${num}${ph} value="${escapeHtml(v)}" />`;
+    }
+    return `<div class="field"><label>${escapeHtml(f.label)}${req}</label>${input}</div>`;
+  }).join('');
+  if (cat === 'auto') renderCarModel(prefill && prefill.model);
+  if (cat === 'tech') renderElaModel(prefill && prefill.model);
+}
+function renderCarModel(saved, brands) {
+  const brandEl = document.getElementById('ef-brand');
+  const brand = brandEl ? brandEl.value : '';
+  const sel = document.getElementById('ef-model');
+  if (!sel) return;
+  const models = (brand && brand !== 'Другая' && (brands || CAR_MODELS)[brand]) || [];
+  if (brand && brand !== 'Другая' && models.length) {
+    if (sel.tagName.toLowerCase() !== 'select') {
+      sel.outerHTML = '<select id="ef-model"></select>';
+    }
+    const node = document.getElementById('ef-model');
+    node.innerHTML = '<option value="">— выберите модель —</option>' + models.map(o =>
+      `<option value="${escapeHtml(o)}" ${String(o) === String(saved || '') ? 'selected' : ''}>${escapeHtml(o)}</option>`).join('');
+    if (saved) node.value = saved;
+  } else {
+    if (sel.tagName.toLowerCase() === 'select') {
+      sel.outerHTML = `<input id="ef-model" type="text" value="${escapeHtml(saved || '')}" placeholder="Модель" />`;
+    } else if (saved !== undefined) {
+      sel.value = saved || '';
+    }
+  }
+}
+function renderElaModel(saved) {
+  renderCarModel(saved, MODELS_TECH);
+}
+function collectExtra() {
+  const cat = $('#f-cat').value;
+  const fields = CATEGORY_FIELDS[cat] || [];
+  const out = {};
+  fields.forEach(f => {
+    const node = document.getElementById('ef-' + f.key);
+    if (node) out[f.key] = node.value.trim();
+  });
+  return out;
+}
+function validateExtra() {
+  const cat = $('#f-cat').value;
+  const fields = CATEGORY_FIELDS[cat] || [];
+  for (const f of fields) {
+    if (f.required) {
+      const node = document.getElementById('ef-' + f.key);
+      const v = (node ? node.value : '').trim();
+      if (!v) { toast('Заполните поле: ' + f.label); return false; }
+    }
+  }
+  return true;
+}
+function openPlace() {
+  if (state.editing) {
+    const a = state.editing;
+    fillCatSelect();
+    $('#f-title').value = a.title;
+    $('#f-cat').value = a.category;
+    renderExtraFields(a.extra || {});
+    $('#f-price').value = a.price;
+    $('#f-desc').value = a.description || '';
+    $('#f-city').value = a.city;
+    $('#f-tg').value = a.tg || '';
+    $('#f-phone').value = a.phone || '';
+    $('#f-trade').checked = (a.badges || []).includes('trade');
+    $('#f-urgent').checked = (a.badges || []).includes('urgent');
+    state.newImages = a.images ? a.images.slice() : [];
+    renderImgPick();
+    $('#publishBtn').textContent = 'Сохранить изменения';
+    $('#cancelEditBtn').classList.remove('hidden');
+  } else {
+    $('#f-title').value = ''; $('#f-price').value = ''; $('#f-desc').value = '';
+    $('#f-tg').value = ''; $('#f-phone').value = '';
+    $('#f-trade').checked = false; $('#f-urgent').checked = false;
+    fillCatSelect();
+    $('#f-cat').value = 'auto';
+    renderExtraFields();
+    $('#f-city').value = state.city;
+    state.newImages = []; renderImgPick();
+    $('#publishBtn').textContent = 'Опубликовать';
+    $('#cancelEditBtn').classList.add('hidden');
+  }
+  renderTemplates();
+  attachSanitizeHandlers();
+}
+function confirmDialog(msg, cb) {
+  if (tg && tg.showConfirm) tg.showConfirm(msg, cb);
+  else cb(confirm(msg));
+}
+function renderImgPick() {
+  const el = $('#imgPick');
+  const thumbs = state.newImages.map((src, i) => `
+    <div class="img-thumb">
+      <img src="${src}" alt="" />
+      <button class="rm" onclick="removeImg(${i})">×</button>
+    </div>`).join('');
+  const count = state.newImages.length;
+  const add = count >= 20 ? '' : `
+    <label class="img-add">
+      <span>+</span><span class="lbl">Добавить фото</span>
+      <input id="f-images" type="file" accept="image/*" multiple onchange="onPickImages(this)" />
+    </label>`;
+  el.innerHTML = thumbs + add;
+  const cn = $('#imgCount');
+  if (cn) cn.textContent = count ? `(${count}/20)` : (state.editing ? '' : '· обязательно');
+}
+function onPickImages(input) {
+  const files = Array.from(input.files || []);
+  files.forEach(f => {
+    if (state.newImages.length >= 20) return;
+    if (!f.type.startsWith('image/')) return;
+    compressImage(f).then(b => {
+      if (b) { state.newImages.push(b); renderImgPick(); }
+    });
+  });
+  input.value = '';
+}
+function compressImage(file) {
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const MAX = 1400;
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if (!w || !h) return resolve(null);
+      if (w > MAX && w >= h) { h = Math.round(h * MAX / w); w = MAX; }
+      else if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      let q = 0.8;
+      let data = canvas.toDataURL('image/jpeg', q);
+      while (data.length > 900 * 1024 && q > 0.4) { q -= 0.1; data = canvas.toDataURL('image/jpeg', q); }
+      resolve(data);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+function removeImg(i) {
+  state.newImages.splice(i, 1);
+  renderImgPick();
+}
+async function publishAd() {
+  const title = sanitizeInput($('#f-title').value);
+  const price = parseInt($('#f-price').value) || 0;
+  const desc = sanitizeInput($('#f-desc').value);
+  const cat = $('#f-cat').value;
+  const tgU = sanitizeInput($('#f-tg').value);
+  const ph = $('#f-phone').value.trim();
+  const city = $('#f-city').value || state.city;
+  if (!title || !price) { toast('Заполните заголовок и цену'); return; }
+  if (!city) { toast('Сначала выберите город'); openCity(); return; }
+  if (!state.editing && !state.newImages.length) { toast('Добавьте хотя бы одно фото — это обязательно'); return; }
+  if (!validateExtra()) return;
+  const badges = [];
+  if ($('#f-trade').checked) badges.push('trade');
+  if ($('#f-urgent').checked) badges.push('urgent');
+  const body = { title, category: cat, price, description: desc, city, tg: tgU, phone: ph, images: state.newImages, extra: collectExtra(), badges };
+  try {
+    if (state.editing) {
+      await api('/api/ads/' + state.editing.id, { method: 'PUT', body });
+      toast('Объявление обновлено!');
+      state.editing = null;
+    } else {
+      await api('/api/ads', { method: 'POST', body });
+      lastPostedTpl = { title: body.title, category: body.category, price: body.price, description: body.description, tg: body.tg, phone: body.phone, extra: body.extra };
+      toastTpl('Объявление опубликовано! <button class="btn mini" style="margin:0 0 0 10px;display:inline-block;width:auto" onclick="saveAsTemplate()"><svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Сохранить как шаблон</button>');
+    }
+    $('#f-title').value = ''; $('#f-price').value = ''; $('#f-desc').value = ''; $('#f-tg').value = ''; $('#f-phone').value = '';
+    state.newImages = []; renderImgPick();
+    $('#publishBtn').textContent = 'Опубликовать';
+    $('#cancelEditBtn').classList.add('hidden');
+    await loadMe(); await loadAds();
+    if (state.backToMine) { state.backToMine = false; myAds(); }
+    else goTab('home');
+  } catch (e) { toast(e.message); }
+}
+function editAd() {
+  if (!state.current) return;
+  state.backToMine = mineViewActive();
+  state.editing = state.current;
+  closeSheet('detailSheet');
+  goTab('place');
+}
+function deleteAd() {
+  if (!state.current) return;
+  showDeleteConfirm();
+}
+let dnfTimer = null;
+function showDeleteConfirm() {
+  let n = 10;
+  const left = document.getElementById('dnfLeft');
+  const ok = document.getElementById('dnfOk');
+  openSheet('confirmSheet');
+  if (left) left.textContent = n;
+  ok.disabled = true;
+  clearInterval(dnfTimer);
+  dnfTimer = setInterval(() => {
+    n--;
+    if (left) left.textContent = n;
+    if (n <= 0) {
+      clearInterval(dnfTimer); dnfTimer = null;
+      ok.disabled = false;
+    }
+  }, 1000);
+}
+function doDeleteAd() {
+  clearInterval(dnfTimer); dnfTimer = null;
+  closeSheet('confirmSheet');
+  if (!state.current) return;
+  (async () => {
+    try {
+      await api('/api/ads/' + state.current.id, { method: 'DELETE' });
+      toast('Объявление удалено');
+      state.editing = null;
+      closeSheet('detailSheet');
+      await loadMe(); await loadAds();
+      if (state.backToMine) { state.backToMine = false; myAds(); }
+      else goTab('home');
+    } catch (e) { toast(e.message); }
+  })();
+}
+function cancelEdit() {
+  state.editing = null;
+  $('#publishBtn').textContent = 'Опубликовать';
+  $('#cancelEditBtn').classList.add('hidden');
+  $('#f-title').value = ''; $('#f-price').value = ''; $('#f-desc').value = ''; $('#f-tg').value = ''; $('#f-phone').value = '';
+  state.newImages = []; renderImgPick();
+  if (state.backToMine) { state.backToMine = false; goTab('mine'); }
+  else goTab('home');
+}
+function updateStatusBtn() {
+  const a = state.current; if (!a) return;
+  const isExp = a.status === 'expired';
+  $('#statusBtn').textContent = isExp || a.status === 'sold' ? 'Сделать активным' : 'Отметить как продано';
+  $('#statusBtn').classList.toggle('hidden', isExp || !a.isMine);
+  $('#renewBtn').classList.toggle('hidden', !isExp);
+}
+async function renewAd() {
+  const a = state.current; if (!a || a.status !== 'expired') return;
+  try {
+    const r = await api('/api/ads/' + a.id + '/renew', { method: 'POST' });
+    a.status = 'active';
+    a.createdAt = r.ad.createdAt;
+    updateStatusBtn();
+    toast('Объявление продлено на 30 дней');
+    await loadMe(); await loadAds();
+    if (mineViewActive()) myAds();
+  } catch (e) { toast(e.message); }
+}
+async function toggleStatus() {
+  const a = state.current; if (!a) return;
+  const st = a.status === 'sold' ? 'active' : 'sold';
+  try {
+    const r = await api('/api/ads/' + a.id + '/status', { method: 'POST', body: { status: st } });
+    a.status = r.status;
+    updateStatusBtn();
+    toast(r.status === 'sold' ? 'Отмечено как продано' : 'Объявление активно');
+    state.ads = state.ads.map(x => x.id === a.id ? { ...x, status: r.status } : x);
+    renderHome();
+    if (document.getElementById('view-search').classList.contains('hidden') === false) renderSearch($('#searchInput').value);
+    renderFav();
+  } catch (e) { toast(e.message); }
+}
+const REPORT_REASONS = ['Спам', 'Не та категория', 'Запрещённый товар', 'Обман / мошенничество', 'Другое'];
+function openReport() {
+  const a = state.current; if (!a) return;
+  $('#reportOptions').innerHTML = REPORT_REASONS.map(r => `<div class="city-opt" onclick="submitReport('${escapeHtml(r)}')"><span>${r}</span></div>`).join('');
+  openSheet('reportSheet');
+}
+async function submitReport(reason) {
+  const a = state.current; if (!a) return;
+  try {
+    await api('/api/report', { method: 'POST', body: { adId: a.id, reason } });
+    closeSheet('reportSheet');
+    toast('Жалоба отправлена. Спасибо!');
+  } catch (e) { toast(e.message); }
+}
+async function openAdmin() {
+  try {
+    const [rs, ms, us] = await Promise.all([
+      api('/api/admin/reports'),
+      api('/api/admin/moderation'),
+      api('/api/admin/users'),
+    ]);
+    const { reports } = rs;
+    const el = $('#adminList');
+    if (!reports.length) {
+      el.innerHTML = emptyHTML('Жалоб нет');
+    } else {
+      el.innerHTML = reports.map(r => `
+        <div class="ad">
+          <div class="ad-body">
+            <div class="ad-title">${escapeHtml(r.title)}</div>
+            <div class="ad-meta"><span>${escapeHtml(r.city)}</span><span class="dot"></span><span>Причина: ${escapeHtml(r.reason)}</span></div>
+            <div class="contact-btns" style="margin-top:10px">
+              <button class="btn tg" onclick="adminAction(${r.ad_id},'hide')">Скрыть</button>
+              <button class="btn ph" onclick="adminAction(${r.ad_id},'delete')" style="color:#ff5a5a">Удалить</button>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+    const entries = ms.entries || [];
+    const mel = $('#modList');
+    if (!entries.length) {
+      mel.innerHTML = emptyHTML('Отклонённых нет');
+    } else {
+      mel.innerHTML = entries.map(m => `
+        <div class="ad">
+          <div class="ad-body">
+            <div class="ad-title">${escapeHtml(m.title || '(пусто)')}</div>
+            <div class="ad-meta"><span>${escapeHtml(m.category)}</span><span class="dot"></span><span>${escapeHtml(m.reason)}</span></div>
+            <div class="ad-meta" style="margin-top:4px"><span>${escapeHtml(m.user_name || '?')}</span><span class="dot"></span><span>${escapeHtml(m.city || '')}</span><span class="dot"></span><span style="color:var(--red, #ff5a5a)">«${escapeHtml(m.matched || '')}»</span></div>
+          </div>
+        </div>`).join('');
+    }
+    const users = (us && us.users) || [];
+    const ul = $('#userList');
+    ul.innerHTML = users.length ? users.map(u => `
+      <div class="ad${u.banned ? ' banned' : ''}" style="${u.banned ? 'opacity:.6' : ''}">
+        <div class="ad-body">
+          <div class="ad-title">${escapeHtml(u.name)}${u.banned ? ' <span style="color:#ff5a5a"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg> заблокирован</span>' : ''}</div>
+          <div class="ad-meta"><span>@${escapeHtml(u.username || '—')}</span><span class="dot"></span><span>Объявлений: ${u.ads}</span></div>
+          <div class="contact-btns" style="margin-top:10px">
+            ${u.banned
+              ? `<button class="btn tg" onclick="adminUser(${JSON.stringify(u.id)},'unban')">Разблокировать</button>`
+              : `<button class="btn ph" onclick="adminUser(${JSON.stringify(u.id)},'ban')" style="color:#ff5a5a">Заблокировать</button>`}
+          </div>
+        </div>
+      </div>`).join('') : emptyHTML('Пользователей нет');
+    openSheet('adminSheet');
+  } catch (e) { toast(e.message); }
+}
+async function adminUser(id, action) {
+  try {
+    await api('/api/admin/users/' + encodeURIComponent(id) + '/' + action, { method: 'POST' });
+    toast(action === 'ban' ? 'Пользователь заблокирован' : 'Пользователь разблокирован');
+    await openAdmin();
+    await loadAds();
+  } catch (e) { toast(e.message); }
+}
+async function adminAction(id, action) {
+  try {
+    await api('/api/admin/ads/' + id, { method: 'POST', body: { action } });
+    toast(action === 'delete' ? 'Объявление удалено' : 'Объявление скрыто');
+    await openAdmin();
+    await loadAds();
+  } catch (e) { toast(e.message); }
+}
+function renderMine() {
+  const list = (state.me && Array.isArray(state.me.myAds)) ? state.me.myAds : [];
+  const msg = state.me ? (list.length ? '' : 'Пока нет объявлений') : '…';
+  $('#adListMine').innerHTML = list.length ? list.map(a => adHTML(a, { my: true })).join('') : (state.me ? emptyHTML(msg, '📦') : loadingHTML(3));
+}
+async function openMine() {
+  if (!state.me || !Array.isArray(state.me.myAds)) await loadMe();
+  renderMine();
+}
+function openPlaceFromMine() {
+  state.backToMine = true;
+  goTab('place');
+}
+async function myAds() {
+  await loadMe();
+  goTab('mine');
+}
+function showAbout() { toast('КупиПродай — площадка объявлений v1.0'); }
+function showLegal() { window.location.href = '/legal'; }
+
+/* ===== City ===== */
+/* ===== City picker (region -> cities) ===== */
+let cityLevel = 'region';
+let curRegion = null;
+
+function openCity() {
+  cityLevel = 'region';
+  curRegion = null;
+  $('#cityBack').classList.add('hidden');
+  $('#cityTitle').textContent = 'Выберите регион';
+  $('#citySearch').value = '';
+  renderRegions('');
+  openSheet('citySheet');
+}
+function renderRegions(filter) {
+  const f = (filter || '').trim().toLowerCase();
+  if (f) {
+    const hits = [];
+    REGIONS.forEach(r => {
+      if (r.name.toLowerCase().includes(f)) {
+        hits.push({ city: null, region: r });
+      } else {
+        r.cities.forEach(c => {
+          if (c.toLowerCase().includes(f) || (f.length > 1 && c.toLowerCase().replace(/ё/g,'е').includes(f))) {
+            hits.push({ city: c, region: r });
+          }
+        });
+      }
+    });
+    $('#cityOptions').innerHTML = hits.length ? hits.map(x => x.city
+      ? `<div class="city-opt ${x.city === state.city ? 'sel' : ''}" onclick="setCity('${escapeHtml(x.city)}')">
+           <span>${escapeHtml(x.city)}</span>
+           <span style="color:var(--text-mute);font-size:13px">${escapeHtml(x.region.name)}</span>
+         </div>`
+      : `<div class="city-opt" onclick="openRegion('${escapeHtml(x.region.name)}')">
+           <span>${escapeHtml(x.region.name)}</span>
+           <span style="color:var(--text-mute);font-size:13px">${x.region.cities.length} ›</span>
+         </div>`).join('') : emptyHTML('Ничего не найдено');
+    return;
+  }
+  const list = REGIONS;
+  $('#cityOptions').innerHTML = list.map(r => `
+    <div class="city-opt" onclick="openRegion('${escapeHtml(r.name)}')">
+      <span>${escapeHtml(r.name)}</span>
+      <span style="color:var(--text-mute);font-size:13px">${r.cities.length} ›</span>
+    </div>`).join('');
+}
+function openRegion(name) {
+  const r = REGIONS.find(x => x.name === name);
+  if (!r) return;
+  cityLevel = 'cities';
+  curRegion = r;
+  $('#cityBack').classList.remove('hidden');
+  $('#cityTitle').textContent = name;
+  $('#citySearch').value = '';
+  renderCities(r, '');
+}
+function renderCities(r, filter) {
+  const f = (filter || '').trim().toLowerCase();
+  const list = r.cities.filter(c => !f || c.toLowerCase().includes(f));
+  $('#cityOptions').innerHTML = (list.length ? list : []).map(c => `
+    <div class="city-opt ${c === state.city ? 'sel' : ''}" onclick="setCity('${escapeHtml(c)}')">
+      <span>${escapeHtml(c)}</span>
+      ${c === state.city ? '<span style="color:var(--blue)">✓</span>' : ''}
+    </div>`).join('') || emptyHTML('Нет городов');
+}
+function cityBack() {
+  if (cityLevel === 'cities') {
+    cityLevel = 'region';
+    curRegion = null;
+    $('#cityBack').classList.add('hidden');
+    $('#cityTitle').textContent = 'Выберите регион';
+    $('#citySearch').value = '';
+    renderRegions('');
+  }
+}
+function cityFilter(v) {
+  if (cityLevel === 'region') renderRegions(v);
+  else if (curRegion) renderCities(curRegion, v);
+}
+async function setCity(c) {
+  state.city = c;
+  localStorage.setItem('m_city', c);
+  closeSheet('citySheet');
+  state.scopeAds = null; state.scopeKey = '';
+  await loadAds();
+  toast('Город: ' + c);
+}
+
+/* ===== Notifs (demo UI) ===== */
+function openNotifs() {
+  $('#notifList').innerHTML = emptyHTML('Пока нет уведомлений');
+  openSheet('notifSheet');
+}
+
+/* ===== Sheets / Toast ===== */
+function openSheet(id) { document.getElementById(id).classList.add('show'); }
+function closeSheet(id) { document.getElementById(id).classList.remove('show'); }
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ===== Init ===== */
+let obIndex = 0;
+function initOnb() {
+  try { if (localStorage.getItem('m_onboarded')) return false; } catch (e) {}
+  obIndex = 0;
+  const dots = document.getElementById('obDots');
+  if (dots) dots.innerHTML = Array.from({ length: 3 }, (_, i) => `<span class="ob-dot${i === 0 ? ' on' : ''}"></span>`).join('');
+  updateOb();
+  const ob = document.getElementById('onboard');
+  if (ob) ob.classList.remove('hidden');
+  return true;
+}
+function updateOb() {
+  const track = document.getElementById('obTrack');
+  if (track) track.style.transform = `translateX(-${obIndex * 33.3334}%)`;
+  document.querySelectorAll('#obDots .ob-dot').forEach((d, i) => d.classList.toggle('on', i === obIndex));
+  const nxt = document.getElementById('obNext');
+  if (nxt) nxt.textContent = obIndex === 2 ? 'Начать' : 'Далее';
+}
+function nextOnb() {
+  tap();
+  if (obIndex < 2) { obIndex++; updateOb(); }
+  else finishOnb();
+}
+function finishOnb() {
+  try { localStorage.setItem('m_onboarded', '1'); } catch (e) {}
+  const ob = document.getElementById('onboard');
+  if (ob) ob.classList.add('hidden');
+  if (!state.city) {
+    openCity();
+    $('#adListHome').innerHTML = emptyHTML('Выберите город, чтобы увидеть объявления');
+  }
+}
+
+async function init() {
+  applyTheme();
+  initPullToRefresh();
+  attachSanitizeHandlers();
+  const fresh = initOnb();
+  document.querySelectorAll('#revStars span').forEach(s => s.addEventListener('click', () => pickRev(Number(s.dataset.v))));
+  renderCategories('catGrid');
+  fillCatSelect();
+  try {
+    state.me = await api('/api/auth', { method: 'POST', body: {} });
+    if (state.me.debug) console.warn('DEBUG mode: BOT_TOKEN not set on server.');
+  } catch (e) { toast('Ошибка авторизации'); }
+  if (!state.city && !fresh) {
+    openCity();
+    $('#adListHome').innerHTML = emptyHTML('Выберите город, чтобы увидеть объявления');
+  } else if (!state.city) {
+    $('#adListHome').innerHTML = emptyHTML('Выберите город, чтобы увидеть объявления');
+  } else {
+    $('#adListHome').innerHTML = loadingHTML();
+    await loadAds();
+    const deepAd = new URLSearchParams(location.search).get('ad');
+    if (deepAd) openAd(Number(deepAd));
+  }
+  renderProfile();
+}
+init();
+</script>
+</body>
+</html>
