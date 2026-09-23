@@ -95,9 +95,9 @@
   .section-title { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 10px; font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--text-dim); }
   .section-title .more { font-size: 12.5px; text-transform: none; letter-spacing: 0; color: var(--blue); font-weight: 500; cursor: pointer; }
   .section-title.big { text-transform: none; letter-spacing: 0; font-size: 21px; font-weight: 700; color: var(--text); margin: 4px 0 14px; }
-  .categories { display: grid; grid-template-columns: repeat(7, 72px); grid-template-rows: repeat(2, auto); gap: 14px 10px; overflow-x: auto; padding: 2px 2px 10px; margin-bottom: 14px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .categories { display: grid; grid-template-columns: repeat(7, 93px); grid-template-rows: repeat(2, auto); gap: 14px 10px; overflow-x: auto; padding: 2px 2px 10px; margin-bottom: 14px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
   .categories::-webkit-scrollbar { display: none; }
-  .categories .cat { width: 72px; scroll-snap-align: start; }
+  .categories .cat { width: 93px; scroll-snap-align: start; }
   .search-list { display: flex; flex-direction: column; gap: 8px; }
   .search-cat, .search-sub { display: flex; align-items: center; gap: 10px; padding: 12px 13px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; }
   .search-cat:active, .search-sub:active { background: var(--bg-elev); }
@@ -141,7 +141,7 @@
   .f-chip input { accent-color: var(--blue); }
   .btn.mini { padding: 7px 12px; font-size: 12.5px; border-radius: 10px; }
   .cat { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-  .cat .ico { width: 68px; height: 68px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; position: relative; overflow: hidden; transition: transform .15s, box-shadow .15s; }
+  .cat .ico { width: 93px; height: 68px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; position: relative; overflow: hidden; transition: transform .15s, box-shadow .15s; }
   .cat .ico svg { position: relative; z-index: 1; transition: transform .15s; }
   .cat .ico .cat-art-img { width: 54px; height: 54px; object-fit: contain; display: block; position: relative; z-index: 1; transition: transform .15s; user-select: none; -webkit-user-drag: none; }
   .sc-ico .cat-art-img { width: 30px; height: 30px; object-fit: contain; display: block; }
@@ -829,6 +829,7 @@
     <div class="sheet sheet-map">
       <div class="grab"></div>
       <div class="map-head">
+        <button class="back-mini" onclick="closeSheet('mapSheet')" aria-label="Назад">‹</button>
         <h2>Объявления рядом</h2>
         <span class="map-status" id="mapStatus">Требуется геолокация</span>
       </div>
